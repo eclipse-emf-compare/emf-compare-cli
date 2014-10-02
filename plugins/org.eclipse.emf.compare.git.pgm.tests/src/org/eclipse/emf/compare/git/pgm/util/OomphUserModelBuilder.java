@@ -20,12 +20,9 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.eclipse.oomph.p2.P2Factory;
 import org.eclipse.oomph.resources.ResourcesFactory;
 import org.eclipse.oomph.resources.SourceLocator;
-import org.eclipse.oomph.setup.Index;
-import org.eclipse.oomph.setup.InstallationTask;
 import org.eclipse.oomph.setup.Project;
-import org.eclipse.oomph.setup.ProjectCatalog;
 import org.eclipse.oomph.setup.SetupFactory;
-import org.eclipse.oomph.setup.WorkspaceTask;
+import org.eclipse.oomph.setup.VariableTask;
 import org.eclipse.oomph.setup.p2.P2Task;
 import org.eclipse.oomph.setup.p2.SetupP2Factory;
 import org.eclipse.oomph.setup.projects.ProjectsFactory;
@@ -36,7 +33,7 @@ import org.eclipse.oomph.setup.projects.ProjectsImportTask;
  */
 public class OomphUserModelBuilder {
 
-	private String installationTaskLocation;
+	private String installationLocation;
 
 	private String workspaceLocation;
 
@@ -46,8 +43,8 @@ public class OomphUserModelBuilder {
 
 	private String[] repositories;
 
-	public OomphUserModelBuilder setInstallationTaskLocation(String installationTaskLocation) {
-		this.installationTaskLocation = installationTaskLocation;
+	public OomphUserModelBuilder setInstallationLocation(String installationTaskLocation) {
+		this.installationLocation = installationTaskLocation;
 		return this;
 	}
 
@@ -94,28 +91,24 @@ public class OomphUserModelBuilder {
 
 	public File saveTo(String setupFilePath) throws IOException {
 		Resource newResource = new XMIResourceImpl();
-		Index index = SetupFactory.eINSTANCE.createIndex();
-		newResource.getContents().add(index);
+		Project project = SetupFactory.eINSTANCE.createProject();
+		newResource.getContents().add(project);
 
-		ProjectCatalog projectCatalog = SetupFactory.eINSTANCE.createProjectCatalog();
-		index.getProjectCatalogs().add(projectCatalog);
-		if (installationTaskLocation != null) {
-			InstallationTask installationTask = SetupFactory.eINSTANCE.createInstallationTask();
-			projectCatalog.getSetupTasks().add(installationTask);
-			installationTask.setLocation(installationTaskLocation);
+		if (installationLocation != null) {
+			VariableTask installationVariableTask = SetupFactory.eINSTANCE.createVariableTask();
+			installationVariableTask.setName("installation.location"); //$NON-NLS-1$
+			installationVariableTask.setValue(installationLocation);
 		}
 
 		if (workspaceLocation != null) {
-			WorkspaceTask workspaceTask = SetupFactory.eINSTANCE.createWorkspaceTask();
-			workspaceTask.setLocation(workspaceLocation);
-			projectCatalog.getSetupTasks().add(workspaceTask);
+			VariableTask workspaceVariableTask = SetupFactory.eINSTANCE.createVariableTask();
+			workspaceVariableTask.setName("workspace.location"); //$NON-NLS-1$
+			workspaceVariableTask.setValue(workspaceLocation);
 		}
 
 		Stream.of(getProjectPaths()).distinct().forEach(projectPath -> {
-			Project p = SetupFactory.eINSTANCE.createProject();
-			projectCatalog.getProjects().add(p);
 			ProjectsImportTask importTask = ProjectsFactory.eINSTANCE.createProjectsImportTask();
-			p.getSetupTasks().add(importTask);
+			project.getSetupTasks().add(importTask);
 			SourceLocator sourceLocator = ResourcesFactory.eINSTANCE.createSourceLocator();
 			importTask.getSourceLocators().add(sourceLocator);
 			sourceLocator.setRootFolder(projectPath);
@@ -123,7 +116,7 @@ public class OomphUserModelBuilder {
 
 		if (getRepositories().length > 0 || getRequirements().length > 0) {
 			P2Task p2Task = SetupP2Factory.eINSTANCE.createP2Task();
-			projectCatalog.getSetupTasks().add(p2Task);
+			project.getSetupTasks().add(p2Task);
 			Stream.of(getRequirements()).distinct().forEach(
 					req -> p2Task.getRequirements().add(P2Factory.eINSTANCE.createRequirement(req)));
 			Stream.of(getRepositories()).distinct().forEach(

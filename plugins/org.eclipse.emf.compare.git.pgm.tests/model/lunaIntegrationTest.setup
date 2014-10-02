@@ -18,7 +18,7 @@
           name="org.eclipse.emf.sdk.feature.group"/>
       <requirement
           name="org.eclipse.egit"/>
-      <requirementfile
+      <requirement
           name="org.eclipse.egit.core"/>
       <requirement
           name="org.eclipse.pde.api.tools.ee.feature.feature.group"/>
@@ -48,10 +48,10 @@
           name="org.eclipse.emf.compare.git.pgm.feature.feature.group"/>
       <repository
           url="http://download.eclipse.org/releases/luna/201406250900"/>
-       <repository
+      <repository
           url="http://ericssonegit.ci.obeo.fr:8180/jenkins/job/egit-logical/lastSuccessfulBuild/artifact/org.eclipse.egit.repository/target/repository/"/>
       <repository
-          url="${emfcompare-git-pgm--updasite}"/>
+          url="${emfcompare-git-pgm--updatesite}"/>
       <repository
           url="http://download.eclipse.org/modeling/emf/emf/updates/2.10/core/R201405190339"/>
       <repository
@@ -61,6 +61,10 @@
       <repository
           url="http://download.eclipse.org/tools/orbit/downloads/drops/R20140525021250/repository/"/>
     </setupTask>
+    <setupTask
+        xsi:type="setup:InstallationTask"/>
+    <setupTask
+        xsi:type="setup:WorkspaceTask"/>
     <product
         name="epp.package.standard"
         label="Eclipse Standard/SDK">

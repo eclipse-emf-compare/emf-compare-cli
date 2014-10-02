@@ -57,7 +57,7 @@ public class LogicalMergeToolArgumentsCommandTest extends AbstractLogicalCommand
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 

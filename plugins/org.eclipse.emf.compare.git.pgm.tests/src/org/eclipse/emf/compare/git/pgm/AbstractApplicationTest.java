@@ -51,7 +51,6 @@ import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 
@@ -85,31 +84,6 @@ public abstract class AbstractApplicationTest {
 
 	private PrintStream syserr;
 
-	/**
-	 * Internal data structure.
-	 * 
-	 * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
-	 */
-	protected static class CommittedFile {
-		private final File file;
-
-		private final RevCommit rev;
-
-		public CommittedFile(File file, RevCommit rev) {
-			super();
-			this.file = file;
-			this.rev = rev;
-		}
-
-		public File getFile() {
-			return file;
-		}
-
-		public RevCommit getRev() {
-			return rev;
-		}
-	}
-
 	@Before
 	public void before() throws Exception {
 		// Creates a local git repository for test purpose
@@ -134,14 +108,6 @@ public abstract class AbstractApplicationTest {
 
 	}
 
-	protected File getWorkspaceLocation() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		return root.getLocation().toFile();
-	}
-
-	protected abstract IApplication buildApp();
-
 	@After
 	public void tearDown() throws Exception {
 		// repository.dispose();
@@ -149,10 +115,7 @@ public abstract class AbstractApplicationTest {
 		// Restores system properties
 		setCmdLocation(userDir);
 
-		File tmpFolder = testTmpFolder.toFile();
-		if (tmpFolder.exists()) {
-			FileUtils.delete(tmpFolder, FileUtils.RECURSIVE | FileUtils.RETRY);
-		}
+		deleteRecursively(testTmpFolder.toFile());
 
 		System.setOut(sysout);
 		outputStream.close();
@@ -160,6 +123,51 @@ public abstract class AbstractApplicationTest {
 		System.setErr(syserr);
 		errStream.close();
 
+	}
+
+	public MockedApplicationContext getContext() {
+		return context;
+	}
+
+	public void setContext(MockedApplicationContext context) {
+		this.context = context;
+	}
+
+	public Path getRepositoryPath() {
+		return repositoryPath;
+	}
+
+	public void setRepositoryPath(Path repositoryPath) {
+		this.repositoryPath = repositoryPath;
+	}
+
+	public File getGitFolderPath() {
+		return gitFolderPath;
+	}
+
+	public void setGitFolderPath(File gitFolderPath) {
+		this.gitFolderPath = gitFolderPath;
+	}
+
+	public void deleteRecursively(File f) {
+		if (!f.exists()) {
+			return;
+		}
+
+		if (f.isDirectory()) {
+			for (File content : f.listFiles()) {
+				deleteRecursively(content);
+			}
+		}
+		f.delete();
+	}
+
+	protected abstract IApplication buildApp();
+
+	protected File getWorkspaceLocation() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		return root.getLocation().toFile();
 	}
 
 	protected void setCmdLocation(String path) {
@@ -266,28 +274,28 @@ public abstract class AbstractApplicationTest {
 		return builder.toString();
 	}
 
-	public MockedApplicationContext getContext() {
-		return context;
-	}
+	/**
+	 * Internal data structure.
+	 * 
+	 * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
+	 */
+	protected static class CommittedFile {
+		private final File file;
 
-	public void setContext(MockedApplicationContext context) {
-		this.context = context;
-	}
+		private final RevCommit rev;
 
-	public Path getRepositoryPath() {
-		return repositoryPath;
-	}
+		public CommittedFile(File file, RevCommit rev) {
+			super();
+			this.file = file;
+			this.rev = rev;
+		}
 
-	public void setRepositoryPath(Path repositoryPath) {
-		this.repositoryPath = repositoryPath;
-	}
+		public File getFile() {
+			return file;
+		}
 
-	public File getGitFolderPath() {
-		return gitFolderPath;
+		public RevCommit getRev() {
+			return rev;
+		}
 	}
-
-	public void setGitFolderPath(File gitFolderPath) {
-		this.gitFolderPath = gitFolderPath;
-	}
-
 }

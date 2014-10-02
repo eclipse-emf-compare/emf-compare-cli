@@ -185,7 +185,7 @@ public class LogicalMergeApplicationTest extends AbstractApplicationTest {
 	private File createPapyrusUserOomphModel(Path setupFilePath, File... project) throws IOException {
 		OomphUserModelBuilder userModelBuilder = new OomphUserModelBuilder();
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
-		File userSetupFile = userModelBuilder.setInstallationTaskLocation(oomphFolderPath.toString()) //
+		File userSetupFile = userModelBuilder.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(getWorkspaceLocation().getAbsolutePath()) //
 				.setProjectPaths(Arrays.stream(project).map(p -> p.getAbsolutePath()).toArray(String[]::new)) //
 				.setRepositories("http://download.eclipse.org/releases/luna/201406250900",

@@ -81,10 +81,16 @@ public class LogicalApp implements IApplication {
 
 	private final URI environmentSetupURI;
 
+	/**
+	 * Default constructor.
+	 */
 	public LogicalApp() {
 		this(URI.createPlatformPluginURI("/org.eclipse.emf.compare.git.pgm/model/luna.setup", true)); //$NON-NLS-1$
 	}
 
+	/**
+	 * Constructor used for tests.
+	 */
 	public LogicalApp(URI environmentURI) {
 		environmentSetupURI = environmentURI;
 
@@ -97,7 +103,7 @@ public class LogicalApp implements IApplication {
 	 */
 	public Object start(IApplicationContext context) throws Exception {
 		// Prevents vm args if the application exits on something different that 0
-		System.setProperty(IApplicationContext.EXIT_DATA_PROPERTY, "");
+		System.setProperty(IApplicationContext.EXIT_DATA_PROPERTY, ""); //$NON-NLS-1$
 		@SuppressWarnings("rawtypes")
 		final Map args = context.getArguments();
 		String[] appArg = (String[])args.get("application.args"); //$NON-NLS-1$
@@ -118,11 +124,19 @@ public class LogicalApp implements IApplication {
 		}
 
 		if (System.out.checkError() || System.err.checkError()) {
-			// TODO improve this
 			System.out.println("Unknown error");
 			returnCode = ERROR;
 		}
 		return returnCode;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.eclipse.equinox.app.IApplication#stop()
+	 */
+	public void stop() {
+		// nothing to do
 	}
 
 	/**
@@ -202,14 +216,4 @@ public class LogicalApp implements IApplication {
 	AbstractLogicalCommand getLogicalCommand() {
 		return logicalCommand;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see org.eclipse.equinox.app.IApplication#stop()
-	 */
-	public void stop() {
-		// nothing to do
-	}
-
 }

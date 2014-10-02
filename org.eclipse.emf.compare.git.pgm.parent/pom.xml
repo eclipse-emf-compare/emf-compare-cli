@@ -15,7 +15,6 @@
 	</properties>
 	<modules>
 		<module>../plugins/org.eclipse.emf.compare.git.pgm</module>
-		<module>../plugins/org.eclipse.emf.compare.git.pgm.tests</module>
 		<module>../packaging/org.eclipse.emf.compare.git.pgm.product</module>
 		<module>../packaging/org.eclipse.emf.compare.git.pgm.feature</module>
 		<module>../packaging/org.eclipse.emf.compare.git.pgm.update</module>

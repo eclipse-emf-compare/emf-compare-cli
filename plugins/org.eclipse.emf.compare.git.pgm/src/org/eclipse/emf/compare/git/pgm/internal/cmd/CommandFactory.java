@@ -50,10 +50,20 @@ public final class CommandFactory {
 		private static final CommandFactory INSTANCE = new CommandFactory();
 	}
 
+	/**
+	 * Get the CommandFactory instance.
+	 * 
+	 * @return the CommandFactory instance.
+	 */
 	public static CommandFactory getInstance() {
 		return SingletonHolder.INSTANCE;
 	}
 
+	/**
+	 * Returns the list of arguments.
+	 * 
+	 * @return the list of arguments.
+	 */
 	public Collection<String> getAvailableCmd() {
 		return cmds.keySet();
 	}

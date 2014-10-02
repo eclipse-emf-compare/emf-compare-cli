@@ -86,7 +86,7 @@ public abstract class AbstractLogicalCommandTest extends AbstractLogicalAppTest 
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -115,7 +115,7 @@ public abstract class AbstractLogicalCommandTest extends AbstractLogicalAppTest 
 		setCmdLocation(getRepositoryPath().toString());
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 

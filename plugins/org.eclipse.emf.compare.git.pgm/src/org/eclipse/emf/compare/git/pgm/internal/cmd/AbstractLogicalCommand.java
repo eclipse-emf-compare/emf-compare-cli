@@ -63,11 +63,10 @@ import org.eclipse.oomph.setup.Product;
 import org.eclipse.oomph.setup.ProductCatalog;
 import org.eclipse.oomph.setup.ProductVersion;
 import org.eclipse.oomph.setup.Project;
-import org.eclipse.oomph.setup.ProjectCatalog;
-import org.eclipse.oomph.setup.SetupFactory;
 import org.eclipse.oomph.setup.SetupPackage;
 import org.eclipse.oomph.setup.SetupTask;
 import org.eclipse.oomph.setup.Trigger;
+import org.eclipse.oomph.setup.VariableTask;
 import org.eclipse.oomph.setup.WorkspaceTask;
 import org.eclipse.oomph.setup.internal.core.SetupContext;
 import org.eclipse.oomph.setup.internal.core.SetupTaskPerformer;
@@ -144,6 +143,9 @@ public abstract class AbstractLogicalCommand {
 	 */
 	private SetupTaskPerformer performer;
 
+	/**
+	 * Log.
+	 */
 	private ProgressLog progressPageLog;
 
 	/**
@@ -151,16 +153,6 @@ public abstract class AbstractLogicalCommand {
 	 */
 	protected AbstractLogicalCommand() {
 		// Force the command to be built in the CommandFactory.
-	}
-
-	/**
-	 * Sets the command name.
-	 * 
-	 * @param name
-	 *            the command name.
-	 */
-	final void setCommandName(final String name) {
-		commandName = name;
 	}
 
 	/**
@@ -180,6 +172,96 @@ public abstract class AbstractLogicalCommand {
 		}
 		return Returns.COMPLETE.code();
 	}
+
+	/**
+	 * Builds this command.
+	 * 
+	 * @param args
+	 *            The arguments for this command.
+	 * @param environmentSetupURI
+	 *            URI to the environment setup file.
+	 * @throws Die
+	 *             exception on error.
+	 * @throws IOException
+	 */
+	public void build(Collection<String> args, URI environmentSetupURI) throws Die, IOException {
+
+		repo = parseArgumentsAndBuildRepo(args);
+
+		try {
+			final String outputEncoding;
+			if (repo != null) {
+				outputEncoding = repo.getConfig().getString("i18n", null, "logOutputEncoding"); //$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				outputEncoding = null;
+			}
+			BufferedWriter outbufw;
+			if (outputEncoding != null) {
+				outbufw = new BufferedWriter(new OutputStreamWriter(System.out, outputEncoding));
+			} else {
+				outbufw = new BufferedWriter(new OutputStreamWriter(System.out));
+			}
+			out = new ThrowingPrintWriter(outbufw);
+		} catch (IOException e) {
+			throw new DiesOn(SOFTWARE_ERROR).displaying("Cannot create input stream").ready();
+		}
+
+		if (!help) {
+			try {
+				// Loads eclipse environment setup model.
+				performer = createSetupTaskPerformer(setupFile.getAbsolutePath(), environmentSetupURI);
+				performer.perform();
+
+				if (!performer.hasSuccessfullyPerformed()) {
+					throw new DiesOn(DeathType.FATAL).displaying("Error durring Oomph operation").ready();
+				}
+			} catch (Die e) {
+				throw e;
+			} catch (Exception e) {
+				throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
+			}
+		}
+
+	}
+
+	/**
+	 * Returns the value of the show-stack-trace argument.
+	 * 
+	 * @return the value of the show-stack-trace argument.
+	 */
+	public boolean isShowStackTrace() {
+		return showStackTrace;
+	}
+
+	/**
+	 * Returns the user setup file associated with this command.
+	 * 
+	 * @return the user setup file associated with this command.
+	 */
+	public File getSetupFile() {
+		return setupFile;
+	}
+
+	/**
+	 * Flush the out stream. This is mainly use to handle premature exit.
+	 * 
+	 * @throws IOException
+	 *             if any problem with the stream.
+	 */
+	public void flushOutW() throws IOException {
+		if (out != null) {
+			out.flush();
+		}
+	}
+
+	/**
+	 * Runs the command.
+	 * 
+	 * @return Return code.
+	 * @throws Exception
+	 *             exception on error.
+	 */
+	protected abstract Integer internalRun() throws Die, IOException;
 
 	/**
 	 * Gets the git repository.
@@ -281,67 +363,13 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * Runs the command.
+	 * Sets the command name.
 	 * 
-	 * @return Return code.
-	 * @throws Exception
-	 *             exception on error.
+	 * @param name
+	 *            the command name.
 	 */
-	protected abstract Integer internalRun() throws Die, IOException;
-
-	public boolean isShowStackTrace() {
-		return showStackTrace;
-	}
-
-	/**
-	 * Builds this command.
-	 * 
-	 * @param args
-	 *            The arguments for this command.
-	 * @param environmentSetupURI
-	 *            URI to the environment setup file.
-	 * @throws Die
-	 *             exception on error.
-	 * @throws IOException
-	 */
-	public void build(Collection<String> args, URI environmentSetupURI) throws Die, IOException {
-
-		repo = parseArgumentsAndBuildRepo(args);
-
-		try {
-			final String outputEncoding;
-			if (repo != null) {
-				outputEncoding = repo.getConfig().getString("i18n", null, "logOutputEncoding"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
-				outputEncoding = null;
-			}
-			BufferedWriter outbufw;
-			if (outputEncoding != null) {
-				outbufw = new BufferedWriter(new OutputStreamWriter(System.out, outputEncoding));
-			} else {
-				outbufw = new BufferedWriter(new OutputStreamWriter(System.out));
-			}
-			out = new ThrowingPrintWriter(outbufw);
-		} catch (IOException e) {
-			throw new DiesOn(SOFTWARE_ERROR).displaying("Cannot create input stream").ready();
-		}
-
-		if (!help) {
-			try {
-				// Loads eclipse environment setup model.
-				performer = createSetupTaskPerformer(setupFile.getAbsolutePath(), environmentSetupURI);
-				performer.perform();
-
-				if (!performer.hasSuccessfullyPerformed()) {
-					throw new DiesOn(DeathType.FATAL).displaying("Error durring Oomph operation").ready();
-				}
-			} catch (Die e) {
-				throw e;
-			} catch (Exception e) {
-				throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-			}
-		}
-
+	final void setCommandName(final String name) {
+		commandName = name;
 	}
 
 	/**
@@ -378,27 +406,14 @@ public abstract class AbstractLogicalCommand {
 			throw new DiesOn(FATAL).displaying(userSetupFilePath + " is not a valid setup file").ready();
 		}
 
-		Index startupSetupIndex = (Index)EcoreUtil.getObjectByType(startupSetup.getContents(),
-				SetupPackage.Literals.INDEX);
-
-		if (startupSetupIndex == null) {
-			throw new DiesOn(SOFTWARE_ERROR).displaying("The index of of the setup file should not be null")
-					.ready();
-		}
-
-		// Check workspace path and content.
-		if (!modelDefinesWorkspacePath(startupSetupIndex)) {
-			// Use default workspace.
-			useDefaultWorkspace(startupSetupIndex);
-		}
-
-		final String installationPath;
-		// Check installation path and content.
-		if (modelDefinesInstallationPath(startupSetupIndex)) {
-			installationPath = getInstallationPath(startupSetupIndex);
+		Object startupSetupRoot = EcoreUtil.getObjectByType(startupSetup.getContents(),
+				SetupPackage.Literals.PROJECT);
+		final Project startupSetupProject;
+		if (startupSetupRoot instanceof Project) {
+			startupSetupProject = (Project)startupSetupRoot;
 		} else {
-			// Use default installation.
-			installationPath = useDefaultInstallation(startupSetupIndex);
+			throw new DiesOn(SOFTWARE_ERROR).displaying(
+					"The root of the setup file should be a Setup::PROJECT").ready();
 		}
 
 		progressPageLog = new ProgressPageLog(System.out);
@@ -407,31 +422,25 @@ public abstract class AbstractLogicalCommand {
 		Index eclipseSetupIndex = (Index)EcoreUtil.getObjectByType(environmentSetup.getContents(),
 				SetupPackage.Literals.INDEX);
 
+		handleWorkspace(startupSetupProject, eclipseSetupIndex);
+		handleInstallation(startupSetupProject, eclipseSetupIndex);
+
 		EList<ProductCatalog> productCatalogs = eclipseSetupIndex.getProductCatalogs();
 		ProductCatalog catalog = productCatalogs.get(0);
 		Product product = catalog.getProducts().get(0);
 		ProductVersion productVersion = product.getVersions().get(0);
 
 		// Add extra plugins to install from user setup model.
-		for (ProjectCatalog projectCatalog : startupSetupIndex.getProjectCatalogs()) {
-			for (SetupTask setupTask : projectCatalog.getSetupTasks()) {
-				if (setupTask instanceof P2Task) {
-					SetupTask copy = EcoreUtil.copy(setupTask);
-					catalog.getSetupTasks().add(copy);
-				}
-			}
-			for (Project project : projectCatalog.getProjects()) {
-				for (SetupTask setupTask : project.getSetupTasks()) {
-					if (setupTask instanceof P2Task) {
-						SetupTask copy = EcoreUtil.copy(setupTask);
-						catalog.getSetupTasks().add(copy);
-					}
-				}
+		for (SetupTask setupTask : startupSetupProject.getSetupTasks()) {
+			if (setupTask instanceof P2Task) {
+				SetupTask copy = EcoreUtil.copy(setupTask);
+				catalog.getSetupTasks().add(copy);
 			}
 		}
 
 		// Create Oomph setup context.
-		final SetupContext setupContext = SetupContext.create(rs, productVersion);
+		final SetupContext setupContext = SetupContext.create(rs);
+		setupContext.getInstallation().setProductVersion(productVersion);
 		Trigger triggerBootstrap = Trigger.BOOTSTRAP;
 		URIConverter uriConverter = rs.getURIConverter();
 		SetupTaskPerformer aPerformer;
@@ -439,7 +448,8 @@ public abstract class AbstractLogicalCommand {
 			aPerformer = SetupTaskPerformer.create(uriConverter, SetupPrompter.CANCEL, triggerBootstrap,
 					setupContext, false);
 		} catch (Exception e) {
-			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying("Invalid setup model").ready();
+			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying("Error during processing of setup mdoel")
+					.ready();
 		}
 		Confirmer confirmer = Confirmer.ACCEPT;
 		aPerformer.put(ILicense.class, confirmer);
@@ -448,78 +458,13 @@ public abstract class AbstractLogicalCommand {
 		aPerformer.setOffline(false);
 		aPerformer.setMirrors(true);
 
+		final String installationPath = getInstallationPath(startupSetupProject);
 		if (installationPathContainsExistingEclipse(installationPath)) {
 			aPerformer.getTriggeredSetupTasks().clear();
 			progressPageLog.log("Existing eclipse environment found at : " + installationPath); //$NON-NLS-1$
 		}
 
-		// Add installation task and workspace task from user setup model.
-		SetupTask installationTask = EcoreUtil.copy(getInstallationTask(startupSetupIndex));
-		aPerformer.getTriggeredSetupTasks().add(installationTask);
-		SetupTask workspaceTask = EcoreUtil.copy(getWorkspaceTask(startupSetupIndex));
-		aPerformer.getTriggeredSetupTasks().add(workspaceTask);
-
 		return aPerformer;
-	}
-
-	/**
-	 * Check if the given Index defines an installation task with a non null location.
-	 * 
-	 * @param index
-	 *            the given Index.
-	 * @return true if the given Index defines an installation task with a non null location, false otherwise.
-	 */
-	private boolean modelDefinesInstallationPath(Index index) {
-		String installationPath = getInstallationPath(index);
-		if (installationPath != null) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Search an installation task in the given Index.
-	 * 
-	 * @param index
-	 *            the given Index.
-	 * @return the installation task if found, null otherwise.
-	 */
-	private InstallationTask getInstallationTask(Index index) {
-		for (ProjectCatalog projectCatalog : index.getProjectCatalogs()) {
-			for (SetupTask setupTask : projectCatalog.getSetupTasks()) {
-				if (setupTask instanceof InstallationTask) {
-					return ((InstallationTask)setupTask);
-				}
-			}
-		}
-		for (ProductCatalog productCatalog : index.getProductCatalogs()) {
-			for (SetupTask setupTask : productCatalog.getSetupTasks()) {
-				if (setupTask instanceof InstallationTask) {
-					return ((InstallationTask)setupTask);
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Search an installation task in the given Index. If found, return his location attribute value.
-	 * 
-	 * @param index
-	 *            the given Index.
-	 * @return the location attribute value of the installation task if found, null otherwise.
-	 */
-	private String getInstallationPath(Index index) {
-		final String path;
-		final InstallationTask task = getInstallationTask(index);
-		if (task != null) {
-			String resourcePath = index.eResource().getURI().toFileString();
-			String resourceBasePath = resourcePath.substring(0, resourcePath.lastIndexOf(SEP));
-			path = toFileWithAbsolutePath(resourceBasePath, task.getLocation()).toString();
-		} else {
-			path = null;
-		}
-		return path;
 	}
 
 	/**
@@ -557,16 +502,71 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * Returns true if the given Index (setup model root element) contains a workspace task with a non null
-	 * workspace location.
+	 * Handle the creation/reuse of the workspace path.
+	 * 
+	 * @param project
+	 *            the root object of the user model.
+	 * @param index
+	 *            the root object of the environment model.
+	 * @throws IOException
+	 * @throws Die
+	 */
+	private void handleWorkspace(Project project, Index index) throws IOException, Die {
+		final String workspaceLocation;
+		if (modelDefinesWorkspacePath(project)) {
+			workspaceLocation = getWorkspacePath(project);
+		} else {
+			workspaceLocation = genWorkspacePath(project);
+		}
+
+		for (ProductCatalog productCatalog : index.getProductCatalogs()) {
+			for (SetupTask setupTask : productCatalog.getSetupTasks()) {
+				if (setupTask instanceof WorkspaceTask) {
+					((WorkspaceTask)setupTask).setLocation(workspaceLocation);
+					return;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Handle the creation/reuse of the installation path.
+	 * 
+	 * @param project
+	 *            the root object of the user model.
+	 * @param index
+	 *            the root object of the environment model.
+	 * @throws IOException
+	 * @throws Die
+	 */
+	private void handleInstallation(Project project, Index index) throws IOException, Die {
+		final String installationLocation;
+		if (modelDefinesWorkspacePath(project)) {
+			installationLocation = getInstallationPath(project);
+		} else {
+			installationLocation = genInstallationPath(project);
+		}
+
+		for (ProductCatalog productCatalog : index.getProductCatalogs()) {
+			for (SetupTask setupTask : productCatalog.getSetupTasks()) {
+				if (setupTask instanceof InstallationTask) {
+					((InstallationTask)setupTask).setLocation(installationLocation);
+					return;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns true if the given Project contains a variable task with a non null workspace location.
 	 * 
 	 * @param index
-	 *            the given Index (setup model root element)
-	 * @return true if the given Index(setup model root element) contains a workspace task with a non null
-	 *         workspace location, false otherwise.
+	 *            the given Project.
+	 * @return true if the given Project contains a variable task with a non null workspace location, false
+	 *         otherwise.
 	 */
-	private boolean modelDefinesWorkspacePath(Index index) {
-		String workspacePath = getWorkspacePath(index);
+	private boolean modelDefinesWorkspacePath(Project project) {
+		String workspacePath = getWorkspacePath(project);
 		if (workspacePath != null) {
 			return true;
 		}
@@ -574,24 +574,17 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * Search a workspace task in the given Index.
+	 * Search a variable task with name "workspace.location" in the given Project.
 	 * 
-	 * @param index
-	 *            the given Index.
-	 * @return the workspace task if found, null otherwise.
+	 * @param project
+	 *            the given Project.
+	 * @return the variable task if found, null otherwise.
 	 */
-	private WorkspaceTask getWorkspaceTask(Index index) {
-		for (ProjectCatalog projectCatalog : index.getProjectCatalogs()) {
-			for (SetupTask setupTask : projectCatalog.getSetupTasks()) {
-				if (setupTask instanceof WorkspaceTask) {
-					return ((WorkspaceTask)setupTask);
-				}
-			}
-		}
-		for (ProductCatalog productCatalog : index.getProductCatalogs()) {
-			for (SetupTask setupTask : productCatalog.getSetupTasks()) {
-				if (setupTask instanceof WorkspaceTask) {
-					return ((WorkspaceTask)setupTask);
+	private VariableTask getVariableTaskForWorkspace(Project project) {
+		for (SetupTask setupTask : project.getSetupTasks()) {
+			if (setupTask instanceof VariableTask) {
+				if ("workspace.location".equals(((VariableTask)setupTask).getName())) { //$NON-NLS-1$
+					return (VariableTask)setupTask;
 				}
 			}
 		}
@@ -599,19 +592,37 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * Search a workspace task in the given Index. If found, return his location attribute value.
+	 * Search a variable task with name "installation.location" in the given Project.
 	 * 
-	 * @param index
-	 *            the given Index.
+	 * @param project
+	 *            the given Project.
+	 * @return the variable task if found, null otherwise.
+	 */
+	private VariableTask getVariableTaskForInstallation(Project project) {
+		for (SetupTask setupTask : project.getSetupTasks()) {
+			if (setupTask instanceof VariableTask) {
+				if ("installation.location".equals(((VariableTask)setupTask).getName())) { //$NON-NLS-1$
+					return (VariableTask)setupTask;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Search a workspace task in the given Project. If found, return his location attribute value.
+	 * 
+	 * @param project
+	 *            the given Project.
 	 * @return the location attribute value of the workspace task if found, null otherwise.
 	 */
-	private String getWorkspacePath(Index index) {
+	private String getWorkspacePath(Project project) {
 		final String path;
-		final WorkspaceTask task = getWorkspaceTask(index);
+		final VariableTask task = getVariableTaskForWorkspace(project);
 		if (task != null) {
-			String resourcePath = index.eResource().getURI().toFileString();
+			String resourcePath = project.eResource().getURI().toFileString();
 			String resourceBasePath = resourcePath.substring(0, resourcePath.lastIndexOf(SEP));
-			path = toFileWithAbsolutePath(resourceBasePath, task.getLocation()).toString();
+			path = toFileWithAbsolutePath(resourceBasePath, task.getValue()).toString();
 		} else {
 			path = null;
 		}
@@ -620,26 +631,54 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * If the given index hasn't defined workspace task, this method generates a unique id in the temporary
-	 * folder of the system, add a new workspace task in the given Index, and set the location of this new
-	 * workspace task with the generated id. If the generated id already exists (cause a command already been
-	 * called with the same Index), it is reused.
+	 * Search an installation task in the given Index. If found, return his location attribute value.
 	 * 
 	 * @param index
 	 *            the given Index.
-	 * @return the location of the workspace.
-	 * @throws Die
-	 * @throws IOException
+	 * @return the location attribute value of the installation task if found, null otherwise.
 	 */
-	private String useDefaultWorkspace(Index index) throws IOException, Die {
-		String id = generateIDForSetup(index.eResource().getURI().toFileString());
-		File ws = createOrGetTempDir("emfcWs" + id); //$NON-NLS-1$
-		WorkspaceTask wsTask = SetupFactory.eINSTANCE.createWorkspaceTask();
-		wsTask.setLocation(ws.getPath());
-		EList<ProjectCatalog> projectCatalogs = index.getProjectCatalogs();
-		if (!projectCatalogs.isEmpty()) {
-			projectCatalogs.get(0).getSetupTasks().add(wsTask);
+	private String getInstallationPath(Project project) {
+		final String path;
+		final VariableTask task = getVariableTaskForInstallation(project);
+		if (task != null) {
+			String resourcePath = project.eResource().getURI().toFileString();
+			String resourceBasePath = resourcePath.substring(0, resourcePath.lastIndexOf(SEP));
+			path = toFileWithAbsolutePath(resourceBasePath, task.getValue()).toString();
+		} else {
+			path = null;
 		}
+		return path;
+	}
+
+	/**
+	 * Generates a unique id in the temporary folder of the system according to the given Project. If the
+	 * generated id already exists (cause a command already been called with the same Project), it is reused.
+	 * 
+	 * @param project
+	 *            the given Project.
+	 * @return the location of the workspace.
+	 * @throws IOException
+	 * @throws Die
+	 */
+	private String genWorkspacePath(Project project) throws IOException, Die {
+		String id = generateIDForSetup(project.eResource().getURI().toFileString());
+		File ws = createOrGetTempDir("emfcWs" + id); //$NON-NLS-1$
+		return ws.getAbsolutePath();
+	}
+
+	/**
+	 * Generates a unique id in the temporary folder of the system according to the given Project. If the
+	 * generated id already exists (cause a command already been called with the same Project), it is reused.
+	 * 
+	 * @param project
+	 *            the given Project.
+	 * @return the location of the workspace.
+	 * @throws IOException
+	 * @throws Die
+	 */
+	private String genInstallationPath(Project project) throws IOException, Die {
+		String id = generateIDForSetup(project.eResource().getURI().toFileString());
+		File ws = createOrGetTempDir("emfcInstall" + id); //$NON-NLS-1$
 		return ws.getAbsolutePath();
 	}
 
@@ -698,30 +737,6 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * If the given index hasn't defined installation task, this method generates a unique id in the temporary
-	 * folder of the system, add a new installation task in the given Index, and set the location of this new
-	 * installation task with the generated id. If the generated id already exists (cause a command already
-	 * been called with the same Index), it is reused.
-	 * 
-	 * @param index
-	 *            the given Index.
-	 * @return the location of the installation.
-	 * @throws Die
-	 * @throws IOException
-	 */
-	private String useDefaultInstallation(Index index) throws IOException, Die {
-		String id = generateIDForSetup(index.eResource().getURI().toFileString());
-		File install = createOrGetTempDir("emfcInstall" + id); //$NON-NLS-1$
-		InstallationTask installTask = SetupFactory.eINSTANCE.createInstallationTask();
-		installTask.setLocation(install.getPath());
-		EList<ProjectCatalog> projectCatalogs = index.getProjectCatalogs();
-		if (!projectCatalogs.isEmpty()) {
-			projectCatalogs.get(0).getSetupTasks().add(installTask);
-		}
-		return install.getAbsolutePath();
-	}
-
-	/**
 	 * Converts an array of bytes into a string of hexadecimal values.
 	 * 
 	 * @param arrayBytes
@@ -734,27 +749,6 @@ public abstract class AbstractLogicalCommand {
 			stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16).substring(1));
 		}
 		return stringBuffer.toString();
-	}
-
-	/**
-	 * Flush the out stream. This is mainly use to handle premature exit.
-	 * 
-	 * @throws IOException
-	 *             if any problem with the stream.
-	 */
-	public void flushOutW() throws IOException {
-		if (out != null) {
-			out.flush();
-		}
-	}
-
-	/**
-	 * Returns the user setup file associated with this command.
-	 * 
-	 * @return the user setup file associated with this command.
-	 */
-	public File getSetupFile() {
-		return setupFile;
 	}
 
 	/**

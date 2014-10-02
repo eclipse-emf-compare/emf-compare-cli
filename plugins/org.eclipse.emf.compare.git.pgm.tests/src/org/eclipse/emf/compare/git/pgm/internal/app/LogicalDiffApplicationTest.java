@@ -52,7 +52,7 @@ public class LogicalDiffApplicationTest extends AbstractApplicationTest {
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(getTestTmpFolder().resolve("oomphFolder").toString()) //
+				.setInstallationLocation(getTestTmpFolder().resolve("oomphFolder").toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 

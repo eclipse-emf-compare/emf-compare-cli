@@ -18,7 +18,7 @@
           name="org.eclipse.emf.sdk.feature.group"/>
       <requirement
           name="org.eclipse.egit"/>
-      <requirementfile
+      <requirement
           name="org.eclipse.egit.core"/>
       <requirement
           name="org.eclipse.pde.api.tools.ee.feature.feature.group"/>
@@ -63,6 +63,10 @@
       <repository
           url="http://download.eclipse.org/tools/orbit/downloads/drops/R20140525021250/repository/"/>
     </setupTask>
+    <setupTask
+        xsi:type="setup:InstallationTask"/>
+    <setupTask
+        xsi:type="setup:WorkspaceTask"/>
     <product
         name="epp.package.standard"
         label="Eclipse Standard/SDK">

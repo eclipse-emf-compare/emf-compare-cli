@@ -74,9 +74,7 @@ import org.eclipse.oomph.base.provider.BaseEditUtil;
 import org.eclipse.oomph.internal.setup.SetupPrompter;
 import org.eclipse.oomph.resources.ResourcesFactory;
 import org.eclipse.oomph.resources.SourceLocator;
-import org.eclipse.oomph.setup.Index;
 import org.eclipse.oomph.setup.Project;
-import org.eclipse.oomph.setup.ProjectCatalog;
 import org.eclipse.oomph.setup.SetupPackage;
 import org.eclipse.oomph.setup.SetupTask;
 import org.eclipse.oomph.setup.Trigger;
@@ -129,6 +127,47 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	protected Repository repo;
 
 	/**
+	 * {@inheritDoc}.
+	 */
+	public Object start(IApplicationContext context) throws Exception {
+		// Prevents VM args if the application exits on something different that 0
+		System.setProperty(IApplicationContext.EXIT_DATA_PROPERTY, EMPTY_STRING);
+		final Map<?, ?> args = context.getArguments();
+		final String[] appArgs = (String[])args.get("application.args"); //$NON-NLS-1$
+
+		// This time it creates the repository using EGit code in order to add the repository to the EGit
+		// cache
+		final CmdLineParserRepositoryBuilder clp = CmdLineParserRepositoryBuilder
+				.newEGitRepoBuilderCmdParser(this);
+		try {
+			clp.parseArgument(appArgs);
+			repo = clp.getRepo();
+		} catch (CmdLineException err) {
+			err.printStackTrace();
+			System.err.println(err.getMessage());
+			dispose();
+			return Returns.ERROR;
+		}
+		try {
+			performStartup();
+			return performGitCommand();
+		} catch (Die e) {
+			Integer returnCode = EMFCompareGitPGMUtil.handleDieError(e, showStackTrace);
+			return returnCode;
+		} finally {
+			dispose();
+		}
+
+	}
+
+	/**
+	 * {@inheritDoc}.
+	 */
+	public void stop() {
+		// Nothing to do.
+	}
+
+	/**
 	 * Performs the logical git command (diff or merge).
 	 * 
 	 * @return a {@link org.eclipse.emf.compare.git.pgm.Returns}.
@@ -157,8 +196,8 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		URI startupSetupURI = URI.createFileURI(setupFile.getAbsolutePath());
 		Resource startupSetupResource = rs.getResource(startupSetupURI, true);
 
-		Index startupSetupIndex = (Index)EcoreUtil.getObjectByType(startupSetupResource.getContents(),
-				SetupPackage.Literals.INDEX);
+		Project startupSetupProject = (Project)EcoreUtil.getObjectByType(startupSetupResource.getContents(),
+				SetupPackage.Literals.PROJECT);
 
 		SetupContext setupContext = SetupContext.createInstallationAndUser(rs);
 
@@ -176,7 +215,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 
 			cleanWorkspace();
 
-			handleImportProjects(startupSetupIndex, performerStartup);
+			handleImportProjects(startupSetupProject, performerStartup);
 
 			performerStartup.perform();
 
@@ -197,54 +236,100 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	}
 
 	/**
-	 * Handle ProjectsImport tasks.
-	 * 
-	 * @param startupSetupIndex
-	 *            the root of the setup model.
-	 * @param performerStartup
-	 *            the SetupTaskPerformer.
+	 * Close the repository and the log.
 	 */
-	private void handleImportProjects(Index startupSetupIndex, SetupTaskPerformer performerStartup) {
-		List<ProjectsImportTask> projectToImport = new ArrayList<ProjectsImportTask>();
+	protected void dispose() {
+		if (repo != null) {
+			repo.close();
+		}
+		progressPageLog.setTerminating();
+	}
 
-		// Import Projects & execute other startup tasks.
-		final String resourcePath = startupSetupIndex.eResource().getURI().toFileString();
-		final String resourceBasePath = resourcePath.substring(0, resourcePath.lastIndexOf(SEP));
-		for (ProjectCatalog projectCatalog : startupSetupIndex.getProjectCatalogs()) {
-			for (SetupTask setupTask : projectCatalog.getSetupTasks()) {
-				if (setupTask instanceof ProjectsImportTask) {
-					// Convert locations of projects to absolute paths.
-					ProjectsImportTask importTask = createCopyWithAbsolutePath((ProjectsImportTask)setupTask,
-							resourceBasePath);
-					performerStartup.getTriggeredSetupTasks().add(importTask);
-					projectToImport.add(importTask);
-				} else {
-					performerStartup.getTriggeredSetupTasks().add(setupTask);
-				}
+	/**
+	 * @see org.eclipse.egit.ui.internal.CompareUtils#canDirectlyOpenInCompare(IFile)
+	 * @param file
+	 *            the file to test.
+	 * @return true if the file to test is EMFCompare compliant, false otherwise.
+	 */
+	protected boolean isEMFCompareCompliantFile(RemoteResourceMappingContext mergeContext, IFile file) {
+		try {
+			EMFModelProvider modelProvider = new EMFModelProvider();
+			ResourceMapping[] modelMappings = modelProvider.getMappings(file, mergeContext,
+					new NullProgressMonitor());
+			if (modelMappings.length > 0) {
+				return true;
 			}
-			for (Project project : projectCatalog.getProjects()) {
-				for (SetupTask setupTask : project.getSetupTasks()) {
-					if (setupTask instanceof ProjectsImportTask) {
-						// Convert locations of projects to absolute paths.
-						ProjectsImportTask importTask = createCopyWithAbsolutePath(
-								(ProjectsImportTask)setupTask, resourceBasePath);
-						performerStartup.getTriggeredSetupTasks().add(importTask);
-						projectToImport.add(importTask);
-					} else {
-						performerStartup.getTriggeredSetupTasks().add(setupTask);
-					}
-				}
-			}
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 
-		// If no ProjectsImportTask found, import all projects in repo
-		if (projectToImport.isEmpty()) {
-			ProjectsImportTask importTask = ProjectsFactory.eINSTANCE.createProjectsImportTask();
-			SourceLocator sourceLocator = ResourcesFactory.eINSTANCE.createSourceLocator(repo.getWorkTree()
-					.getAbsolutePath(), false);
-			importTask.getSourceLocators().add(sourceLocator);
-			performerStartup.getTriggeredSetupTasks().add(importTask);
+		return false;
+	}
+
+	/**
+	 * Gets the tree iterator of the id located in the repository.
+	 * 
+	 * @param repository
+	 *            the repository containing the id.
+	 * @param id
+	 *            the id for which we want the tree iterator.
+	 * @return the tree iterator of the id located in the repository.
+	 * @throws IOException
+	 */
+	protected AbstractTreeIterator getTreeIterator(Repository repository, ObjectId id) throws IOException {
+		final CanonicalTreeParser p = new CanonicalTreeParser();
+		final ObjectReader or = repository.newObjectReader();
+		try {
+			p.reset(or, new RevWalk(repository).parseTree(id));
+			return p;
+		} finally {
+			or.release();
 		}
+	}
+
+	/**
+	 * Simulate a comparison between the two given references and returns back the subscriber that can provide
+	 * all computed synchronization information.
+	 * 
+	 * @param sourceRef
+	 *            Source reference (i.e. "left" side of the comparison).
+	 * @param targetRef
+	 *            Target reference (i.e. "right" side of the comparison).
+	 * @param comparedFile
+	 *            The file we are comparing (that would be the file right-clicked into the workspace).
+	 * @return The created subscriber.
+	 */
+	protected RemoteResourceMappingContext createSubscriberForComparison(Repository repository,
+			ObjectId sourceRef, ObjectId targetRef, IFile comparedFile) throws IOException {
+		final GitSynchronizeData data = new GitSynchronizeData(repository, sourceRef.getName(), targetRef
+				.getName(), false);
+		final GitSynchronizeDataSet dataSet = new GitSynchronizeDataSet(data);
+		GitResourceVariantTreeSubscriber subscriber = new GitResourceVariantTreeSubscriber(dataSet);
+		subscriber.init(new NullProgressMonitor());
+		return new GitSubscriberResourceMappingContext(subscriber, dataSet);
+	}
+
+	/**
+	 * This will query all model providers for those that are enabled on the given file and list all mappings
+	 * available for that file.
+	 * 
+	 * @param file
+	 *            The file for which we need the associated resource mappings.
+	 * @return All mappings available for that file.
+	 */
+	protected ResourceMapping[] getResourceMappings(RemoteResourceMappingContext mergeContext, IFile file) {
+		final Set<ResourceMapping> mappings = new LinkedHashSet<ResourceMapping>();
+		try {
+			EMFModelProvider modelProvider = new EMFModelProvider();
+			ResourceMapping[] modelMappings = modelProvider.getMappings(file, mergeContext,
+					new NullProgressMonitor());
+			for (ResourceMapping mapping : modelMappings) {
+				mappings.add(mapping);
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return mappings.toArray(new ResourceMapping[mappings.size()]);
 	}
 
 	/**
@@ -333,6 +418,42 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	}
 
 	/**
+	 * Handle ProjectsImport tasks.
+	 * 
+	 * @param startupSetupProject
+	 *            the root of the setup model.
+	 * @param performerStartup
+	 *            the SetupTaskPerformer.
+	 */
+	private void handleImportProjects(Project startupSetupProject, SetupTaskPerformer performerStartup) {
+		List<ProjectsImportTask> projectToImport = new ArrayList<ProjectsImportTask>();
+
+		// Import Projects & execute other startup tasks.
+		final String resourcePath = startupSetupProject.eResource().getURI().toFileString();
+		final String resourceBasePath = resourcePath.substring(0, resourcePath.lastIndexOf(SEP));
+		for (SetupTask setupTask : startupSetupProject.getSetupTasks()) {
+			if (setupTask instanceof ProjectsImportTask) {
+				// Convert locations of projects to absolute paths.
+				ProjectsImportTask importTask = createCopyWithAbsolutePath((ProjectsImportTask)setupTask,
+						resourceBasePath);
+				performerStartup.getTriggeredSetupTasks().add(importTask);
+				projectToImport.add(importTask);
+			} else {
+				performerStartup.getTriggeredSetupTasks().add(setupTask);
+			}
+		}
+
+		// If no ProjectsImportTask found, import all projects in repo
+		if (projectToImport.isEmpty()) {
+			ProjectsImportTask importTask = ProjectsFactory.eINSTANCE.createProjectsImportTask();
+			SourceLocator sourceLocator = ResourcesFactory.eINSTANCE.createSourceLocator(repo.getWorkTree()
+					.getAbsolutePath(), false);
+			importTask.getSourceLocators().add(sourceLocator);
+			performerStartup.getTriggeredSetupTasks().add(importTask);
+		}
+	}
+
+	/**
 	 * Forces to wait for all EGit operation to terminate.
 	 * <p>
 	 * If this is not done then it might happen that some projects are not connected yet whereas the git
@@ -347,140 +468,5 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		jobMan.join(JobFamilies.AUTO_IGNORE, new NullProgressMonitor());
 		jobMan.join(JobFamilies.REPOSITORY_CHANGED, new NullProgressMonitor());
 		jobMan.join(JobFamilies.INDEX_DIFF_CACHE_UPDATE, new NullProgressMonitor());
-	}
-
-	/**
-	 * {@inheritDoc}.
-	 */
-	public Object start(IApplicationContext context) throws Exception {
-		// Prevents VM args if the application exits on something different that 0
-		System.setProperty(IApplicationContext.EXIT_DATA_PROPERTY, EMPTY_STRING);
-		final Map<?, ?> args = context.getArguments();
-		final String[] appArgs = (String[])args.get("application.args"); //$NON-NLS-1$
-
-		// This time it creates the repository using EGit code in order to add the repository to the EGit
-		// cache
-		final CmdLineParserRepositoryBuilder clp = CmdLineParserRepositoryBuilder
-				.newEGitRepoBuilderCmdParser(this);
-		try {
-			clp.parseArgument(appArgs);
-			repo = clp.getRepo();
-		} catch (CmdLineException err) {
-			err.printStackTrace();
-			System.err.println(err.getMessage());
-			dispose();
-			return Returns.ERROR;
-		}
-		try {
-			performStartup();
-			return performGitCommand();
-		} catch (Die e) {
-			Integer returnCode = EMFCompareGitPGMUtil.handleDieError(e, showStackTrace);
-			return returnCode;
-		} finally {
-			dispose();
-		}
-
-	}
-
-	protected void dispose() {
-		if (repo != null) {
-			repo.close();
-		}
-		progressPageLog.setTerminating();
-	}
-
-	/**
-	 * {@inheritDoc}.
-	 */
-	public void stop() {
-		// Nothing to do.
-	}
-
-	/**
-	 * @see org.eclipse.egit.ui.internal.CompareUtils#canDirectlyOpenInCompare(IFile)
-	 * @param file
-	 *            the file to test.
-	 * @return true if the file to test is EMFCompare compliant, false otherwise.
-	 */
-	protected boolean isEMFCompareCompliantFile(RemoteResourceMappingContext mergeContext, IFile file) {
-		try {
-			EMFModelProvider modelProvider = new EMFModelProvider();
-			ResourceMapping[] modelMappings = modelProvider.getMappings(file, mergeContext,
-					new NullProgressMonitor());
-			if (modelMappings.length > 0) {
-				return true;
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-		return false;
-	}
-
-	/**
-	 * Gets the tree iterator of the id located in the repository.
-	 * 
-	 * @param repository
-	 *            the repository containing the id.
-	 * @param id
-	 *            the id for which we want the tree iterator.
-	 * @return the tree iterator of the id located in the repository.
-	 * @throws IOException
-	 */
-	protected AbstractTreeIterator getTreeIterator(Repository repository, ObjectId id) throws IOException {
-		final CanonicalTreeParser p = new CanonicalTreeParser();
-		final ObjectReader or = repository.newObjectReader();
-		try {
-			p.reset(or, new RevWalk(repository).parseTree(id));
-			return p;
-		} finally {
-			or.release();
-		}
-	}
-
-	/**
-	 * Simulate a comparison between the two given references and returns back the subscriber that can provide
-	 * all computed synchronization information.
-	 * 
-	 * @param sourceRef
-	 *            Source reference (i.e. "left" side of the comparison).
-	 * @param targetRef
-	 *            Target reference (i.e. "right" side of the comparison).
-	 * @param comparedFile
-	 *            The file we are comparing (that would be the file right-clicked into the workspace).
-	 * @return The created subscriber.
-	 */
-	protected RemoteResourceMappingContext createSubscriberForComparison(Repository repository,
-			ObjectId sourceRef, ObjectId targetRef, IFile comparedFile) throws IOException {
-		final GitSynchronizeData data = new GitSynchronizeData(repository, sourceRef.getName(), targetRef
-				.getName(), false);
-		final GitSynchronizeDataSet dataSet = new GitSynchronizeDataSet(data);
-		GitResourceVariantTreeSubscriber subscriber = new GitResourceVariantTreeSubscriber(dataSet);
-		subscriber.init(new NullProgressMonitor());
-		return new GitSubscriberResourceMappingContext(subscriber, dataSet);
-	}
-
-	/**
-	 * This will query all model providers for those that are enabled on the given file and list all mappings
-	 * available for that file.
-	 * 
-	 * @param file
-	 *            The file for which we need the associated resource mappings.
-	 * @return All mappings available for that file.
-	 */
-	protected ResourceMapping[] getResourceMappings(RemoteResourceMappingContext mergeContext, IFile file) {
-		final Set<ResourceMapping> mappings = new LinkedHashSet<ResourceMapping>();
-		try {
-			EMFModelProvider modelProvider = new EMFModelProvider();
-			ResourceMapping[] modelMappings = modelProvider.getMappings(file, mergeContext,
-					new NullProgressMonitor());
-			for (ResourceMapping mapping : modelMappings) {
-				mappings.add(mapping);
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		return mappings.toArray(new ResourceMapping[mappings.size()]);
 	}
 }

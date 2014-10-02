@@ -55,7 +55,7 @@ public class LogicalMergeCommandIntegrationTest extends AbstractLogicalAppTest {
 	public void alreadyUpToDateTest() throws Exception {
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
+				.setInstallationLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -83,7 +83,7 @@ public class LogicalMergeCommandIntegrationTest extends AbstractLogicalAppTest {
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File setupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
+				.setInstallationLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -117,7 +117,7 @@ public class LogicalMergeCommandIntegrationTest extends AbstractLogicalAppTest {
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File setupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
+				.setInstallationLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -149,7 +149,7 @@ public class LogicalMergeCommandIntegrationTest extends AbstractLogicalAppTest {
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File setupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
+				.setInstallationLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -179,7 +179,7 @@ public class LogicalMergeCommandIntegrationTest extends AbstractLogicalAppTest {
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File setupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
+				.setInstallationLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 

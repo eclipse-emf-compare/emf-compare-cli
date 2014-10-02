@@ -83,7 +83,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 		// Creates a Oomph setup file
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File setupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -121,7 +121,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -147,7 +147,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -176,7 +176,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -198,7 +198,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -225,7 +225,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationTaskLocation(oomphFolderPath.toString()) //
+				.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -250,7 +250,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 		setCmdLocation(getRepositoryPath().toString());
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
-		File newSetupFile = new OomphUserModelBuilder().setInstallationTaskLocation(
+		File newSetupFile = new OomphUserModelBuilder().setInstallationLocation(
 				oomphFolderPath.toString()).setWorkspaceLocation(oomphFolderPath.resolve("ws").toString())
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
