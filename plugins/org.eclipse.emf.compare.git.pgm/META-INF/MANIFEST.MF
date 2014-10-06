@@ -18,8 +18,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.compare;bundle-version="3.1.0",
  org.eclipse.emf.compare.ide.ui;bundle-version="4.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: com.google.common.base;version="15.0.0",
- com.google.common.collect;version="15.0.0",
+Import-Package: com.google.common.base;version="[11.0.0,16.0.0)",
+ com.google.common.collect;version="[11.0.0,16.0.0)",
  org.kohsuke.args4j;version="[2.0.12,2.1.0)",
  org.kohsuke.args4j.spi;version="[2.0.12,2.1.0)"
 Export-Package: org.eclipse.emf.compare.git.pgm;mandatory:="org.eclipse.emf.compare.git.pgm";org.eclipse.emf.compare.git.pgm:=split;x-friends:="org.eclipse.emf.compare.git.pgm.tests",
