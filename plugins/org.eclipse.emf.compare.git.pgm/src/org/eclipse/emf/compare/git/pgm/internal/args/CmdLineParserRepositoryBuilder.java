@@ -18,7 +18,6 @@ import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.egit.core.RepositoryCache;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
@@ -33,7 +32,7 @@ import org.kohsuke.args4j.CmdLineParser;
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-public class CmdLineParserRepositoryBuilder extends CmdLineParser {
+public final class CmdLineParserRepositoryBuilder extends CmdLineParser {
 
 	/**
 	 * Functional interface used to build a {@link Repository}.
@@ -42,52 +41,58 @@ public class CmdLineParserRepositoryBuilder extends CmdLineParser {
 	 */
 	public interface RepoBuilder {
 
+		/**
+		 * Build the repository represented by the given directory.
+		 * 
+		 * @param gitDir
+		 *            the repository to build.
+		 * @return a {@link Repository}.
+		 * @throws Die
+		 *             e
+		 */
 		Repository buildRepository(String gitDir) throws Die;
 	}
 
 	/**
 	 * {@link Repository} builder that uses pure JGit code.
 	 */
-	private static RepoBuilder JGIT_REPO_BUILDER = new RepoBuilder() {
-
+	private static RepoBuilder jgitRepoBuilder = new RepoBuilder() {
 		/**
-		 * {@inheritDoc}
-		 * 
-		 * @see org.eclipse.emf.compare.git.pgm.internal.args.CmdLineParserRepositoryBuilder.RepoBuilder#buildRepository(java.lang.String)
+		 * {@inheritDoc}.
 		 */
 		public Repository buildRepository(String aGitdir) throws Die {
-			final File gitDir;
+			/** The current repository directory. */
+			final File myGitDir;
+			/** The current repository. */
+			final Repository myRepo;
 			if (aGitdir == null) {
-				gitDir = null;
+				myGitDir = null;
 			} else {
-				gitDir = new File(aGitdir);
+				myGitDir = new File(aGitdir);
 			}
-			RepositoryBuilder rb = new RepositoryBuilder().setGitDir(gitDir).readEnvironment().setMustExist(
-					true).findGitDir();
+			RepositoryBuilder rb = new RepositoryBuilder().setGitDir(myGitDir).readEnvironment()
+					.setMustExist(true).findGitDir();
 			if (rb.getGitDir() == null) {
 				throw new DiesOn(FATAL).displaying(CAN_T_FIND_GIT_REPOSITORY_MESSAGE).ready();
 			}
-			Repository repo;
 			try {
-				repo = rb.build();
+				myRepo = rb.build();
 			} catch (RepositoryNotFoundException e) {
 				throw new DiesOn(FATAL).displaying(CAN_T_FIND_GIT_REPOSITORY_MESSAGE).ready();
 			} catch (IOException e) {
 				throw new DiesOn(FATAL).duedTo(e).displaying("Cannot build the git repository").ready();
 			}
-			return repo;
+			return myRepo;
 		}
-
 	};
 
 	/**
 	 * {@link Repository} builder that uses pure EGit code.
 	 * <p>
-	 * This builder creates the repository and add it the {@link RepositoryCache} of EGit
+	 * This builder creates the repository and add it the RepositoryCache of EGit
 	 * </p>
 	 */
-	private static RepoBuilder EGIT_REPO_BUILDER = new RepoBuilder() {
-
+	private static RepoBuilder egitRepoBuilder = new RepoBuilder() {
 		/**
 		 * {@inheritDoc}
 		 * 
@@ -95,41 +100,55 @@ public class CmdLineParserRepositoryBuilder extends CmdLineParser {
 		 */
 		public Repository buildRepository(String aGitdir) throws Die {
 			Preconditions.checkNotNull(aGitdir);
-			File gitDir = new File(aGitdir);
-			if (!gitDir.exists()) {
+			File myGitDir = new File(aGitdir);
+			if (!myGitDir.exists()) {
 				throw new DiesOn(DeathType.FATAL).displaying(
-						"Can not build git reposutory: " + aGitdir + "does not exist").ready();
+						"Can't build git repository: " + aGitdir + "does not exist").ready();
 			}
-
 			try {
-				Repository repository = org.eclipse.egit.core.Activator.getDefault().getRepositoryCache()
-						.lookupRepository(gitDir);
-				if (repository == null) {
-					throw new DiesOn(DeathType.FATAL).displaying("Can build repository " + aGitdir).ready();
+				Repository myRepo = org.eclipse.egit.core.Activator.getDefault().getRepositoryCache()
+						.lookupRepository(myGitDir);
+				if (myRepo == null) {
+					throw new DiesOn(DeathType.FATAL).displaying("Can't build repository " + aGitdir).ready();
 				}
-				return repository;
+				return myRepo;
 			} catch (IOException e1) {
-				throw new DiesOn(DeathType.FATAL).duedTo(e1).displaying("Can build repository " + aGitdir)
+				throw new DiesOn(DeathType.FATAL).duedTo(e1).displaying("Can't build repository " + aGitdir)
 						.ready();
 			}
 		}
-
 	};
 
 	/**
 	 * Git directory.
 	 */
-	private String gitDir = null;
+	private String gitDir;
 
 	/**
 	 * Git repository.
 	 */
-	private Repository repo = null;
+	private Repository repository;
 
 	/**
 	 * {@link Repository} builder.
 	 */
 	private final RepoBuilder builder;
+
+	/**
+	 * Constructor.
+	 * <p>
+	 * The git repository will be buit during argument parsing
+	 * </p>
+	 * 
+	 * @param bean
+	 *            instance of a class annotated by Option and Argument.
+	 * @param builder
+	 *            the Repository builder.
+	 */
+	private CmdLineParserRepositoryBuilder(Object bean, RepoBuilder builder) {
+		super(bean);
+		this.builder = builder;
+	}
 
 	/**
 	 * Creates a new {@link CmdLineParser} that will build the {@link Repository} using pure JGit methods.
@@ -138,10 +157,11 @@ public class CmdLineParserRepositoryBuilder extends CmdLineParser {
 	 * </p>
 	 * 
 	 * @param bean
-	 * @return
+	 *            instance of a class annotated by Option and Argument.
+	 * @return a new {@link CmdLineParser}.
 	 */
 	public static CmdLineParserRepositoryBuilder newJGitRepoBuilderCmdParser(Object bean) {
-		return new CmdLineParserRepositoryBuilder(bean, JGIT_REPO_BUILDER);
+		return new CmdLineParserRepositoryBuilder(bean, jgitRepoBuilder);
 	}
 
 	/**
@@ -153,23 +173,11 @@ public class CmdLineParserRepositoryBuilder extends CmdLineParser {
 	 * </p>
 	 * 
 	 * @param bean
-	 * @return
+	 *            instance of a class annotated by Option and Argument.
+	 * @return a new {@link CmdLineParser}.
 	 */
 	public static CmdLineParserRepositoryBuilder newEGitRepoBuilderCmdParser(Object bean) {
-		return new CmdLineParserRepositoryBuilder(bean, EGIT_REPO_BUILDER);
-	}
-
-	/**
-	 * Constructor.
-	 * <p>
-	 * The git repository will be buit during argument parsing
-	 * </p>
-	 * 
-	 * @param bean
-	 */
-	private CmdLineParserRepositoryBuilder(Object bean, RepoBuilder builder) {
-		super(bean);
-		this.builder = builder;
+		return new CmdLineParserRepositoryBuilder(bean, egitRepoBuilder);
 	}
 
 	/**
@@ -178,14 +186,15 @@ public class CmdLineParserRepositoryBuilder extends CmdLineParser {
 	 * The first time this method is called it may build the repository and so laucn a {@link Die} exception
 	 * <p>
 	 * 
-	 * @return
+	 * @return the git {@link Repository}.
 	 * @throws Die
+	 *             e
 	 */
 	public Repository getRepo() throws Die {
-		if (repo == null) {
-			repo = builder.buildRepository(gitDir);
+		if (repository == null) {
+			repository = builder.buildRepository(gitDir);
 		}
-		return repo;
+		return repository;
 	}
 
 	/**
@@ -196,11 +205,11 @@ public class CmdLineParserRepositoryBuilder extends CmdLineParser {
 	 * </p>
 	 * 
 	 * @param gitDir
+	 *            the path to the git dir repository.
 	 */
 	public void setGitDir(String gitDir) {
 		// The gitDir argument should be provided before the repository is built
-		Preconditions.checkArgument(repo == null);
+		Preconditions.checkArgument(repository == null);
 		this.gitDir = gitDir;
 	}
-
 }

@@ -88,11 +88,20 @@ import org.kohsuke.args4j.Option;
 @SuppressWarnings("restriction")
 public abstract class AbstractLogicalCommand {
 
+	/** Oomph option. */
 	protected static final String PROP_SETUP_CONFIRM_SKIP = "oomph.setup.confirm.skip"; //$NON-NLS-1$
 
+	/** Oomph option. */
 	protected static final String PROP_SETUP_OFFLINE_STARTUP = "oomph.setup.offline.startup"; //$NON-NLS-1$
 
+	/** Oomph option. */
 	protected static final String PROP_SETUP_MIRRORS_STARTUP = "oomph.setup.mirrors.startup"; //$NON-NLS-1$
+
+	/** VM Args option. */
+	protected static final String VMARGS_OPTION = "-D"; //$NON-NLS-1$
+
+	/** Eclipse string. */
+	private static final String ECLIPSE = "eclipse"; //$NON-NLS-1$
 
 	/**
 	 * Holds true if a user has set the help option to true.
@@ -183,6 +192,7 @@ public abstract class AbstractLogicalCommand {
 	 * @throws Die
 	 *             exception on error.
 	 * @throws IOException
+	 *             e
 	 */
 	public void build(Collection<String> args, URI environmentSetupURI) throws Die, IOException {
 
@@ -258,7 +268,9 @@ public abstract class AbstractLogicalCommand {
 	 * Runs the command.
 	 * 
 	 * @return Return code.
-	 * @throws Exception
+	 * @throws Die
+	 *             e
+	 * @throws IOException
 	 *             exception on error.
 	 */
 	protected abstract Integer internalRun() throws Die, IOException;
@@ -275,7 +287,7 @@ public abstract class AbstractLogicalCommand {
 	/**
 	 * Gets the SetupTaskPerformer.
 	 * 
-	 * @return
+	 * @return the SetupTaskPerformer.
 	 */
 	protected SetupTaskPerformer getPerformer() {
 		return performer;
@@ -284,12 +296,13 @@ public abstract class AbstractLogicalCommand {
 	/**
 	 * Parses the arguments related to this command. It also in charge of building the git repository.
 	 * <p>
-	 * Since the --git-dir option can be passed throught the command line, the parser is also in charge of
+	 * Since the --git-dir option can be passed through the command line, the parser is also in charge of
 	 * building the repository
 	 * </p>
 	 * 
 	 * @param args
 	 *            arguments.
+	 * @return the Repository.
 	 * @throws Die
 	 *             if the program exits prematurely.
 	 */
@@ -377,10 +390,13 @@ public abstract class AbstractLogicalCommand {
 	 * 
 	 * @param userSetupFilePath
 	 *            the path of the user setup model.
+	 * @param environmentSetupURI
+	 *            URI of the setup file that contains the environment used to execute the logical commands.
 	 * @return a SetupTaskPerformer.
 	 * @throws Die
+	 *             e
 	 * @throws IOException
-	 * @throws Exception
+	 *             e
 	 */
 	private SetupTaskPerformer createSetupTaskPerformer(String userSetupFilePath, URI environmentSetupURI)
 			throws IOException, Die {
@@ -480,15 +496,15 @@ public abstract class AbstractLogicalCommand {
 			if (file.exists()) {
 				String[] eclipseFolder = file.list(new FilenameFilter() {
 					public boolean accept(File dir, String name) {
-						return "eclipse".equals(name); //$NON-NLS-1$
+						return ECLIPSE.equals(name);
 					}
 				});
 				if (eclipseFolder.length == 1) {
-					File eclipse = new File(installationPath + SEP + "eclipse"); //$NON-NLS-1$
+					File eclipse = new File(installationPath + SEP + ECLIPSE);
 					if (eclipse.exists()) {
 						String[] eclipseExe = eclipse.list(new FilenameFilter() {
 							public boolean accept(File dir, String name) {
-								return "eclipse".equals(name) || "eclipse.exe".equals(name); //$NON-NLS-1$ //$NON-NLS-2$
+								return ECLIPSE.equals(name) || "eclipse.exe".equals(name); //$NON-NLS-1$ 
 							}
 						});
 						if (eclipseExe.length == 1) {
@@ -509,7 +525,9 @@ public abstract class AbstractLogicalCommand {
 	 * @param index
 	 *            the root object of the environment model.
 	 * @throws IOException
+	 *             e
 	 * @throws Die
+	 *             e
 	 */
 	private void handleWorkspace(Project project, Index index) throws IOException, Die {
 		final String workspaceLocation;
@@ -537,7 +555,9 @@ public abstract class AbstractLogicalCommand {
 	 * @param index
 	 *            the root object of the environment model.
 	 * @throws IOException
+	 *             e
 	 * @throws Die
+	 *             e
 	 */
 	private void handleInstallation(Project project, Index index) throws IOException, Die {
 		final String installationLocation;
@@ -560,7 +580,7 @@ public abstract class AbstractLogicalCommand {
 	/**
 	 * Returns true if the given Project contains a variable task with a non null workspace location.
 	 * 
-	 * @param index
+	 * @param project
 	 *            the given Project.
 	 * @return true if the given Project contains a variable task with a non null workspace location, false
 	 *         otherwise.
@@ -631,10 +651,10 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * Search an installation task in the given Index. If found, return his location attribute value.
+	 * Search an installation task in the given Project. If found, return his location attribute value.
 	 * 
-	 * @param index
-	 *            the given Index.
+	 * @param project
+	 *            the given Project.
 	 * @return the location attribute value of the installation task if found, null otherwise.
 	 */
 	private String getInstallationPath(Project project) {
@@ -658,7 +678,9 @@ public abstract class AbstractLogicalCommand {
 	 *            the given Project.
 	 * @return the location of the workspace.
 	 * @throws IOException
+	 *             e
 	 * @throws Die
+	 *             e
 	 */
 	private String genWorkspacePath(Project project) throws IOException, Die {
 		String id = generateIDForSetup(project.eResource().getURI().toFileString());
@@ -674,7 +696,9 @@ public abstract class AbstractLogicalCommand {
 	 *            the given Project.
 	 * @return the location of the workspace.
 	 * @throws IOException
+	 *             e
 	 * @throws Die
+	 *             e
 	 */
 	private String genInstallationPath(Project project) throws IOException, Die {
 		String id = generateIDForSetup(project.eResource().getURI().toFileString());
@@ -685,6 +709,8 @@ public abstract class AbstractLogicalCommand {
 	/**
 	 * Creates a temporary directory in the system temp directory.
 	 * 
+	 * @param name
+	 *            the name of the temp directory to create.
 	 * @return the new created directory.
 	 */
 	private static File createOrGetTempDir(String name) {
@@ -711,6 +737,7 @@ public abstract class AbstractLogicalCommand {
 	 *            the absolute path of the given file.
 	 * @return a unique ID for the a given file.
 	 * @throws IOException
+	 *             e
 	 * @throws Die
 	 *             On any other program error.
 	 */
@@ -718,7 +745,7 @@ public abstract class AbstractLogicalCommand {
 		File f = new File(setupFilePath);
 		MessageDigest digest;
 		try {
-			digest = MessageDigest.getInstance("SHA-1");
+			digest = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
 		} catch (NoSuchAlgorithmException e) {
 			throw new DiesOn(DeathType.ERROR).duedTo(e).ready();
 		}
@@ -752,16 +779,27 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
+	 * Stream goobler.
+	 * 
 	 * @author <a href="mailto:axel.richard@obeo.fr">Axel Richard</a>
 	 */
 	class StreamGobbler implements Runnable {
+		/** The stream. */
 		private InputStream is;
 
-		// reads everything from is until empty.
+		/**
+		 * Reads everything from is until empty.
+		 * 
+		 * @param is
+		 *            the stream to read.
+		 */
 		StreamGobbler(InputStream is) {
 			this.is = is;
 		}
 
+		/**
+		 * {@inheritDoc}.
+		 */
 		public void run() {
 			try {
 				InputStreamReader isr = new InputStreamReader(is);

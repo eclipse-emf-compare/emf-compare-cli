@@ -24,8 +24,15 @@ import org.eclipse.oomph.util.OomphPlugin;
  */
 public class ProgressPageLog implements ProgressLog {
 
+	/** The print stream where to log. */
 	private final PrintStream out;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param out
+	 *            the print stream where to log.
+	 */
 	public ProgressPageLog(PrintStream out) {
 		super();
 		this.out = out;
@@ -82,6 +89,9 @@ public class ProgressPageLog implements ProgressLog {
 	public void task(SetupTask setupTask) {
 	}
 
+	/**
+	 * {@inheritDoc}.
+	 */
 	public void setTerminating() {
 
 	}

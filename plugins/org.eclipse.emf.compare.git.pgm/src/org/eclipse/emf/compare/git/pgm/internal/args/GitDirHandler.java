@@ -16,7 +16,6 @@ import org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
-import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 import org.kohsuke.args4j.spi.StringOptionHandler;
@@ -33,11 +32,11 @@ public class GitDirHandler extends StringOptionHandler {
 	 * Constructor.
 	 * 
 	 * @param parser
-	 *            {@link OptionHandler#owner}
+	 *            {@link org.kohsuke.args4j.spi.OptionHandler#owner}
 	 * @param option
-	 *            {@link OptionHandler#option}
+	 *            {@link org.kohsuke.args4j.spi.OptionHandler#option}
 	 * @param setter
-	 *            {@link OptionHandler#setter}
+	 *            {@link org.kohsuke.args4j.spi.OptionHandler#setter}
 	 */
 	public GitDirHandler(CmdLineParser parser, OptionDef option, Setter<? super String> setter) {
 		super(parser, option, setter);

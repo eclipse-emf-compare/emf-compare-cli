@@ -22,11 +22,11 @@ import org.eclipse.oomph.resources.SourceLocator;
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-public class FunctionCatalog {
+public final class FunctionCatalog {
 
-	private FunctionCatalog() {
-	}
-
+	/**
+	 * Get the absolute path of a given File.
+	 */
 	public static final Function<File, String> FILE_TO_PATH = new Function<File, String>() {
 
 		public String apply(File input) {
@@ -34,16 +34,27 @@ public class FunctionCatalog {
 		}
 	};
 
+	/**
+	 * Get the File for a given IProject.
+	 */
 	public static final Function<IProject, File> IPROJECT_TO_FILE = new Function<IProject, File>() {
 		public File apply(IProject input) {
 			return new File(input.getLocation().toString());
 		}
 	};
 
+	/**
+	 * Get the File for a given SourceLocator.
+	 */
 	public static final Function<SourceLocator, File> SOURCELOCATOR_TO_FILE = new Function<SourceLocator, File>() {
 		public File apply(SourceLocator input) {
 			return new File(input.getRootFolder());
 		}
 	};
 
+	/**
+	 * Internal constructor.
+	 */
+	private FunctionCatalog() {
+	}
 }

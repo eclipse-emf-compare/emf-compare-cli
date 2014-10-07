@@ -99,6 +99,16 @@ import org.kohsuke.args4j.Option;
 public abstract class AbstractLogicalApplication implements IApplication {
 
 	/**
+	 * Logs any message from oomph.
+	 */
+	protected ProgressPageLog progressPageLog;
+
+	/**
+	 * Git repository for this command to be executed in.
+	 */
+	protected Repository repo;
+
+	/**
 	 * Holds git directory location.
 	 */
 	@Argument(index = 0, metaVar = "gitFolderPath", usage = "Path to the .git folder of your repository.", handler = GitDirHandler.class)
@@ -117,19 +127,11 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	private boolean showStackTrace;
 
 	/**
-	 * Logs any message from oomph.
-	 */
-	protected ProgressPageLog progressPageLog;
-
-	/**
-	 * Git repository for this command to be executed in.
-	 */
-	protected Repository repo;
-
-	/**
 	 * {@inheritDoc}.
 	 */
+	@Override
 	public Object start(IApplicationContext context) throws Exception {
+		Integer code;
 		// Prevents VM args if the application exits on something different that 0
 		System.setProperty(IApplicationContext.EXIT_DATA_PROPERTY, EMPTY_STRING);
 		final Map<?, ?> args = context.getArguments();
@@ -150,14 +152,14 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		}
 		try {
 			performStartup();
-			return performGitCommand();
+			code = performGitCommand();
 		} catch (Die e) {
-			Integer returnCode = EMFCompareGitPGMUtil.handleDieError(e, showStackTrace);
-			return returnCode;
+			code = EMFCompareGitPGMUtil.handleDieError(e, showStackTrace);
 		} finally {
 			dispose();
 		}
 
+		return code;
 	}
 
 	/**
@@ -171,6 +173,8 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 * Performs the logical git command (diff or merge).
 	 * 
 	 * @return a {@link org.eclipse.emf.compare.git.pgm.Returns}.
+	 * @throws Die
+	 *             e
 	 */
 	protected abstract Integer performGitCommand() throws Die;
 
@@ -178,9 +182,8 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 * Creates and configure the setup task performer to execute the imports of projects referenced in the
 	 * user setup model. Then call the {@link #performGitCommand()}.
 	 * 
-	 * @return a {@link org.eclipse.emf.compare.git.pgm.Returns}.
-	 * @throws IOException
 	 * @throws Die
+	 *             e
 	 */
 	protected void performStartup() throws Die {
 		ComposedAdapterFactory adapterFactory = new ComposedAdapterFactory(BaseEditUtil
@@ -246,7 +249,11 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	}
 
 	/**
+	 * Check if the file to test is EMFCompare compliant.
+	 * 
 	 * @see org.eclipse.egit.ui.internal.CompareUtils#canDirectlyOpenInCompare(IFile)
+	 * @param mergeContext
+	 *            a resource mapping context.
 	 * @param file
 	 *            the file to test.
 	 * @return true if the file to test is EMFCompare compliant, false otherwise.
@@ -275,6 +282,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 *            the id for which we want the tree iterator.
 	 * @return the tree iterator of the id located in the repository.
 	 * @throws IOException
+	 *             e
 	 */
 	protected AbstractTreeIterator getTreeIterator(Repository repository, ObjectId id) throws IOException {
 		final CanonicalTreeParser p = new CanonicalTreeParser();
@@ -291,6 +299,8 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 * Simulate a comparison between the two given references and returns back the subscriber that can provide
 	 * all computed synchronization information.
 	 * 
+	 * @param repository
+	 *            the current repository.
 	 * @param sourceRef
 	 *            Source reference (i.e. "left" side of the comparison).
 	 * @param targetRef
@@ -298,6 +308,8 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 * @param comparedFile
 	 *            The file we are comparing (that would be the file right-clicked into the workspace).
 	 * @return The created subscriber.
+	 * @throws IOException
+	 *             e
 	 */
 	protected RemoteResourceMappingContext createSubscriberForComparison(Repository repository,
 			ObjectId sourceRef, ObjectId targetRef, IFile comparedFile) throws IOException {
@@ -313,6 +325,8 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 * This will query all model providers for those that are enabled on the given file and list all mappings
 	 * available for that file.
 	 * 
+	 * @param mergeContext
+	 *            a resource mapping context.
 	 * @param file
 	 *            The file for which we need the associated resource mappings.
 	 * @return All mappings available for that file.
@@ -356,8 +370,13 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	}
 
 	/**
+	 * Validate that the perform operation has been successfully executed for the given
+	 * {@link SetupTaskPerformer}.
+	 * 
 	 * @param performerStartup
+	 *            the given {@link SetupTaskPerformer}.
 	 * @throws Die
+	 *             e
 	 */
 	private void validatePerform(SetupTaskPerformer performerStartup) throws Die {
 		if (!performerStartup.hasSuccessfullyPerformed()) {
@@ -375,7 +394,10 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	}
 
 	/**
-	 * @throws CoreException
+	 * Clean the workspace.
+	 * 
+	 * @throws Die
+	 *             e
 	 */
 	private void cleanWorkspace() throws Die {
 		final IWorkspace workspace = org.eclipse.core.resources.ResourcesPlugin.getWorkspace();
@@ -386,7 +408,6 @@ public abstract class AbstractLogicalApplication implements IApplication {
 					for (IProject project : root.getProjects()) {
 						project.delete(false, true, monitor);
 					}
-
 					for (File file : root.getLocation().toFile().listFiles()) {
 						if (file.isDirectory()) {
 							// Hack waiting for a response on
@@ -461,6 +482,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 * </p>
 	 * 
 	 * @throws InterruptedException
+	 *             e
 	 */
 	private void waitEgitJobs() throws InterruptedException {
 		IJobManager jobMan = Job.getJobManager();

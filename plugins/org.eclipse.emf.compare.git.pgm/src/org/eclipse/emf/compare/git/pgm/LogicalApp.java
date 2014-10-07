@@ -79,6 +79,9 @@ public class LogicalApp implements IApplication {
 	@Argument(index = 1, metaVar = "args")
 	private List<String> arguments = new ArrayList<String>();
 
+	/**
+	 * The URI of the setup file that contains the environment used to execute the logical commands.
+	 */
 	private final URI environmentSetupURI;
 
 	/**
@@ -90,6 +93,9 @@ public class LogicalApp implements IApplication {
 
 	/**
 	 * Constructor used for tests.
+	 * 
+	 * @param environmentURI
+	 *            URI of the setup file that contains the environment used to execute the logical commands.
 	 */
 	public LogicalApp(URI environmentURI) {
 		environmentSetupURI = environmentURI;
@@ -146,7 +152,9 @@ public class LogicalApp implements IApplication {
 	 *            application arguments.
 	 * @return {@link Returns}
 	 * @throws Die
+	 *             e
 	 * @throws IOException
+	 *             e
 	 */
 	private Object execute(final String[] argv) throws Die, IOException {
 		final CmdLineParser clp = new CmdLineParser(this);

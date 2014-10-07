@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Obeo.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Obeo - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.util;
 
 import com.google.common.base.Strings;
@@ -11,7 +21,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 
-public class EMFCompareGitPGMUtil {
+/**
+ * Utils methods.
+ * 
+ * @author <a href="mailto:axel.richard@obeo.fr">Axel Richard</a>
+ */
+public final class EMFCompareGitPGMUtil {
 
 	/**
 	 * File separator.
@@ -37,6 +52,12 @@ public class EMFCompareGitPGMUtil {
 	 * Parent Folder.
 	 */
 	public static final String PARENT = ".."; //$NON-NLS-1$
+
+	/**
+	 * Internal constructor.
+	 */
+	private EMFCompareGitPGMUtil() {
+	}
 
 	/**
 	 * Displays the error message to the user and return matching {@link Returns}.
@@ -78,9 +99,8 @@ public class EMFCompareGitPGMUtil {
 	}
 
 	/**
-	 * Upstream, based on branch 'master' of git@github.com:adaussy/EMFCompareGitPGM.git Returns, from a
-	 * relative path, the corresponding file with an absolute path. This absolute path is computed against
-	 * 'user.dir' system property.
+	 * Returns, from a relative path, the corresponding file with an absolute path. This absolute path is
+	 * computed against 'user.dir' system property.
 	 * 
 	 * @param relativePath
 	 *            the relative path for which we want the corresponding file.
@@ -94,8 +114,11 @@ public class EMFCompareGitPGMUtil {
 	 * Returns, from a relative path, the corresponding file with an absolute path. This absolute path is
 	 * computed against the given base path.
 	 * 
+	 * @param basePath
+	 *            teh basePath to construct the full path.
 	 * @param relativePath
-	 *            the relative path for which we want the corresponding file.
+	 *            the relative path for which we want the corresponding file. the relative path for which we
+	 *            want the corresponding file.
 	 * @return the corresponding file with an absolute path.
 	 */
 	public static File toFileWithAbsolutePath(String basePath, String relativePath) {
@@ -113,7 +136,8 @@ public class EMFCompareGitPGMUtil {
 	 * Get a nice message from a IStatus.
 	 * 
 	 * @param status
-	 * @return
+	 *            the IStatus.
+	 * @return a nice message from a IStatus.
 	 */
 	public static String getStatusMessage(IStatus status) {
 		StringBuilder statusMessage = new StringBuilder(status.getMessage());
@@ -123,6 +147,16 @@ public class EMFCompareGitPGMUtil {
 		return statusMessage.toString();
 	}
 
+	/**
+	 * Append a new message to the status.
+	 * 
+	 * @param status
+	 *            the IStatus.
+	 * @param builder
+	 *            the message.
+	 * @param depth
+	 *            the depth of the new message.
+	 */
 	private static void appendChildrenStatus(IStatus status, StringBuilder builder, int depth) {
 		for (IStatus child : status.getChildren()) {
 			builder.append(Strings.repeat(" ", depth)).append(child.getMessage()).append(EOL); //$NON-NLS-1$

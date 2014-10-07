@@ -31,16 +31,35 @@ public enum Returns {
 	 */
 	ERROR(Integer.valueOf(128));
 
+	/** The return code. */
 	private final Integer code;
 
+	/**
+	 * Internal constructor.
+	 * 
+	 * @param code
+	 *            the return code.
+	 */
 	private Returns(Integer code) {
 		this.code = code;
 	}
 
+	/**
+	 * Get the return code.
+	 * 
+	 * @return the return code.
+	 */
 	public final Integer code() {
 		return code;
 	}
 
+	/**
+	 * Converts an int into a Returns code.
+	 * 
+	 * @param code
+	 *            the code represented as an int.
+	 * @return the Returns code.
+	 */
 	public static Returns valueOf(int code) {
 		for (Returns r : Returns.values()) {
 			if (r.code().equals(Integer.valueOf(code))) {

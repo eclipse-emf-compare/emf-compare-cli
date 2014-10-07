@@ -89,9 +89,9 @@ public class LogicalMergeToolCommand extends AbstractLogicalCommand {
 		}
 
 		command.add("-vmargs"); //$NON-NLS-1$
-		command.add("-D" + PROP_SETUP_CONFIRM_SKIP + "=true"); //$NON-NLS-1$ //$NON-NLS-2$
-		command.add("-D" + PROP_SETUP_OFFLINE_STARTUP + "=" + false); //$NON-NLS-1$ //$NON-NLS-2$
-		command.add("-D" + PROP_SETUP_MIRRORS_STARTUP + "=" + true); //$NON-NLS-1$ //$NON-NLS-2$
+		command.add(VMARGS_OPTION + PROP_SETUP_CONFIRM_SKIP + "=true"); //$NON-NLS-1$ 
+		command.add(VMARGS_OPTION + PROP_SETUP_OFFLINE_STARTUP + "=" + false); //$NON-NLS-1$ 
+		command.add(VMARGS_OPTION + PROP_SETUP_MIRRORS_STARTUP + "=" + true); //$NON-NLS-1$ 
 
 		ProcessBuilder builder = new ProcessBuilder(command);
 		Process process;

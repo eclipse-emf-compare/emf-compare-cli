@@ -69,6 +69,9 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 	@Option(name = "-m", metaVar = "message", required = false, usage = "Set the commit message to be used for the merge commit (in case one is created).")
 	private String message;
 
+	/**
+	 * Option debug.
+	 */
 	@Option(name = "--debug", usage = "Launched the provisonned eclipse in debug mode.", aliases = {"-d" })
 	private boolean debug;
 
@@ -82,13 +85,13 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 		// Checks we are not already in a conflict state
 		// Checks that the repository is in conflict state
 		if (getRepository().getRepositoryState() == RepositoryState.MERGING) {
-			StringBuilder message = new StringBuilder(
+			StringBuilder msg = new StringBuilder(
 					"error: 'merge' is not possible because you have unmerged files.").append(EOL);
-			message.append("hint: Use the logicalmergetool command to fix them up un the work tree").append(
+			msg.append("hint: Use the logicalmergetool command to fix them up un the work tree").append(
 					EOL);
-			message.append("hint: and then use the 'git add/rm <file>' as").append(EOL);
-			message.append("hint: appropriate to mark resolution").append(EOL);
-			System.out.println(message);
+			msg.append("hint: and then use the 'git add/rm <file>' as").append(EOL);
+			msg.append("hint: appropriate to mark resolution").append(EOL);
+			System.out.println(msg);
 			throw new DiesOn(DeathType.FATAL).displaying("Exiting because of an unresolved conflict.")
 					.ready();
 		}
@@ -148,9 +151,9 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 		}
 
 		command.add("-vmargs"); //$NON-NLS-1$
-		command.add("-D" + PROP_SETUP_CONFIRM_SKIP + "=true"); //$NON-NLS-1$ //$NON-NLS-2$
-		command.add("-D" + PROP_SETUP_OFFLINE_STARTUP + "=" + false); //$NON-NLS-1$ //$NON-NLS-2$
-		command.add("-D" + PROP_SETUP_MIRRORS_STARTUP + "=" + true); //$NON-NLS-1$ //$NON-NLS-2$
+		command.add(VMARGS_OPTION + PROP_SETUP_CONFIRM_SKIP + "=true"); //$NON-NLS-1$ 
+		command.add(VMARGS_OPTION + PROP_SETUP_OFFLINE_STARTUP + "=" + false); //$NON-NLS-1$ 
+		command.add(VMARGS_OPTION + PROP_SETUP_MIRRORS_STARTUP + "=" + true); //$NON-NLS-1$ 
 		if (debug) {
 			command.add("-Xdebug"); //$NON-NLS-1$
 			command.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8123"); //$NON-NLS-1$

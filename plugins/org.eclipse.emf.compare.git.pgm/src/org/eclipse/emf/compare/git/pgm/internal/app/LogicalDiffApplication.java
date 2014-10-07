@@ -160,14 +160,14 @@ public class LogicalDiffApplication extends AbstractLogicalApplication {
 
 							ByteArrayOutputStream baos = new ByteArrayOutputStream();
 							resource.save(baos, null);
-							System.out.println(baos.toString("UTF-8"));//$NON-NLS-1$
+							System.out.println(baos.toString("UTF-8")); //$NON-NLS-1$
 						}
 					}
 				}
 			}
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			e.printStackTrace();
+			progressPageLog.log(e);
 		}
 
 		return Returns.COMPLETE.code();
