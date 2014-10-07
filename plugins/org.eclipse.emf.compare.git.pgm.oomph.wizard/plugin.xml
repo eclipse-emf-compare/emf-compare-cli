@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.oomph"
+            name="Oomph">
+      </category>
+      <wizard
+            category="org.eclipse.oomph"
+            class="org.eclipse.emf.compare.git.pgm.oomph.wizard.EMFCompareGitPGMSetupWizard"
+            icon="icons/emfcompare-icon.gif"
+            id="org.eclipse.emf.compare.git.pgm.oomph.wizard"
+            name="Setup for EMF Compare Git PGM"
+            project="false">
+      </wizard>
+   </extension>
+
+</plugin>
