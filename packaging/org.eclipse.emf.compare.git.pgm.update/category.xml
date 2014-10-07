@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.eclipse.emf.compare.git.pgm.feature_1.0.0.qualifier.jar" id="org.eclipse.emf.compare.git.pgm.feature" version="1.0.0.qualifier"/>
+   <feature id="org.eclipse.emf.compare.git.pgm" version="0.0.0">
+   	<category name="compare_pgm"/>
+   </feature>
+   <feature id="org.eclipse.emf.compare.git.pgm.oomph.wizard" version="0.0.0">
+      <category name="compare_pgm_wizard"/>
+   </feature>
+   <category-def name="compare_pgm" label="EMF Compare Git PGM">
+      <description>
+         EMF Compare Git PGM features.
+      </description>
+   </category-def>
+   <category-def name="compare_pgm_wizard" label="EMF Compare Git PGM Wizards">
+      <description>
+         Features to integrate Wizards for EMF Compare Git PGM.
+      </description>
+   </category-def>
 </site>

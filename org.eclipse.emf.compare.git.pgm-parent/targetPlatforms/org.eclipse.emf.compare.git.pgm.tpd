@@ -19,7 +19,7 @@ location "http://download.eclipse.org/releases/luna" {
 	org.eclipse.papyrus.sdk.feature.feature.group lazy
 	}
 
-location "https://hudson.eclipse.org/oomph/job/integration/lastSuccessfulBuild/artifact/updates/" {
+location "http://download.eclipse.org/oomph/updates" {
 	org.eclipse.oomph.util lazy
 	org.eclipse.oomph.base.edit lazy
 	org.eclipse.oomph.setup lazy

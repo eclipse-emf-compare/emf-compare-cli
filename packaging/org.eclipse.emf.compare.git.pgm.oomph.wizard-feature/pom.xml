@@ -3,13 +3,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.eclipse.emf.compare.git.pgm</groupId>
-    <artifactId>org.eclipse.emf.compare.git.pgm-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../../org.eclipse.emf.compare.git.pgm-parent</relativePath>
+    	<groupId>org.eclipse.emf.compare.git.pgm</groupId>
+		<artifactId>org.eclipse.emf.compare.git.pgm-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../org.eclipse.emf.compare.git.pgm-parent</relativePath>
   </parent>
-  <groupId>org.eclipse.emf.compare.git.pgm</groupId>
+  <groupId>org.eclipse.emf.compare.git.pgm.features</groupId>
   <artifactId>org.eclipse.emf.compare.git.pgm.oomph.wizard</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-feature</packaging>
 </project>

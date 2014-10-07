@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.emf.compare.git.pgm.feature"
+      id="org.eclipse.emf.compare.git.pgm"
       label="EMF Compare Git PGM Feature"
-      version="1.0.0.qualifier">
+      version="1.0.0.qualifier"
+      plugin="org.eclipse.emf.compare.git.pgm">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

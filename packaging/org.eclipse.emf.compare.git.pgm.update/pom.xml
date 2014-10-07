@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.eclipse.emf.compare.git.pgm</groupId>
-		<artifactId>org.eclipse.emf.compare.git.pgm.parent</artifactId>
+		<artifactId>org.eclipse.emf.compare.git.pgm-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../../org.eclipse.emf.compare.git.pgm.parent/</relativePath>
+		<relativePath>../../org.eclipse.emf.compare.git.pgm-parent</relativePath>
 	</parent>
 	<groupId>org.eclipse.emf.compare.git.pgm</groupId>
 	<artifactId>org.eclipse.emf.compare.git.pgm.update</artifactId>
@@ -20,7 +20,7 @@
 				<artifactId>tycho-p2-repository-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
-					<repositoryName>EMF Compare EGit PGM</repositoryName>
+					<repositoryName>EMF Compare Git PGM</repositoryName>
 					<finalName>${project.groupId}-${unqualifiedVersion}.${buildQualifier}</finalName>
 				</configuration>
 			</plugin>
