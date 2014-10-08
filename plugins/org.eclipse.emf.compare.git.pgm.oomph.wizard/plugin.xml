@@ -14,6 +14,7 @@
             id="org.eclipse.emf.compare.git.pgm.oomph.wizard"
             name="Setup Model for EMF Compare&apos;s Git commands"
             project="false">
+          <description>This wizard creates a new setup model for EMF Compare&apos;s Git commands.</description>
       </wizard>
    </extension>
 
