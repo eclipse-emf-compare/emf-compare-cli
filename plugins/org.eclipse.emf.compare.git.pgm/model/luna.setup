@@ -51,7 +51,7 @@
       <repository
           url="http://download.eclipse.org/releases/luna/201406250900"/>
       <repository
-          url="http://ericssonegit.ci.obeo.fr:8180/jenkins/job/egit-logical/lastSuccessfulBuild/artifact/org.eclipse.egit.repository/target/repository/"/>
+          url="http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/"/>
       <repository
           url="http://adaussy.github.io/EMFCompareGitPGM/"/>
       <repository

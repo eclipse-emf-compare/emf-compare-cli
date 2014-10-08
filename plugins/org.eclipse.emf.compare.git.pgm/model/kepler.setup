@@ -51,7 +51,7 @@
       <repository
           url="http://download.eclipse.org/releases/kepler/201402280900"/>
       <repository
-          url="file:/D:/tests/egitLogical/org.eclipse.egit.repository-3.5.0-SNAPSHOT"/>
+          url="http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/"/>
       <repository
           url="http://adaussy.github.io/EMFCompareGitPGM/"/>
       <repository
