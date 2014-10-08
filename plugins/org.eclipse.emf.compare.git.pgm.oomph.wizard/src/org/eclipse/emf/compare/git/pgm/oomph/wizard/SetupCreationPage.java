@@ -41,7 +41,7 @@ public class SetupCreationPage extends WizardNewFileCreationPage {
 	public SetupCreationPage(String pageName, IStructuredSelection selection) {
 		super(pageName, selection);
 		setTitle("Setup for EMF Compare Git PGM");
-		setDescription("This wizard creates a new setup model for EMF Compare Git PGM.");
+		setDescription("This wizard creates a new setup model for EMF Compare's Git commands.");
 		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
 				Activator.PLUGIN_ID, "icons/emfcompare-logo-wiz.png"));
 	}

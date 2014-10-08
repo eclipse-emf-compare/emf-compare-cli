@@ -12,7 +12,7 @@
             class="org.eclipse.emf.compare.git.pgm.oomph.wizard.EMFCompareGitPGMSetupWizard"
             icon="icons/emfcompare-icon.gif"
             id="org.eclipse.emf.compare.git.pgm.oomph.wizard"
-            name="Setup for EMF Compare Git PGM"
+            name="Setup Model for EMF Compare&apos;s Git commands"
             project="false">
       </wizard>
    </extension>

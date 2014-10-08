@@ -73,7 +73,7 @@ public class SetupContentPage extends WizardPage {
 	public SetupContentPage() {
 		super("wizardPage");
 		setTitle("Setup for EMF Compare Git PGM");
-		setDescription("This wizard creates a new setup model for EMF Compare Git PGM.");
+		setDescription("This wizard creates a new setup model for EMF Compare's Git commands.");
 		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(
 				Activator.PLUGIN_ID, "icons/emfcompare-logo-wiz.png"));
 	}
