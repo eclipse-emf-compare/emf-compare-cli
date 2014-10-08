@@ -12,7 +12,11 @@ package org.eclipse.emf.compare.git.pgm.internal.args;
 
 import com.google.common.base.Preconditions;
 
+import java.io.IOException;
+
 import org.eclipse.emf.compare.git.pgm.internal.exception.ArgumentValidationError;
+import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -57,7 +61,7 @@ public class RefOptionHandler extends OptionHandler<ObjectId> {
 		try {
 			objectID = ((CmdLineParserRepositoryBuilder)owner).getRepo().resolve(ref);
 			setter.addValue(objectID);
-		} catch (Exception e) {
+		} catch (RevisionSyntaxException | IOException | Die e) {
 			throw new ArgumentValidationError(owner, e);
 		}
 		if (objectID == null) {
