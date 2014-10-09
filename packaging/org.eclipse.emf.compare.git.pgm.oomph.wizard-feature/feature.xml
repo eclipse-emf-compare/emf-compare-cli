@@ -24,14 +24,10 @@
       <import feature="org.eclipse.oomph.setup" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.setup.core" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.setup.git" version="1.0.0.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.oomph.setup.installer" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.setup.jdt" version="1.0.0.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.oomph.setup.launching" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.setup.projects" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.setup.projectset" version="1.0.0.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.oomph.setup.workbench" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.setup.workingsets" version="1.0.0.qualifier" match="greaterOrEqual"/>
-      <import feature="org.eclipse.oomph.license" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.p2" version="1.0.0.qualifier" match="greaterOrEqual"/>
       <import feature="org.eclipse.oomph.preferences" version="1.0.0.qualifier" match="greaterOrEqual"/>
    </requires>
