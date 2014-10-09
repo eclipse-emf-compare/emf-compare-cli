@@ -35,8 +35,8 @@ import org.junit.Test;
  * Should only be called from the tycho build since it used the emfcompare-git-pgm update to create the
  * provided platform.
  * <p>
- * If you need to run it locally please set the system variable "emfcompare-git-pgm--updasite" to the location
- * of update holding emfcompare-git-pgm plugins.
+ * If you need to run it locally please set the system variable "emfcompare-git-pgm--updatesite" to the
+ * location of update holding emfcompare-git-pgm plugins.
  * </p>
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>

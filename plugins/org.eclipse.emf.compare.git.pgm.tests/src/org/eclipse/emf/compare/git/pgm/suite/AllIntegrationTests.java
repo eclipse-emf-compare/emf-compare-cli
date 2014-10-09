@@ -33,8 +33,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * Should only be called from the tycho build since it used the emfcompare-git-pgm update to create the
  * provided platform.
  * <p>
- * If you need to run it locally please set the system variable "emfcompare-git-pgm--updasite" to the location
- * of update holding emfcompare-git-pgm plugins.
+ * If you need to run it locally please set the system variable "emfcompare-git-pgm--updatesite" to the
+ * location of update holding emfcompare-git-pgm plugins.
  * </p>
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
@@ -47,7 +47,7 @@ public class AllIntegrationTests {
 	/**
 	 * System property to set to the emfcompare-git-pgm update site location.
 	 */
-	private static final String EMFCOMPARE_GIT_PGM_UPDASITE_SYS_PROP = "emfcompare-git-pgm--updasite"; //$NON-NLS-1$
+	private static final String EMFCOMPARE_GIT_PGM_UPDASITE_SYS_PROP = "emfcompare-git-pgm--updatesite"; //$NON-NLS-1$
 
 	private static final String TMP_DIRECTORY_PREFIX = "emfcompare-git-pgm"; //$NON-NLS-1$
 
