@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Logical Merge" uid="org.eclipse.emf.compare.git.pgm.product" id="org.eclipse.emf.compare.git.pgm.product" application="org.eclipse.emf.compare.git.pgm.application" useFeatures="false" includeLaunchers="true">
+<product name="EMF Compare Git Commands" uid="org.eclipse.emf.compare.git.pgm.product" id="org.eclipse.emf.compare.git.pgm.product" application="org.eclipse.emf.compare.git.pgm.application" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
