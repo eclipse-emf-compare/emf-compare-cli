@@ -47,7 +47,7 @@
       <requirement
           name="com.google.guava"/>
       <requirement
-          name="org.eclipse.emf.compare.git.pgm.feature.feature.group"/>
+          name="org.eclipse.emf.compare.git.pgm.feature.group"/>
       <repository
           url="http://download.eclipse.org/releases/kepler/201402280900"/>
       <repository
