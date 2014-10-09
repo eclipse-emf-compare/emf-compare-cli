@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup:Project
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:projects="http://www.eclipse.org/oomph/setup/projects/1.0"
+    xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
+    xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore"
+    name="MER_003"
+    label="MER_003">
+  <setupTask
+      xsi:type="setup:VariableTask"
+      name="installation.location"
+      value="/your/installation/location"
+      defaultValue=""/>
+  <setupTask
+      xsi:type="setup:VariableTask"
+      name="workspace.location"
+      value="/your/workspace/location"/>
+  <setupTask
+      xsi:type="setup.p2:P2Task"
+      label="Additional Plugins">
+    <requirement
+        name="org.eclipse.uml2.feature.group"/>
+    <requirement
+        name="org.eclipse.gmf.runtime.notation.sdk.feature.group"/>
+    <requirement
+        name="org.eclipse.papyrus.sdk.feature.feature.group"/>
+    <requirement
+        name="org.eclipse.emf.compare.rcp.ui.feature.group"/>
+    <requirement
+        name="org.eclipse.emf.compare.uml2.feature.group"/>
+    <requirement
+        name="org.eclipse.emf.compare.diagram.gmf.feature.group"/>
+    <requirement
+        name="org.eclipse.emf.compare.diagram.papyrus.feature.group"/>
+    <repository
+        url="http://download.eclipse.org/releases/luna/201406250900"/>
+    <repository
+        url="http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest/"/>
+  </setupTask>
+  <setupTask
+      xsi:type="projects:ProjectsImportTask">
+    <sourceLocator
+        rootFolder="/your/projects/location"
+        locateNestedProjects="true"/>
+  </setupTask>
+  <description> </description>
+</setup:Project>
