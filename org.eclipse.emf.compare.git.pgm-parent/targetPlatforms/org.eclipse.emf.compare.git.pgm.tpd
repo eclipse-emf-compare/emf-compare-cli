@@ -29,7 +29,7 @@ location "http://download.eclipse.org/oomph/updates" {
 
 }
 
-location "http://ericssonegit.ci.obeo.fr:8180/jenkins/job/egit-logical/lastSuccessfulBuild/artifact/org.eclipse.egit.repository/target/repository/" {
+location "http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/" {
 	org.eclipse.egit.feature.group lazy
 }
 
