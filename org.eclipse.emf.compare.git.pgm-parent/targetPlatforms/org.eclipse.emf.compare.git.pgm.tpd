@@ -21,12 +21,15 @@ location "http://download.eclipse.org/releases/luna" {
 
 location "http://download.eclipse.org/oomph/updates" {
 	org.eclipse.oomph.util lazy
-	org.eclipse.oomph.base.edit lazy
-	org.eclipse.oomph.setup lazy
-	org.eclipse.oomph.setup.core lazy
-	org.eclipse.oomph.setup.projects lazy
-	org.eclipse.oomph.setup.p2 lazy
-
+	org.eclipse.oomph.p2.feature.group lazy
+	org.eclipse.oomph.preferences.feature.group lazy
+	org.eclipse.oomph.setup.feature.group lazy
+	org.eclipse.oomph.setup.core.feature.group lazy
+	org.eclipse.oomph.setup.git.feature.group lazy
+	org.eclipse.oomph.setup.jdt.feature.group lazy
+	org.eclipse.oomph.setup.projects.feature.group lazy
+	org.eclipse.oomph.setup.projectset.feature.group lazy
+	org.eclipse.oomph.setup.workingsets.feature.group lazy
 }
 
 location "http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/" {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="EMF Compare Git PGM target platform" sequenceNumber="1412837973">
+<target name="EMF Compare Git PGM target platform" sequenceNumber="1412839018">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.emf.compare.rcp.ui.feature.group" version="0.0.0"/>
@@ -22,11 +22,15 @@
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.oomph.util" version="0.0.0"/>
-      <unit id="org.eclipse.oomph.base.edit" version="0.0.0"/>
-      <unit id="org.eclipse.oomph.setup" version="0.0.0"/>
-      <unit id="org.eclipse.oomph.setup.core" version="0.0.0"/>
-      <unit id="org.eclipse.oomph.setup.projects" version="0.0.0"/>
-      <unit id="org.eclipse.oomph.setup.p2" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.p2.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.preferences.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.setup.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.setup.core.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.setup.git.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.setup.jdt.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.setup.projects.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.setup.projectset.feature.group" version="0.0.0"/>
+      <unit id="org.eclipse.oomph.setup.workingsets.feature.group" version="0.0.0"/>
       <repository location="http://download.eclipse.org/oomph/updates"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">

@@ -53,7 +53,7 @@
       <repository
           url="http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/"/>
       <repository
-          url="http://adaussy.github.io/EMFCompareGitPGM/"/>
+          url="file:/D:/git/compare2/org.eclipse.emf.compare-cli/packaging/org.eclipse.emf.compare.git.pgm.update/target/repository/"/>
       <repository
           url="http://download.eclipse.org/modeling/emf/emf/updates/2.10/core/R201405190339"/>
       <repository
