@@ -49,13 +49,13 @@
       <requirement
           name="org.eclipse.emf.compare.git.pgm.feature.group"/>
       <repository
-          url="http://download.eclipse.org/releases/luna/201406250900"/>
+          url="http://download.eclipse.org/releases/luna/201409261001"/>
       <repository
           url="http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/"/>
       <repository
-          url="https://hudson.eclipse.org/emfcompare/job/cli-master-nightly/lastSuccessfulBuild/artifact/packaging/org.eclipse.emf.compare.git.pgm.update/target/repository/"/>
+          url="http://download.eclipse.org/oomph/updates"/>
       <repository
-          url="http://download.eclipse.org/modeling/emf/emf/updates/2.10/core/R201405190339"/>
+          url="http://download.eclipse.org/modeling/emf/emf/updates/2.10.x"/>
       <repository
           url="https://hudson.eclipse.org/oomph/job/integration/lastSuccessfulBuild/artifact/updates/"/>
       <repository
@@ -95,7 +95,7 @@
           <repository
               url="http://download.eclipse.org/technology/epp/packages/luna"/>
           <repository
-              url="http://download.eclipse.org/releases/luna/201406250900"/>
+              url="http://download.eclipse.org/releases/luna/201409261001"/>
         </setupTask>
       </version>
     </product>
