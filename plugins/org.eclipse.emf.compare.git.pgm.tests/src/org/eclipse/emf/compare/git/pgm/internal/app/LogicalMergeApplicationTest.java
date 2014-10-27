@@ -188,7 +188,7 @@ public class LogicalMergeApplicationTest extends AbstractApplicationTest {
 		File userSetupFile = userModelBuilder.setInstallationLocation(oomphFolderPath.toString()) //
 				.setWorkspaceLocation(getWorkspaceLocation().getAbsolutePath()) //
 				.setProjectPaths(Arrays.stream(project).map(p -> p.getAbsolutePath()).toArray(String[]::new)) //
-				.setRepositories("http://download.eclipse.org/releases/luna/201406250900",
+				.setRepositories("http://download.eclipse.org/releases/luna/201409261001",
 						"http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest/") //
 				.setRequirements("org.eclipse.uml2.feature.group",
 						"org.eclipse.papyrus.sdk.feature.feature.group",
