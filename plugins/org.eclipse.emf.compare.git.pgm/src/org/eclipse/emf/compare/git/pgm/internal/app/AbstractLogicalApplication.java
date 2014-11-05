@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
@@ -150,14 +150,23 @@ public abstract class AbstractLogicalApplication implements IApplication {
 			dispose();
 			return Returns.ERROR;
 		}
+		// CHECKSTYLE.OFF: IllegalCatch - We want to hide the strack trace if the showStackTrace option does
+		// not holds true.
 		try {
 			performStartup();
 			code = performGitCommand();
 		} catch (Die e) {
 			code = EMFCompareGitPGMUtil.handleDieError(e, showStackTrace);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			if (showStackTrace) {
+				e.printStackTrace();
+			}
+			code = Returns.ERROR.code();
 		} finally {
 			dispose();
 		}
+		// CHECKSTYLE.ON: IllegalCatch
 
 		return code;
 	}
@@ -203,7 +212,8 @@ public abstract class AbstractLogicalApplication implements IApplication {
 				SetupPackage.Literals.PROJECT);
 
 		SetupContext setupContext = SetupContext.createInstallationAndUser(rs);
-
+		// CHECKSTYLE.OFF: IllegalCatch - No choice since Oomph launch such an exception. We want to handle
+		// exception ourself
 		try {
 			Trigger triggerStartup = Trigger.STARTUP;
 			URIConverter uriConverter = rs.getURIConverter();
@@ -236,6 +246,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 			}
 			throw new DiesOn(DeathType.FATAL).duedTo(e).displaying(message).ready();
 		}
+		// CHECKSTYLE.ON: IllegalCatch
 	}
 
 	/**
@@ -402,37 +413,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	private void cleanWorkspace() throws Die {
 		final IWorkspace workspace = org.eclipse.core.resources.ResourcesPlugin.getWorkspace();
 		try {
-			workspace.run(new IWorkspaceRunnable() {
-				public void run(IProgressMonitor monitor) throws CoreException {
-					IWorkspaceRoot root = workspace.getRoot();
-					for (IProject project : root.getProjects()) {
-						project.delete(false, true, monitor);
-					}
-					for (File file : root.getLocation().toFile().listFiles()) {
-						if (file.isDirectory()) {
-							// Hack waiting for a response on
-							// https://www.eclipse.org/forums/index.php?t=rview&goto=1415112#msg_1415112
-							if (".metadata".equals(file.getName())) { //$NON-NLS-1$
-								// Deletes the Oomph import-history.properties to force new import
-								File importHistory = new File(
-										file.getAbsolutePath()
-												+ SEP
-												+ ".plugins/org.eclipse.oomph.setup.projects/import-history.properties"); //$NON-NLS-1$
-								if (importHistory.exists()) {
-									IOUtil.deleteBestEffort(importHistory);
-									try {
-										importHistory.createNewFile();
-									} catch (IOException e) {
-										throw new CoreException(
-												new Status(IStatus.ERROR, "org.eclipse.emf.compare.git.pgm",
-														"Unable to delete the file .plugins/org.eclipse.oomph.setup.projects/import-history.properties"));
-									}
-								}
-							}
-						}
-					}
-				}
-			}, null);
+			workspace.run(new WorkspaceCleaner(workspace), null);
 		} catch (CoreException e) {
 			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
 		}
@@ -490,5 +471,54 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		jobMan.join(JobFamilies.AUTO_IGNORE, new NullProgressMonitor());
 		jobMan.join(JobFamilies.REPOSITORY_CHANGED, new NullProgressMonitor());
 		jobMan.join(JobFamilies.INDEX_DIFF_CACHE_UPDATE, new NullProgressMonitor());
+	}
+
+	/**
+	 * An workspace action that removes all projects from the workspace. It also deletes
+	 * ".plugins/org.eclipse.oomph.setup.projects/import-history.properties"file since it contains references
+	 * of projects imported by Oomph.
+	 *
+	 * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
+	 */
+	private final class WorkspaceCleaner implements IWorkspaceRunnable {
+		/** Workspace to clean. */
+		private final IWorkspace workspace;
+
+		/**
+		 * Constructor.
+		 *
+		 * @param workspace
+		 *            Workspace to clean
+		 */
+		private WorkspaceCleaner(IWorkspace workspace) {
+			this.workspace = workspace;
+		}
+
+		@Override
+		public void run(IProgressMonitor monitor) throws CoreException {
+			IWorkspaceRoot root = workspace.getRoot();
+			for (IProject project : root.getProjects()) {
+				project.delete(false, true, monitor);
+			}
+			for (File file : root.getLocation().toFile().listFiles()) {
+				if (file.isDirectory()) {
+					if (".metadata".equals(file.getName())) { //$NON-NLS-1$
+						// Deletes the Oomph import-history.properties to force new import
+						File importHistory = new File(file.getAbsolutePath() + SEP
+								+ ".plugins/org.eclipse.oomph.setup.projects/import-history.properties"); //$NON-NLS-1$
+						if (importHistory.exists()) {
+							IOUtil.deleteBestEffort(importHistory);
+							try {
+								importHistory.createNewFile();
+							} catch (IOException e) {
+								throw new CoreException(
+										new Status(IStatus.ERROR, "org.eclipse.emf.compare.git.pgm",
+												"Unable to delete the file .plugins/org.eclipse.oomph.setup.projects/import-history.properties"));
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

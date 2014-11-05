@@ -100,6 +100,9 @@ public abstract class AbstractLogicalCommand {
 	/** VM Args option. */
 	protected static final String VMARGS_OPTION = "-D"; //$NON-NLS-1$
 
+	/** Buffer size of the array use to generate an unique id. */
+	private static final int GEN_ID_BUFFER_SIZE = 1024;
+
 	/** Eclipse string. */
 	private static final String ECLIPSE = "eclipse"; //$NON-NLS-1$
 
@@ -217,6 +220,7 @@ public abstract class AbstractLogicalCommand {
 		}
 
 		if (!help) {
+			// CHECKSTYLE.OFF: IllegalCatch - No choice since Oomph launch such an exception
 			try {
 				// Loads eclipse environment setup model.
 				performer = createSetupTaskPerformer(setupFile.getAbsolutePath(), environmentSetupURI);
@@ -230,6 +234,7 @@ public abstract class AbstractLogicalCommand {
 			} catch (Exception e) {
 				throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
 			}
+			// CHECKSTYLE.ON: IllegalCatch
 		}
 
 	}
@@ -413,11 +418,14 @@ public abstract class AbstractLogicalCommand {
 
 		URI startupSetupURI = URI.createFileURI(userSetupFilePath);
 		Resource startupSetup = null;
+		// CHECKSTYLE.OFF: IllegalCatch - No choice since EMF launch can run a runtime exception if it does
+		// not succeed in creating the resource. We want to handle this exception ourself
 		try {
 			startupSetup = rs.getResource(startupSetupURI, true);
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			// Does nothing handle later
 		}
+		// CHECKSTYLE.ON: IllegalCatch
 		if (startupSetup == null) {
 			throw new DiesOn(FATAL).displaying(userSetupFilePath + " is not a valid setup file").ready();
 		}
@@ -460,6 +468,7 @@ public abstract class AbstractLogicalCommand {
 		Trigger triggerBootstrap = Trigger.BOOTSTRAP;
 		URIConverter uriConverter = rs.getURIConverter();
 		SetupTaskPerformer aPerformer;
+		// CHECKSTYLE.OFF: IllegalCatch - No choice since Oomph launch such an exception
 		try {
 			aPerformer = SetupTaskPerformer.create(uriConverter, SetupPrompter.CANCEL, triggerBootstrap,
 					setupContext, false);
@@ -467,6 +476,7 @@ public abstract class AbstractLogicalCommand {
 			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying("Error during processing of setup mdoel")
 					.ready();
 		}
+		// CHECKSTYLE.ON: IllegalCatch
 		Confirmer confirmer = Confirmer.ACCEPT;
 		aPerformer.put(ILicense.class, confirmer);
 		aPerformer.put(Certificate.class, confirmer);
@@ -494,24 +504,35 @@ public abstract class AbstractLogicalCommand {
 		if (installationPath != null) {
 			File file = new File(installationPath);
 			if (file.exists()) {
-				String[] eclipseFolder = file.list(new FilenameFilter() {
+				File[] eclipseFolder = file.listFiles(new FilenameFilter() {
 					public boolean accept(File dir, String name) {
 						return ECLIPSE.equals(name);
 					}
 				});
-				if (eclipseFolder.length == 1) {
-					File eclipse = new File(installationPath + SEP + ECLIPSE);
-					if (eclipse.exists()) {
-						String[] eclipseExe = eclipse.list(new FilenameFilter() {
-							public boolean accept(File dir, String name) {
-								return ECLIPSE.equals(name) || "eclipse.exe".equals(name); //$NON-NLS-1$ 
-							}
-						});
-						if (eclipseExe.length == 1) {
-							return true;
-						}
-					}
+				if (eclipseFolder != null && eclipseFolder.length == 1) {
+					return isEclipseIntallationFolder(eclipseFolder[0]);
 				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the file is a eclipse installation folder, <code>false</code> otherwise.
+	 *
+	 * @param eclipseFolder
+	 *            file to test.
+	 * @return <code>true</code> if the file is a eclipse installation folder, <code>false</code> otherwise.
+	 */
+	private boolean isEclipseIntallationFolder(File eclipseFolder) {
+		if (eclipseFolder.exists()) {
+			String[] eclipseExe = eclipseFolder.list(new FilenameFilter() {
+				public boolean accept(File dir, String name) {
+					return ECLIPSE.equals(name) || "eclipse.exe".equals(name); //$NON-NLS-1$
+				}
+			});
+			if (eclipseExe.length == 1) {
+				return true;
 			}
 		}
 		return false;
@@ -705,7 +726,6 @@ public abstract class AbstractLogicalCommand {
 		File ws = createOrGetTempDir("emfcInstall" + id); //$NON-NLS-1$
 		return ws.getAbsolutePath();
 	}
-
 	/**
 	 * Creates a temporary directory in the system temp directory.
 	 * 
@@ -750,7 +770,7 @@ public abstract class AbstractLogicalCommand {
 			throw new DiesOn(DeathType.ERROR).duedTo(e).ready();
 		}
 		FileInputStream inputStream = new FileInputStream(f);
-		byte[] bytesBuffer = new byte[1024];
+		byte[] bytesBuffer = new byte[GEN_ID_BUFFER_SIZE];
 		int bytesRead = -1;
 
 		while ((bytesRead = inputStream.read(bytesBuffer)) != -1) {
@@ -773,7 +793,9 @@ public abstract class AbstractLogicalCommand {
 	private static String convertByteArrayToHexString(byte[] arrayBytes) {
 		StringBuffer stringBuffer = new StringBuffer();
 		for (int i = 0; i < arrayBytes.length; i++) {
+			// CHECKSTYLE.OFF: MagicNumber
 			stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16).substring(1));
+			// CHECKSTYLE.ON: MagicNumber
 		}
 		return stringBuffer.toString();
 	}

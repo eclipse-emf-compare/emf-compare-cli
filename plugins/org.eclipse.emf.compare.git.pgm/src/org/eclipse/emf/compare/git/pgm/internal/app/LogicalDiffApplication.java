@@ -11,6 +11,7 @@
 package org.eclipse.emf.compare.git.pgm.internal.app;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.mapping.RemoteResourceMappingContext;
 import org.eclipse.core.resources.mapping.ResourceMapping;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.BasicMonitor;
@@ -29,6 +31,9 @@ import org.eclipse.emf.compare.EMFCompare;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.PathFilterHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.RefOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
+import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
+import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
 import org.eclipse.emf.compare.ide.ui.internal.logical.ComparisonScopeBuilder;
 import org.eclipse.emf.compare.ide.ui.internal.logical.EMFResourceMapping;
 import org.eclipse.emf.compare.ide.ui.internal.logical.IdenticalResourceMinimizer;
@@ -41,6 +46,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.eclipse.jgit.api.DiffCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
@@ -90,12 +96,12 @@ public class LogicalDiffApplication extends AbstractLogicalApplication {
 	 * {@inheritDoc}.
 	 */
 	@Override
-	protected Integer performGitCommand() {
-		try {
-			IWorkspace ws = ResourcesPlugin.getWorkspace();
+	protected Integer performGitCommand() throws Die {
+		IWorkspace ws = ResourcesPlugin.getWorkspace();
 
-			// Call JGit diff to get the files involved
-			OutputStream out = new ByteArrayOutputStream();
+		// Call JGit diff to get the files involved
+		OutputStream out = new ByteArrayOutputStream();
+		try {
 			DiffCommand diffCommand = Git.open(repo.getDirectory()).diff().setOutputStream(out);
 			if (commit != null) {
 				diffCommand = diffCommand.setOldTree(getTreeIterator(repo, commit));
@@ -165,9 +171,8 @@ public class LogicalDiffApplication extends AbstractLogicalApplication {
 					}
 				}
 			}
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			progressPageLog.log(e);
+		} catch (IOException | CoreException | GitAPIException e) {
+			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying(e.getMessage()).ready();
 		}
 
 		return Returns.COMPLETE.code();

@@ -56,35 +56,7 @@ public final class CmdLineParserRepositoryBuilder extends CmdLineParser {
 	/**
 	 * {@link Repository} builder that uses pure JGit code.
 	 */
-	private static RepoBuilder jgitRepoBuilder = new RepoBuilder() {
-		/**
-		 * {@inheritDoc}.
-		 */
-		public Repository buildRepository(String aGitdir) throws Die {
-			/** The current repository directory. */
-			final File myGitDir;
-			/** The current repository. */
-			final Repository myRepo;
-			if (aGitdir == null) {
-				myGitDir = null;
-			} else {
-				myGitDir = new File(aGitdir);
-			}
-			RepositoryBuilder rb = new RepositoryBuilder().setGitDir(myGitDir).readEnvironment()
-					.setMustExist(true).findGitDir();
-			if (rb.getGitDir() == null) {
-				throw new DiesOn(FATAL).displaying(CAN_T_FIND_GIT_REPOSITORY_MESSAGE).ready();
-			}
-			try {
-				myRepo = rb.build();
-			} catch (RepositoryNotFoundException e) {
-				throw new DiesOn(FATAL).displaying(CAN_T_FIND_GIT_REPOSITORY_MESSAGE).ready();
-			} catch (IOException e) {
-				throw new DiesOn(FATAL).duedTo(e).displaying("Cannot build the git repository").ready();
-			}
-			return myRepo;
-		}
-	};
+	private static RepoBuilder jgitRepoBuilder = new JGitRepoBuilder();
 
 	/**
 	 * {@link Repository} builder that uses pure EGit code.
@@ -92,32 +64,7 @@ public final class CmdLineParserRepositoryBuilder extends CmdLineParser {
 	 * This builder creates the repository and add it the RepositoryCache of EGit
 	 * </p>
 	 */
-	private static RepoBuilder egitRepoBuilder = new RepoBuilder() {
-		/**
-		 * {@inheritDoc}
-		 * 
-		 * @see org.eclipse.emf.compare.git.pgm.internal.args.CmdLineParserRepositoryBuilder.RepoBuilder#buildRepository(java.lang.String)
-		 */
-		public Repository buildRepository(String aGitdir) throws Die {
-			Preconditions.checkNotNull(aGitdir);
-			File myGitDir = new File(aGitdir);
-			if (!myGitDir.exists()) {
-				throw new DiesOn(DeathType.FATAL).displaying(
-						"Can't build git repository: " + aGitdir + "does not exist").ready();
-			}
-			try {
-				Repository myRepo = org.eclipse.egit.core.Activator.getDefault().getRepositoryCache()
-						.lookupRepository(myGitDir);
-				if (myRepo == null) {
-					throw new DiesOn(DeathType.FATAL).displaying("Can't build repository " + aGitdir).ready();
-				}
-				return myRepo;
-			} catch (IOException e1) {
-				throw new DiesOn(DeathType.FATAL).duedTo(e1).displaying("Can't build repository " + aGitdir)
-						.ready();
-			}
-		}
-	};
+	private static RepoBuilder egitRepoBuilder = new EGitRepoBuilder();
 
 	/**
 	 * Git directory.
@@ -211,5 +158,71 @@ public final class CmdLineParserRepositoryBuilder extends CmdLineParser {
 		// The gitDir argument should be provided before the repository is built
 		Preconditions.checkArgument(repository == null);
 		this.gitDir = gitDir;
+	}
+
+	/**
+	 * {@link Repository} builder that uses pure EGit code.
+	 * <p>
+	 * This builder creates the repository and add it the RepositoryCache of EGit
+	 * </p>
+	 */
+	private static final class EGitRepoBuilder implements RepoBuilder {
+		/**
+		 * {@inheritDoc}
+		 *
+		 * @see org.eclipse.emf.compare.git.pgm.internal.args.CmdLineParserRepositoryBuilder.RepoBuilder#buildRepository(java.lang.String)
+		 */
+		public Repository buildRepository(String aGitdir) throws Die {
+			Preconditions.checkNotNull(aGitdir);
+			File myGitDir = new File(aGitdir);
+			if (!myGitDir.exists()) {
+				throw new DiesOn(DeathType.FATAL).displaying(
+						"Can't build git repository: " + aGitdir + "does not exist").ready();
+			}
+			try {
+				Repository myRepo = org.eclipse.egit.core.Activator.getDefault().getRepositoryCache()
+						.lookupRepository(myGitDir);
+				if (myRepo == null) {
+					throw new DiesOn(DeathType.FATAL).displaying("Can't build repository " + aGitdir).ready();
+				}
+				return myRepo;
+			} catch (IOException e1) {
+				throw new DiesOn(DeathType.FATAL).duedTo(e1).displaying("Can't build repository " + aGitdir)
+						.ready();
+			}
+		}
+	}
+
+	/**
+	 * {@link Repository} builder that uses pure JGit code.
+	 */
+	private static final class JGitRepoBuilder implements RepoBuilder {
+		/**
+		 * {@inheritDoc}.
+		 */
+		public Repository buildRepository(String aGitdir) throws Die {
+			/** The current repository directory. */
+			final File myGitDir;
+			/** The current repository. */
+			final Repository myRepo;
+			if (aGitdir == null) {
+				myGitDir = null;
+			} else {
+				myGitDir = new File(aGitdir);
+			}
+			RepositoryBuilder rb = new RepositoryBuilder().setGitDir(myGitDir).readEnvironment()
+					.setMustExist(true).findGitDir();
+			if (rb.getGitDir() == null) {
+				throw new DiesOn(FATAL).displaying(CAN_T_FIND_GIT_REPOSITORY_MESSAGE).ready();
+			}
+			try {
+				myRepo = rb.build();
+			} catch (RepositoryNotFoundException e) {
+				throw new DiesOn(FATAL).displaying(CAN_T_FIND_GIT_REPOSITORY_MESSAGE).ready();
+			} catch (IOException e) {
+				throw new DiesOn(FATAL).duedTo(e).displaying("Cannot build the git repository").ready();
+			}
+			return myRepo;
+		}
 	}
 }

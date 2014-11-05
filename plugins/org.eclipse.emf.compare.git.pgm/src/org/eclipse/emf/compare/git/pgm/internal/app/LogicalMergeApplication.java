@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.egit.core.op.MergeOperation;
 import org.eclipse.emf.compare.git.pgm.Returns;
@@ -79,11 +80,10 @@ public class LogicalMergeApplication extends AbstractLogicalApplication {
 	private String message;
 
 	/**
-	 * {@inheritDoc}.
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected Integer performGitCommand() throws Die {
-
 		try {
 			MergeOperation merge = new MergeOperation(repo, commit.getName());
 			if (message != null) {
@@ -94,11 +94,9 @@ public class LogicalMergeApplication extends AbstractLogicalApplication {
 			Ref oldHead = repo.getRef(Constants.HEAD);
 
 			return handleResult(result, oldHead, MergeStrategy.RECURSIVE);
-		} catch (Exception e) {
-			progressPageLog.log(e);
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
+		} catch (CoreException | IOException e) {
+			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying(e.getMessage()).ready();
 		}
-
 	}
 
 	/**
