@@ -61,6 +61,8 @@
       <repository
           url="http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest"/>
       <repository
+          url="http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/luna"/>
+      <repository
           url="http://download.eclipse.org/tools/orbit/downloads/drops/R20140525021250/repository/"/>
     </setupTask>
     <setupTask
