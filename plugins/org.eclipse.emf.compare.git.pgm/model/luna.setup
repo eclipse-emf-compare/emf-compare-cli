@@ -53,11 +53,11 @@
       <repository
           url="http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/"/>
       <repository
-          url="http://download.eclipse.org/oomph/updates"/>
+          url="https://hudson.eclipse.org/emfcompare/job/cli-master-nightly/lastSuccessfulBuild/artifact/packaging/org.eclipse.emf.compare.git.pgm.update/target/repository/"/>
       <repository
           url="http://download.eclipse.org/modeling/emf/emf/updates/2.10.x"/>
       <repository
-          url="https://hudson.eclipse.org/oomph/job/integration/lastSuccessfulBuild/artifact/updates/"/>
+          url="http://download.eclipse.org/oomph/updates"/>
       <repository
           url="http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest"/>
       <repository
