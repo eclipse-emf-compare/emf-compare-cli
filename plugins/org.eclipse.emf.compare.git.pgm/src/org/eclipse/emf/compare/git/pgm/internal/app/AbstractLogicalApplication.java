@@ -143,7 +143,9 @@ public abstract class AbstractLogicalApplication implements IApplication {
 			clp.parseArgument(appArgs);
 			repo = clp.getRepo();
 		} catch (CmdLineException err) {
-			err.printStackTrace();
+			if (showStackTrace) {
+				err.printStackTrace();
+			}
 			System.err.println(err.getMessage());
 			dispose();
 			return Returns.ERROR;
@@ -302,6 +304,16 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		} finally {
 			or.release();
 		}
+	}
+
+	/**
+	 * Returns <code>true</code> if the user has required to display error stack trace in the console.
+	 * 
+	 * @return <code>true</code> if the user has required to display error stack trace in the console,
+	 *         <code>false</code> otherwise.
+	 */
+	protected boolean isShowStackTrace() {
+		return showStackTrace;
 	}
 
 	/**
