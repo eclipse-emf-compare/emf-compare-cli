@@ -256,7 +256,9 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		if (repo != null) {
 			repo.close();
 		}
-		progressPageLog.setTerminating();
+		if (progressPageLog != null) {
+			progressPageLog.setTerminating();
+		}
 	}
 
 	/**
