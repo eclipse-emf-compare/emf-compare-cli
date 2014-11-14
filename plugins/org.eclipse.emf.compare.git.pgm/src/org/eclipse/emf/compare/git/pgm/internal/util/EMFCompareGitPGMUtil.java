@@ -18,6 +18,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.egit.core.JobFamilies;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 
@@ -165,4 +168,39 @@ public final class EMFCompareGitPGMUtil {
 			}
 		}
 	}
+
+	/**
+	 * Forces to wait for all EGit operation to terminate.
+	 * <p>
+	 * If this is not done then it might happen that some projects are not connected yet whereas the git
+	 * command is being performed.
+	 * </p>
+	 */
+	public static void waitEgitJobs() {
+		waitForScope(JobFamilies.AUTO_SHARE);
+		waitForScope(JobFamilies.AUTO_IGNORE);
+		waitForScope(JobFamilies.REPOSITORY_CHANGED);
+		waitForScope(JobFamilies.INDEX_DIFF_CACHE_UPDATE);
+	}
+
+	/**
+	 * Waits for a Job to terminate.
+	 * 
+	 * @param context
+	 *            familly og the job
+	 */
+	private static void waitForScope(Object context) {
+		// The UILockListener might prevent us from properly joining.
+		boolean joined = false;
+		while (!joined) {
+			try {
+				Job.getJobManager().join(context, new NullProgressMonitor());
+				joined = true;
+			} catch (InterruptedException e) {
+				// Some other UI threads were trying to run. Let the syncExecs
+				// do their jobs and re-try to join on ours.
+			}
+		}
+	}
+
 }

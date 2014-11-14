@@ -14,6 +14,7 @@ import static org.eclipse.emf.compare.git.pgm.internal.Options.SHOW_STACK_TRACE_
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EMPTY_STRING;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.SEP;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.toFileWithAbsolutePath;
+import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.waitEgitJobs;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +37,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobManager;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.egit.core.JobFamilies;
 import org.eclipse.egit.core.synchronize.GitResourceVariantTreeSubscriber;
 import org.eclipse.egit.core.synchronize.GitSubscriberResourceMappingContext;
 import org.eclipse.egit.core.synchronize.dto.GitSynchronizeData;
@@ -453,24 +451,6 @@ public abstract class AbstractLogicalApplication implements IApplication {
 			importTask.getSourceLocators().add(sourceLocator);
 			performerStartup.getTriggeredSetupTasks().add(importTask);
 		}
-	}
-
-	/**
-	 * Forces to wait for all EGit operation to terminate.
-	 * <p>
-	 * If this is not done then it might happen that some projects are not connected yet whereas the git
-	 * command is being performed.
-	 * </p>
-	 * 
-	 * @throws InterruptedException
-	 *             e
-	 */
-	private void waitEgitJobs() throws InterruptedException {
-		IJobManager jobMan = Job.getJobManager();
-		jobMan.join(JobFamilies.AUTO_SHARE, new NullProgressMonitor());
-		jobMan.join(JobFamilies.AUTO_IGNORE, new NullProgressMonitor());
-		jobMan.join(JobFamilies.REPOSITORY_CHANGED, new NullProgressMonitor());
-		jobMan.join(JobFamilies.INDEX_DIFF_CACHE_UPDATE, new NullProgressMonitor());
 	}
 
 	/**
