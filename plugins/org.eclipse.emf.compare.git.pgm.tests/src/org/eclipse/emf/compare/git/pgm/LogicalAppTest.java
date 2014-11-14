@@ -27,6 +27,7 @@ public class LogicalAppTest extends AbstractLogicalAppTest {
 		//@formatter:off
 		return EOL 
 				+ "Available commands are:" + EOL
+				+ "logicalcherry-pick" + EOL
 				+ "logicaldiff" + EOL
 				+ "logicalmerge" + EOL
 				+ "logicalmergetool" + EOL;

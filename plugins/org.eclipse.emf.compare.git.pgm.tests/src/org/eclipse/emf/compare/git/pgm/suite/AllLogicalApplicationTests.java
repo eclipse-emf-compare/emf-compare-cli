@@ -14,6 +14,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.textui.TestRunner;
 
+import org.eclipse.emf.compare.git.pgm.internal.app.LogicalCherryPickApplicationTest;
 import org.eclipse.emf.compare.git.pgm.internal.app.LogicalDiffApplicationTest;
 import org.eclipse.emf.compare.git.pgm.internal.app.LogicalMergeApplicationTest;
 import org.junit.runner.RunWith;
@@ -24,7 +25,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @RunWith(Suite.class)
-@SuiteClasses({LogicalMergeApplicationTest.class, LogicalDiffApplicationTest.class })
+@SuiteClasses({LogicalMergeApplicationTest.class, LogicalDiffApplicationTest.class,
+		LogicalCherryPickApplicationTest.class })
 public class AllLogicalApplicationTests {
 
 	public static void main(String[] args) {

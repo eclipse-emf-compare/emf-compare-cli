@@ -36,4 +36,13 @@
             name="EMF Compare Git PGM">
       </product>
    </extension>
+   <extension
+         id="emf.compare.git.logicalcherry-pick"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.eclipse.emf.compare.git.pgm.internal.app.LogicalCherryPickApplication">
+         </run>
+      </application>
+   </extension>
 </plugin>

@@ -38,8 +38,7 @@ public class LogicalMergeToolArgumentsCommandTest extends AbstractLogicalCommand
 	@Override
 	protected String getExpectedUsage() {
 		//@formatter:off
-		return EOL //
-				+ "logicalmergetool <setup> [--git-dir gitFolderPath] [--help (-h)] [--show-stack-trace]" + EOL 
+		return "logicalmergetool <setup> [--git-dir gitFolderPath] [--help (-h)] [--show-stack-trace]" + EOL 
 				+ EOL 
 				+ " <setup>                 : Path to the setup file. The setup file is a Oomph" + EOL 
 				+ "                           model." + EOL 

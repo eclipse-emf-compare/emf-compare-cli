@@ -15,6 +15,7 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 
 import org.eclipse.emf.compare.git.pgm.LogicalAppTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalCherryPickCommandArgumentTest;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalDiffArgumentsTest;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeCommandArgumentsTest;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeToolArgumentsCommandTest;
@@ -27,7 +28,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({LogicalAppTest.class, LogicalMergeCommandArgumentsTest.class,
-		LogicalMergeToolArgumentsCommandTest.class, LogicalDiffArgumentsTest.class })
+		LogicalMergeToolArgumentsCommandTest.class, LogicalDiffArgumentsTest.class,
+		LogicalCherryPickCommandArgumentTest.class })
 public class AllCommandLineArguementTests {
 
 	public static void main(String[] args) {

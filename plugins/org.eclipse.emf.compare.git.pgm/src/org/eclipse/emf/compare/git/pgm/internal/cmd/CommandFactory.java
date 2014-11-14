@@ -36,6 +36,7 @@ public final class CommandFactory {
 		cmds.put(LogicalMergeCommand.LOGICAL_MERGE_CMD_NAME, LogicalMergeCommand.class);
 		cmds.put(LogicalMergeToolCommand.LOGICAL_MERGE_TOOL_CMD_NAME, LogicalMergeToolCommand.class);
 		cmds.put(LogicalDiffCommand.LOGICAL_DIFF_CMD_NAME, LogicalDiffCommand.class);
+		cmds.put(LogicalCherryPickCommand.LOGICAL_CHERRY_PICK_CMD_NAME, LogicalCherryPickCommand.class);
 	}
 
 	/**

@@ -15,9 +15,10 @@ import static org.eclipse.emf.compare.git.pgm.internal.Options.HELP_OPT;
 import static org.eclipse.emf.compare.git.pgm.internal.Options.SHOW_STACK_TRACE_OPT;
 import static org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType.FATAL;
 import static org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType.SOFTWARE_ERROR;
-import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.SEP;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.toFileWithAbsolutePath;
+
+import com.google.common.base.Preconditions;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,6 +43,7 @@ import org.eclipse.emf.compare.git.pgm.internal.ProgressPageLog;
 import org.eclipse.emf.compare.git.pgm.internal.args.CmdLineParserRepositoryBuilder;
 import org.eclipse.emf.compare.git.pgm.internal.args.GitDirHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.SetupFileOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.ArgumentValidationError;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
@@ -77,7 +79,6 @@ import org.eclipse.oomph.setup.p2.P2Task;
 import org.eclipse.oomph.util.Confirmer;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 /**
@@ -161,6 +162,14 @@ public abstract class AbstractLogicalCommand {
 	private ProgressLog progressPageLog;
 
 	/**
+	 * Holds a reference to the {@link CmdLineParserRepositoryBuilder} used to build this command to be able
+	 * to print the usage any time necessary.
+	 * 
+	 * @see org.kohsuke.args4j.CmdLineParser#printUsage(java.io.OutputStream)
+	 */
+	private CmdLineParserRepositoryBuilder cmdLineParser;
+
+	/**
 	 * Constructor.
 	 */
 	protected AbstractLogicalCommand() {
@@ -200,6 +209,20 @@ public abstract class AbstractLogicalCommand {
 	public void build(Collection<String> args, URI environmentSetupURI) throws Die, IOException {
 
 		repo = parseArgumentsAndBuildRepo(args);
+		if (!help) {
+			ValidationStatus validationStatus = getValidationStatus();
+			if (!validationStatus.isValid()) {
+				if (validationStatus.isPrintUsage()) {
+					ByteArrayOutputStream localOut = new ByteArrayOutputStream();
+					PrintWriter printWritter = new PrintWriter(localOut);
+					printUsage(validationStatus.getMessage(), printWritter);
+					printWritter.close();
+					throw new DiesOn(FATAL).displaying(localOut.toString()).ready();
+				} else {
+					throw new DiesOn(FATAL).displaying(validationStatus.getMessage()).ready();
+				}
+			}
+		}
 
 		try {
 			final String outputEncoding;
@@ -312,10 +335,10 @@ public abstract class AbstractLogicalCommand {
 	 *             if the program exits prematurely.
 	 */
 	protected Repository parseArgumentsAndBuildRepo(Collection<String> args) throws Die {
-		final CmdLineParserRepositoryBuilder clp = CmdLineParserRepositoryBuilder
-				.newJGitRepoBuilderCmdParser(this);
+
+		cmdLineParser = CmdLineParserRepositoryBuilder.newJGitRepoBuilderCmdParser(this);
 		try {
-			clp.parseArgument(args);
+			cmdLineParser.parseArgument(args);
 		} catch (ArgumentValidationError err) {
 			// Only throw an error if the user has not required help.
 			if (!help) {
@@ -331,7 +354,7 @@ public abstract class AbstractLogicalCommand {
 			if (!help) {
 				ByteArrayOutputStream localOut = new ByteArrayOutputStream();
 				PrintWriter printWritter = new PrintWriter(localOut);
-				printUsage(err.getMessage() + " in:" + EOL, clp, printWritter);
+				printUsage(err.getMessage(), printWritter);
 				printWritter.close();
 				throw new DiesOn(FATAL).displaying(localOut.toString()).ready();
 			}
@@ -341,31 +364,46 @@ public abstract class AbstractLogicalCommand {
 			// The user has used the help option. Saves the usage message for later
 			ByteArrayOutputStream localOut = new ByteArrayOutputStream();
 			PrintWriter printWritter = new PrintWriter(localOut);
-			printUsage("", clp, printWritter);
+			printUsage(null, printWritter);
 			printWritter.close();
 			usage = localOut.toString();
 		}
-		return clp.getRepo();
+		return cmdLineParser.getRepo();
+	}
+
+	/**
+	 * <p>
+	 * Inherited class may override this method to validate their arguements.
+	 * </p>
+	 * 
+	 * @return {@link ValidationStatus}
+	 */
+	protected ValidationStatus getValidationStatus() {
+		return ValidationStatus.OK_STATUS;
 	}
 
 	/**
 	 * Prints the usage of this command.
+	 * <p>
+	 * The {@link #cmdLineParser} field should have been set
+	 * </p>
 	 * 
 	 * @param message
 	 *            a prefix message.
-	 * @param clp
-	 *            the current command line parser.
 	 * @param printWritter
 	 *            A {@link PrintWriter}.
 	 */
-	protected void printUsage(final String message, final CmdLineParser clp, PrintWriter printWritter) {
-		printWritter.println(message);
+	protected void printUsage(final String message, PrintWriter printWritter) {
+		Preconditions.checkNotNull(cmdLineParser);
+		if (message != null) {
+			printWritter.println(message + " in:");
+		}
 		printWritter.print(commandName);
-		clp.printSingleLineUsage(printWritter, null);
+		cmdLineParser.printSingleLineUsage(printWritter, null);
 		printWritter.println();
 		printWritter.println();
 
-		clp.printUsage(printWritter, null);
+		cmdLineParser.printUsage(printWritter, null);
 		printWritter.println();
 
 		printWritter.flush();
@@ -726,6 +764,7 @@ public abstract class AbstractLogicalCommand {
 		File ws = createOrGetTempDir("emfcInstall" + id); //$NON-NLS-1$
 		return ws.getAbsolutePath();
 	}
+
 	/**
 	 * Creates a temporary directory in the system temp directory.
 	 * 

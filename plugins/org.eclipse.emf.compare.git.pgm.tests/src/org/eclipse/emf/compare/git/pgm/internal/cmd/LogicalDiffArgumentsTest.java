@@ -49,8 +49,7 @@ public class LogicalDiffArgumentsTest extends AbstractLogicalCommandTest {
 	@Override
 	protected String getExpectedUsage() {
 		//@formatter:off
-		return EOL
-				+ "logicaldiff <setup> <commit> [<compareWithCommit>] [-- <path...>] [--git-dir gitFolderPath] [--help (-h)] [--show-stack-trace]" + EOL 
+		return "logicaldiff <setup> <commit> [<compareWithCommit>] [-- <path...>] [--git-dir gitFolderPath] [--help (-h)] [--show-stack-trace]" + EOL 
 				+ EOL 
 				+ " <setup>                 : Path to the setup file. The setup file is a Oomph" + EOL 
 				+ "                           model." + EOL 

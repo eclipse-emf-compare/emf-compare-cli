@@ -48,9 +48,12 @@ import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.UnmergedPathsException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.dircache.DirCache;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.After;
 import org.junit.Before;
 
@@ -127,6 +130,21 @@ public abstract class AbstractApplicationTest {
 
 	public MockedApplicationContext getContext() {
 		return context;
+	}
+
+	protected void resetContext() {
+		context = new MockedApplicationContext();
+	}
+
+	protected void resetApp() {
+		app = buildApp();
+	}
+
+	protected RevCommit getHeadCommit() throws MissingObjectException, IncorrectObjectTypeException,
+			IOException, GitAPIException {
+		Ref headRef = getGit().getRepository().getRef(Constants.HEAD);
+		RevWalk walk = new RevWalk(git.getRepository());
+		return walk.parseCommit(headRef.getObjectId());
 	}
 
 	public void setContext(MockedApplicationContext context) {
