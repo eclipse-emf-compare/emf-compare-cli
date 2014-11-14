@@ -77,7 +77,7 @@ public class LogicalApp implements IApplication {
 	 * Other arguments used in logical commands.
 	 */
 	@Argument(index = 1, metaVar = "args")
-	private List<String> arguments = new ArrayList<String>();
+	private List<String> arguments;
 
 	/**
 	 * The URI of the setup file that contains the environment used to execute the logical commands.
@@ -108,6 +108,8 @@ public class LogicalApp implements IApplication {
 	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
 	 */
 	public Object start(IApplicationContext context) throws Exception {
+		arguments = new ArrayList<>();
+
 		// Prevents vm args if the application exits on something different that 0
 		System.setProperty(IApplicationContext.EXIT_DATA_PROPERTY, ""); //$NON-NLS-1$
 		@SuppressWarnings("rawtypes")
@@ -142,7 +144,10 @@ public class LogicalApp implements IApplication {
 	 * @see org.eclipse.equinox.app.IApplication#stop()
 	 */
 	public void stop() {
-		// nothing to do
+		help = false;
+		arguments = null;
+		logicalCommand = null;
+
 	}
 
 	/**
