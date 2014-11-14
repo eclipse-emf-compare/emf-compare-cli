@@ -15,7 +15,6 @@ import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IWorkspace;
@@ -174,30 +174,49 @@ public abstract class AbstractApplicationTest {
 		System.setProperty("user.dir", path); //$NON-NLS-1$
 	}
 
-	protected void assertOutputMessageEnd(String expected) {
+	protected void assertOutputMessageEnd(String expected) throws IOException {
 		String outputStreamContent = outputStream.toString();
-		// -1 since we want to keep empty lines
+		assertTrue(getAssertOutputMessageEnd(expected, outputStreamContent), outputStreamContent
+				.endsWith(expected));
+		// Resets the outputstream
+		outputStream.close();
+		outputStream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(outputStream));
+	}
+
+	private String getAssertOutputMessageEnd(String expected, String actual) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Expected end:").append(EOL);
+		builder.append(expected).append(EOL);
+		builder.append("but was:").append(EOL);
+		ArrayList<String> actualLines = Lists.newArrayList(actual.split(EOL, -1));
 		List<String> expectedLines = Lists.newArrayList(expected.split(EOL, -1));
-		List<String> actualLines = Lists.newArrayList(outputStreamContent.split(EOL, -1));
-		List<String> actualEndingLine = actualLines.subList(actualLines.size() - expectedLines.size(),
-				actualLines.size());
-		for (int i = 0; i < expectedLines.size(); i++) {
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("The line number ").append(i).append(
-					" of the actual message did not match the related line in expected message:").append(EOL);
-			stringBuilder.append(expected).append(EOL);
-			stringBuilder.append("Actual:").append(EOL);
-			stringBuilder.append(Joiner.on(EOL).join(actualEndingLine)).append(EOL);
-			assertEquals(stringBuilder.toString(), expectedLines.get(i), actualEndingLine.get(i));
+		int expectedLineSize = expectedLines.size();
+		int actualLineSize = actualLines.size();
+		if (expectedLineSize > actualLineSize) {
+			builder.append(actual);
+		} else {
+			builder.append("...");
+			// Tries to display 5 extra line from the actual message to understand the context
+			int numberOfLineToDisplay = Math.min(expectedLineSize + 5, actualLineSize);
+			for (int i = actualLineSize - numberOfLineToDisplay; i < actualLineSize; i++) {
+				builder.append(actualLines.get(i)).append(EOL);
+			}
 		}
+		return builder.toString();
 	}
 
 	protected void assertEmptyErrorMessage() {
 		assertEquals(EMPTY_STRING, errStream.toString());
 	}
 
-	protected void assertOutput(String message) {
+	protected void assertOutput(String message) throws IOException {
 		assertEquals(message, outputStream.toString());
+
+		// Reset the outputstream
+		outputStream.close();
+		outputStream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(outputStream));
 	}
 
 	protected Path getTestTmpFolder() {
