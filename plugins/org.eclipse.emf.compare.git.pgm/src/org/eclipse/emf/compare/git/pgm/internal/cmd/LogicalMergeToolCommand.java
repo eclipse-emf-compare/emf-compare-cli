@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.compare.git.pgm.Returns;
+import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
-import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.oomph.setup.util.OS;
 
 /**
@@ -57,11 +57,6 @@ public class LogicalMergeToolCommand extends AbstractLogicalCommand {
 	 */
 	@Override
 	protected Integer internalRun() throws Die {
-
-		// Checks that the repository is in conflict state
-		if (getRepository().getRepositoryState() != RepositoryState.MERGING) {
-			throw new DiesOn(DeathType.FATAL).displaying("No conflict to merge").ready();
-		}
 
 		OS os = getPerformer().getOS();
 
@@ -116,5 +111,25 @@ public class LogicalMergeToolCommand extends AbstractLogicalCommand {
 		}
 
 		return Returns.valueOf(returnValue).code();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommand#getValidationStatus()
+	 */
+	@Override
+	protected ValidationStatus getValidationStatus() {
+		switch (getRepository().getRepositoryState()) {
+			case MERGING:
+			case REBASING_INTERACTIVE:
+			case REBASING:
+			case REBASING_REBASING:
+			case REBASING_MERGE:
+				return super.getValidationStatus();
+			default:
+				return ValidationStatus.createErrorStatus("No conflict to merge");
+
+		}
 	}
 }
