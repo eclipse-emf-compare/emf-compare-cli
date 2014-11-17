@@ -89,7 +89,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 		// Tests commant on an empty repo (not commit, no branch)
 		getContext().addArg(getCommandName(), setupFile.getAbsolutePath(), "master");
 		Object result = getApp().start(getContext());
-		assertOutput("fatal: master - not a valid git reference." + EOL);
+		assertOutput("fatal: bad revision 'master'." + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.ERROR.code(), result);
 	}
@@ -186,7 +186,7 @@ public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest
 		// Gives an incorrect ref
 		getContext().addArg(LOGICAL_MERGE_CMD_NAME, newSetupFile.getAbsolutePath(), "incorrectId");
 		Object result = getApp().start(getContext());
-		assertOutput("fatal: incorrectId - not a valid git reference." + EOL);
+		assertOutput("fatal: bad revision 'incorrectId'." + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.ERROR.code(), result);
 	}

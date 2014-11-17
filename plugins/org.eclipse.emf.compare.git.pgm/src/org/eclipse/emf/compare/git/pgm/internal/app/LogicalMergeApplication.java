@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.egit.core.op.MergeOperation;
 import org.eclipse.emf.compare.git.pgm.Returns;
-import org.eclipse.emf.compare.git.pgm.internal.args.RefOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
@@ -38,6 +38,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.merge.ResolveMerger.MergeFailureReason;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -70,8 +71,8 @@ public class LogicalMergeApplication extends AbstractLogicalApplication {
 	/**
 	 * Holds a ObjectId that need to be merged.
 	 */
-	@Argument(index = 2, required = true, metaVar = "<commit>", usage = "Commit ID or branch name to merge.", handler = RefOptionHandler.class)
-	private ObjectId commit;
+	@Argument(index = 2, required = true, metaVar = "<commit>", usage = "Commit ID or branch name to merge.", handler = RevCommitOptionHandler.class)
+	private RevCommit commit;
 
 	/**
 	 * Optional message used for the merge commit.

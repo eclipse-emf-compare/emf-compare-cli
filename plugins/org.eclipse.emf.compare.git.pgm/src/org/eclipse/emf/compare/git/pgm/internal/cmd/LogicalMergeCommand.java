@@ -20,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.compare.git.pgm.Returns;
-import org.eclipse.emf.compare.git.pgm.internal.args.RefOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
 import org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil;
-import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.RepositoryState;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.oomph.setup.util.OS;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
@@ -60,8 +60,8 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 	/**
 	 * Holds a ObjectId that need to be merged.
 	 */
-	@Argument(index = 1, required = true, metaVar = "<commit>", usage = "Commit ID or branch name to merge.", handler = RefOptionHandler.class)
-	private ObjectId commit;
+	@Argument(index = 1, required = true, metaVar = "<commit>", usage = "Commit ID or branch name to merge.", handler = RevCommitOptionHandler.class)
+	private RevCommit commit;
 
 	/**
 	 * Optional message used for the merge commit.
@@ -87,8 +87,7 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 		if (getRepository().getRepositoryState() == RepositoryState.MERGING) {
 			StringBuilder msg = new StringBuilder(
 					"error: 'merge' is not possible because you have unmerged files.").append(EOL);
-			msg.append("hint: Use the logicalmergetool command to fix them up un the work tree").append(
-					EOL);
+			msg.append("hint: Use the logicalmergetool command to fix them up un the work tree").append(EOL);
 			msg.append("hint: and then use the 'git add/rm <file>' as").append(EOL);
 			msg.append("hint: appropriate to mark resolution").append(EOL);
 			System.out.println(msg);
@@ -190,7 +189,7 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 	}
 
 	// For testing purpose.
-	ObjectId getCommit() {
+	RevCommit getCommit() {
 		return commit;
 	}
 }

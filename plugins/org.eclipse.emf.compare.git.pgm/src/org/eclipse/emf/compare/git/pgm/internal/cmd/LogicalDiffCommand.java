@@ -20,12 +20,12 @@ import java.util.List;
 
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.PathFilterHandler;
-import org.eclipse.emf.compare.git.pgm.internal.args.RefOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
 import org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil;
-import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.eclipse.oomph.setup.util.OS;
@@ -61,14 +61,14 @@ public class LogicalDiffCommand extends AbstractLogicalCommand {
 	/**
 	 * Holds the reference from which the differences should be displayed.
 	 */
-	@Argument(index = 1, multiValued = false, required = true, metaVar = "<commit>", usage = "Commit ID or branch name.", handler = RefOptionHandler.class)
-	private ObjectId commit;
+	@Argument(index = 1, multiValued = false, required = true, metaVar = "<commit>", usage = "Commit ID or branch name.", handler = RevCommitOptionHandler.class)
+	private RevCommit commit;
 
 	/**
 	 * Optional reference used to view the differences between {@link #commit} and {@link #commitWith}.
 	 */
-	@Argument(index = 2, multiValued = false, required = false, metaVar = "<compareWithCommit>", usage = "Commit ID or branch name. This is to view the changes between <commit> and <compareWithCommit> or HEAD if not specified.", handler = RefOptionHandler.class)
-	private ObjectId commitWith;
+	@Argument(index = 2, multiValued = false, required = false, metaVar = "<compareWithCommit>", usage = "Commit ID or branch name. This is to view the changes between <commit> and <compareWithCommit> or HEAD if not specified.", handler = RevCommitOptionHandler.class)
+	private RevCommit commitWith;
 
 	/**
 	 * {@link TreeFilter} use to filter file on which differences should be shown.
@@ -178,12 +178,12 @@ public class LogicalDiffCommand extends AbstractLogicalCommand {
 	}
 
 	// For testing purpose
-	ObjectId getCommit() {
+	RevCommit getCommit() {
 		return commit;
 	}
 
 	// For testing purpose
-	ObjectId getOptionalCommit() {
+	RevCommit getOptionalCommit() {
 		return commitWith;
 	}
 

@@ -78,7 +78,7 @@ public class LogicalDiffArgumentsTest extends AbstractLogicalCommandTest {
 		// Tests the command on an empty repo (not commit, no branch)
 		getContext().addArg(getCommandName(), userSetupFile.getAbsolutePath(), "master");
 		Object result = getApp().start(getContext());
-		assertOutput("fatal: master - not a valid git reference." + EOL);
+		assertOutput("fatal: bad revision 'master'." + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.ERROR.code(), result);
 	}
@@ -110,7 +110,7 @@ public class LogicalDiffArgumentsTest extends AbstractLogicalCommandTest {
 		// Gives an incorrect ref
 		getContext().addArg(getCommandName(), setupFile.getAbsolutePath(), "incorrectId");
 		Object result = getApp().start(getContext());
-		assertOutput("fatal: incorrectId - not a valid git reference." + EOL);
+		assertOutput("fatal: bad revision 'incorrectId'." + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.ERROR.code(), result);
 	}
@@ -130,7 +130,7 @@ public class LogicalDiffArgumentsTest extends AbstractLogicalCommandTest {
 		// Gives an incorrect ref
 		getContext().addArg(getCommandName(), setupFile.getAbsolutePath(), "master", "incorrectId");
 		Object result = getApp().start(getContext());
-		assertOutput("fatal: incorrectId - not a valid git reference." + EOL);
+		assertOutput("fatal: bad revision 'incorrectId'." + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.ERROR.code(), result);
 	}
