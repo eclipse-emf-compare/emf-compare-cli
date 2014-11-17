@@ -46,7 +46,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class LogicalMergeApplicationTest extends AbstractApplicationTest {
+public class MergeApplicationTest extends AbstractApplicationTest {
 
 	/**
 	 * <h3>Test the logical merge application on the current branch</h3>

@@ -19,9 +19,9 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.textui.TestRunner;
 
-import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalDiffIntegrationTest;
-import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeCommandIntegrationTest;
-import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeToolIntegrationTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.DiffIntegrationTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.MergeIntegrationTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.MergeToolIntegrationTest;
 import org.eclipse.jgit.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,8 +40,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @RunWith(Suite.class)
-@SuiteClasses({LogicalMergeCommandIntegrationTest.class, LogicalMergeToolIntegrationTest.class,
-		LogicalDiffIntegrationTest.class })
+@SuiteClasses({MergeIntegrationTest.class, MergeToolIntegrationTest.class,
+		DiffIntegrationTest.class })
 public class AllIntegrationTests {
 
 	/**

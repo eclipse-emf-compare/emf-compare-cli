@@ -42,7 +42,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class LogicalMergeCommandIntegrationTest extends AbstractLogicalAppTest {
+public class MergeIntegrationTest extends AbstractLogicalAppTest {
 
 	@Override
 	protected IApplication buildApp() {

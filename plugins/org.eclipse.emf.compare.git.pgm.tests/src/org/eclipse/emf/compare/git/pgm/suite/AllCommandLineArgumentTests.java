@@ -15,10 +15,10 @@ import junit.framework.Test;
 import junit.textui.TestRunner;
 
 import org.eclipse.emf.compare.git.pgm.LogicalAppTest;
-import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalCherryPickCommandArgumentTest;
-import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalDiffArgumentsTest;
-import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeCommandArgumentsTest;
-import org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeToolArgumentsCommandTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.CherryPickArgumentsTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.DiffArgumentsTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.MergeArgumentsTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.MergeToolArgumentsTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -27,17 +27,17 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @RunWith(Suite.class)
-@SuiteClasses({LogicalAppTest.class, LogicalMergeCommandArgumentsTest.class,
-		LogicalMergeToolArgumentsCommandTest.class, LogicalDiffArgumentsTest.class,
-		LogicalCherryPickCommandArgumentTest.class })
-public class AllCommandLineArguementTests {
+@SuiteClasses({LogicalAppTest.class, MergeArgumentsTest.class,
+		MergeToolArgumentsTest.class, DiffArgumentsTest.class,
+		CherryPickArgumentsTest.class })
+public class AllCommandLineArgumentTests {
 
 	public static void main(String[] args) {
 		TestRunner.run(suite());
 	}
 
 	public static Test suite() {
-		return new JUnit4TestAdapter(AllCommandLineArguementTests.class);
+		return new JUnit4TestAdapter(AllCommandLineArgumentTests.class);
 	}
 
 }

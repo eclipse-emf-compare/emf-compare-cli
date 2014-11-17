@@ -8,51 +8,51 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
-package org.eclipse.emf.compare.git.pgm.internal.cmd;
+package org.eclipse.emf.compare.git.pgm.internal.app;
 
-import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.nio.file.Path;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.compare.git.pgm.AbstractLogicalAppTest;
-import org.eclipse.emf.compare.git.pgm.LogicalApp;
+import org.eclipse.emf.compare.git.pgm.AbstractApplicationTest;
 import org.eclipse.emf.compare.git.pgm.Returns;
-import org.eclipse.emf.compare.git.pgm.suite.AllIntegrationTests;
+import org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil;
 import org.eclipse.emf.compare.git.pgm.util.OomphUserModelBuilder;
 import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
 import org.eclipse.equinox.app.IApplication;
 import org.junit.Test;
 
 /**
- * Should only be called from the tycho build since it used the emfcompare-git-pgm update to create the
- * provided platform.
- * <p>
- * If you need to run it locally please set the system variable "emfcompare-git-pgm--updatesite" to the
- * location of update holding emfcompare-git-pgm plugins.
- * </p>
+ * Tests the logical diff application.
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-@SuppressWarnings("nls")
-public class LogicalDiffIntegrationTest extends AbstractLogicalAppTest {
+public class DiffApplicationTest extends AbstractApplicationTest {
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#buildApp()
+	 */
 	@Override
 	protected IApplication buildApp() {
-		return new LogicalApp(URI.createURI(
-				"platform:/fragment/org.eclipse.emf.compare.git.pgm.tests/model/lunaIntegrationTest.setup",
-				false));
+		return new LogicalDiffApplication();
 	}
 
+	/**
+	 * Test if there is no difference to display then the software display the "No differende to display"
+	 * message.
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	public void nothingToDo() throws Exception {
 		setCmdLocation(getRepositoryPath().toString());
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
 		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationLocation(AllIntegrationTests.getProvidedPlatformLocation().toString()) //
+				.setInstallationLocation(getTestTmpFolder().resolve("oomphFolder").toString()) //
 				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
 				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
 
@@ -63,15 +63,12 @@ public class LogicalDiffIntegrationTest extends AbstractLogicalAppTest {
 		addAllAndCommit("First commit");
 
 		// No reference
-		getContext().addArg(LogicalDiffCommand.LOGICAL_DIFF_CMD_NAME, newSetupFile.getAbsolutePath(),
+		getContext().addArg(getRepositoryPath().resolve(".git").toString(), newSetupFile.getAbsolutePath(),
 				"master", "master");
 		Object result = getApp().start(getContext());
-
-		printOut();
-		printErr();
-
-		assertOutputMessageEnd("No difference to display." + EOL);
+		assertOutputMessageEnd("No difference to display." + EMFCompareGitPGMUtil.EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.COMPLETE.code(), result);
 	}
+
 }

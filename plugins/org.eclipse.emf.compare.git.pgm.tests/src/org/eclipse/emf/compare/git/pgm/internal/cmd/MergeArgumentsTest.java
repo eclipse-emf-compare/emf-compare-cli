@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class LogicalMergeCommandArgumentsTest extends AbstractLogicalCommandTest {
+public class MergeArgumentsTest extends AbstractLogicalCommandTest {
 
 	@Override
 	protected String getCommandName() {

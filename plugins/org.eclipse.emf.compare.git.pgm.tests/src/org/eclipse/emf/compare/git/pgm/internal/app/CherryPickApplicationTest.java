@@ -51,7 +51,7 @@ import org.junit.Test;
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-public class LogicalCherryPickApplicationTest extends AbstractLogicalCommandApplicationTest {
+public class CherryPickApplicationTest extends AbstractLogicalCommandApplicationTest {
 
 	private File project;
 
