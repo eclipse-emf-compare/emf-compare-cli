@@ -188,7 +188,6 @@ public class LogicalApplicationLauncher {
 	 *             if the process fail to start or is interrupted.
 	 */
 	public Integer launch() throws Die {
-		Preconditions.checkNotNull(applicationName);
 		Preconditions.checkNotNull(workspaceLocation);
 		Preconditions.checkNotNull(setupFilePath);
 		Preconditions.checkNotNull(eclipseFilePath);
@@ -203,8 +202,10 @@ public class LogicalApplicationLauncher {
 		command.add(eclipseFilePath);
 		command.add("-nosplash"); //$NON-NLS-1$
 		command.add("--launcher.suppressErrors"); //$NON-NLS-1$
-		command.add("-application"); //$NON-NLS-1$
-		command.add(applicationName);
+		if (applicationName != null) {
+			command.add("-application"); //$NON-NLS-1$
+			command.add(applicationName);
+		}
 
 		// Propagates the show stack trace option to the application.
 		if (showStackTrace) {

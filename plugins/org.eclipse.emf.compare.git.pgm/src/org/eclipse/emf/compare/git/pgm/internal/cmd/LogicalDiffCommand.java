@@ -10,25 +10,13 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.cmd;
 
-import static org.eclipse.emf.compare.git.pgm.internal.Options.SHOW_STACK_TRACE_OPT;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.PathFilterHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
-import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
-import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
-import org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil;
+import org.eclipse.emf.compare.git.pgm.internal.util.LogicalApplicationLauncher;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
-import org.eclipse.oomph.setup.util.OS;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -58,6 +46,9 @@ public class LogicalDiffCommand extends AbstractLogicalCommand {
 	 */
 	static final String LOGICAL_DIFF_CMD_NAME = "logicaldiff"; //$NON-NLS-1$
 
+	/** Command name. */
+	private static final String LOGICALDIFF_APP_ID = "emf.compare.git.logicaldiff"; //$NON-NLS-1$
+
 	/**
 	 * Holds the reference from which the differences should be displayed.
 	 */
@@ -78,103 +69,45 @@ public class LogicalDiffCommand extends AbstractLogicalCommand {
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @see org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommand#internalRun()
 	 */
 	@Override
 	protected Integer internalRun() throws Die {
 
-		OS os = getPerformer().getOS();
-
-		if (!os.isCurrent()) {
-			return Returns.ERROR.code();
-		}
-
-		try {
-			out().println("Launching the installed product...");
-		} catch (IOException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
-
 		String setupFileAbsolutePath = this.getSetupFile().getAbsolutePath();
-		String setupFileBasePath = Paths.get(setupFileAbsolutePath).getParent().toString();
 
-		String eclipseDir = os.getEclipseDir();
-		String eclipseExecutable = os.getEclipseExecutable();
-		File eclipseFile = EMFCompareGitPGMUtil
-				.toFileWithAbsolutePath(setupFileBasePath, Paths.get(
-						getPerformer().getInstallationLocation().getPath(), eclipseDir, eclipseExecutable)
-						.toString());
+		String eclipsePath = getEclipsePath(setupFileAbsolutePath);
 
-		List<String> command = new ArrayList<String>();
-		command.add(eclipseFile.toString());
-		command.add("-nosplash"); //$NON-NLS-1$
-		command.add("--launcher.suppressErrors"); //$NON-NLS-1$
-		command.add("-application"); //$NON-NLS-1$
-		command.add("emf.compare.git.logicaldiff"); //$NON-NLS-1$
+		// Can not be null since it has been set in
+		// AbstractLogicalCommand.createSetupTaskPerformer(String,
+		// URI)
+		final String workspacePath = getPerformer().getWorkspaceLocation().toString();
 
-		// Propagates the show stack trace option to the application.
-		if (isShowStackTrace()) {
-			command.add(SHOW_STACK_TRACE_OPT);
-		}
-
-		command.add(getRepository().getDirectory().getAbsolutePath());
-
-		command.add(setupFileAbsolutePath);
+		//@formatter:off
+		LogicalApplicationLauncher launcher = new LogicalApplicationLauncher(out())
+				.setApplicationName(LOGICALDIFF_APP_ID)
+				.setEclipsePath(eclipsePath)
+				.setSetupFilePath(setupFileAbsolutePath)
+				.setWorkspaceLocation(workspacePath)
+				.setRepositoryPath(getRepository().getDirectory().getAbsolutePath())
+				.showStackTrace(isShowStackTrace());
+		//@formatter:on
 
 		if (commit != null) {
-			command.add(commit.name());
+			launcher.addAttribute(commit.name());
 		} else {
-			command.add("HEAD"); //$NON-NLS-1$
+			launcher.addAttribute("HEAD"); //$NON-NLS-1$
 		}
 		if (commitWith != null) {
-			command.add(commitWith.name());
+			launcher.addAttribute(commitWith.name());
 		} else {
-			command.add("HEAD"); //$NON-NLS-1$
+			launcher.addAttribute("HEAD"); //$NON-NLS-1$
 		}
 		if (treeFilter != null) {
-			command.add("--"); //$NON-NLS-1$
-			command.add(treeFilter.getPath());
+			launcher.addAttribute("--"); //$NON-NLS-1$
+			launcher.addAttribute(treeFilter.getPath());
 		}
 
-		if (getPerformer().getWorkspaceLocation() != null) {
-			command.add("-data"); //$NON-NLS-1$
-			command.add(getPerformer().getWorkspaceLocation().toString());
-		}
-
-		command.add("-vmargs"); //$NON-NLS-1$
-		command.add(VMARGS_OPTION + PROP_SETUP_CONFIRM_SKIP + "=true"); //$NON-NLS-1$ 
-		command.add(VMARGS_OPTION + PROP_SETUP_OFFLINE_STARTUP + "=" + false); //$NON-NLS-1$ 
-		command.add(VMARGS_OPTION + PROP_SETUP_MIRRORS_STARTUP + "=" + true); //$NON-NLS-1$ 
-		//command.add("-Xdebug"); //$NON-NLS-1$
-		//command.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8123"); //$NON-NLS-1$
-
-		ProcessBuilder builder = new ProcessBuilder(command);
-
-		Process process;
-		try {
-			process = builder.start();
-		} catch (IOException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
-
-		// output both stdout and stderr data from proc to stdout of this
-		// process
-		// StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream());
-		StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
-		// new Thread(errorGobbler).start();
-		new Thread(outputGobbler).start();
-
-		int returnValue;
-		try {
-			returnValue = process.waitFor();
-		} catch (InterruptedException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
-
-		return Returns.valueOf(returnValue).code();
+		return launcher.launch();
 	}
 
 	// For testing purpose

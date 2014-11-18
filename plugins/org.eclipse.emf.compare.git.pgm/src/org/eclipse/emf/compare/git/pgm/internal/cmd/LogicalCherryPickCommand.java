@@ -13,15 +13,10 @@ package org.eclipse.emf.compare.git.pgm.internal.cmd;
 import static org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus.createErrorStatus;
 import static org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus.createErrorStatusWithUsage;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
-import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.toFileWithAbsolutePath;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
@@ -32,7 +27,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.oomph.setup.util.OS;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -91,35 +85,22 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 
 	@Override
 	protected Integer internalRun() throws Die, IOException {
-		OS os = getPerformer().getOS();
-
-		if (!os.isCurrent()) {
-			return Returns.ERROR.code();
-		}
 
 		String setupFileAbsolutePath = this.getSetupFile().getAbsolutePath();
-		String setupFileBasePath = Paths.get(setupFileAbsolutePath).getParent().toString();
 
-		String eclipseDir = os.getEclipseDir();
-		String eclipseExecutable = os.getEclipseExecutable();
-		Path installationPath = Paths.get(getPerformer().getInstallationLocation().getPath(), eclipseDir,
-				eclipseExecutable);
-		File eclipseFile = toFileWithAbsolutePath(setupFileBasePath, installationPath.toString());
+		String eclipsePath = getEclipsePath(setupFileAbsolutePath);
 
-		final String workspaceLocation;
-		File performerWorkspaceLocation = getPerformer().getWorkspaceLocation();
-		if (performerWorkspaceLocation != null) {
-			workspaceLocation = performerWorkspaceLocation.toString();
-		} else {
-			workspaceLocation = null;
-		}
+		// Can not be null since it has been set in
+		// org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommand.createSetupTaskPerformer(String,
+		// URI)
+		final String workspacePath = getPerformer().getWorkspaceLocation().toString();
 
 		//@formatter:off
 		LogicalApplicationLauncher launcher = new LogicalApplicationLauncher(out())
 				.setApplicationName(LOGICALCHERRYPICK_APP_ID)
-				.setEclipsePath(eclipseFile.toString())
+				.setEclipsePath(eclipsePath)
 				.setSetupFilePath(setupFileAbsolutePath)
-				.setWorkspaceLocation(workspaceLocation)
+				.setWorkspaceLocation(workspacePath)
 				.setRepositoryPath(getRepository().getDirectory().getAbsolutePath())
 				.showStackTrace(isShowStackTrace());
 		//@formatter:on

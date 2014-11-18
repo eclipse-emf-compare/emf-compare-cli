@@ -10,19 +10,9 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.cmd;
 
-import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.SEP;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
-import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
-import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
-import org.eclipse.oomph.setup.util.OS;
+import org.eclipse.emf.compare.git.pgm.internal.util.LogicalApplicationLauncher;
 
 /**
  * Logical merge tool command. <h3>Name</h3>
@@ -58,59 +48,24 @@ public class LogicalMergeToolCommand extends AbstractLogicalCommand {
 	@Override
 	protected Integer internalRun() throws Die {
 
-		OS os = getPerformer().getOS();
+		String setupFileAbsolutePath = this.getSetupFile().getAbsolutePath();
 
-		if (!os.isCurrent()) {
-			return Returns.ERROR.code();
-		}
+		String eclipsePath = getEclipsePath(setupFileAbsolutePath);
 
-		try {
-			out().println("Launching the installed product...");
-		} catch (IOException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
+		// Can not be null since it has been set in
+		// org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommand.createSetupTaskPerformer(String,
+		// URI)
+		final String workspacePath = getPerformer().getWorkspaceLocation().toString();
 
-		String eclipseDir = os.getEclipseDir();
-		String eclipseExecutable = os.getEclipseExecutable();
-		String eclipsePath = new File(getPerformer().getInstallationLocation(), eclipseDir + SEP
-				+ eclipseExecutable).getAbsolutePath();
-
-		List<String> command = new ArrayList<String>();
-		command.add(eclipsePath);
-
-		if (getPerformer().getWorkspaceLocation() != null) {
-			command.add("-data"); //$NON-NLS-1$
-			command.add(getPerformer().getWorkspaceLocation().toString());
-		}
-
-		command.add("-vmargs"); //$NON-NLS-1$
-		command.add(VMARGS_OPTION + PROP_SETUP_CONFIRM_SKIP + "=true"); //$NON-NLS-1$ 
-		command.add(VMARGS_OPTION + PROP_SETUP_OFFLINE_STARTUP + "=" + false); //$NON-NLS-1$ 
-		command.add(VMARGS_OPTION + PROP_SETUP_MIRRORS_STARTUP + "=" + true); //$NON-NLS-1$ 
-
-		ProcessBuilder builder = new ProcessBuilder(command);
-		Process process;
-		try {
-			process = builder.start();
-		} catch (IOException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
-
-		// output both stdout and stderr data from proc to stdout of this
-		// process
-		StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream());
-		StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
-		new Thread(errorGobbler).start();
-		new Thread(outputGobbler).start();
-
-		int returnValue;
-		try {
-			returnValue = process.waitFor();
-		} catch (InterruptedException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
-
-		return Returns.valueOf(returnValue).code();
+		//@formatter:off
+		LogicalApplicationLauncher launcher = new LogicalApplicationLauncher(out())
+				.setEclipsePath(eclipsePath)
+				.setSetupFilePath(setupFileAbsolutePath)
+				.setWorkspaceLocation(workspacePath)
+				.setRepositoryPath(getRepository().getDirectory().getAbsolutePath())
+				.showStackTrace(isShowStackTrace());
+		//@formatter:on
+		return launcher.launch();
 	}
 
 	/**

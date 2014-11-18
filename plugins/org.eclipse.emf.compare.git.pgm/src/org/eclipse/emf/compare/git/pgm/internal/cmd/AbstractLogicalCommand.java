@@ -20,17 +20,16 @@ import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil
 
 import com.google.common.base.Preconditions;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -76,6 +75,7 @@ import org.eclipse.oomph.setup.internal.core.util.ECFURIHandlerImpl;
 import org.eclipse.oomph.setup.internal.core.util.SetupUtil;
 import org.eclipse.oomph.setup.log.ProgressLog;
 import org.eclipse.oomph.setup.p2.P2Task;
+import org.eclipse.oomph.setup.util.OS;
 import org.eclipse.oomph.util.Confirmer;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -88,18 +88,6 @@ import org.kohsuke.args4j.Option;
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractLogicalCommand {
-
-	/** Oomph option. */
-	protected static final String PROP_SETUP_CONFIRM_SKIP = "oomph.setup.confirm.skip"; //$NON-NLS-1$
-
-	/** Oomph option. */
-	protected static final String PROP_SETUP_OFFLINE_STARTUP = "oomph.setup.offline.startup"; //$NON-NLS-1$
-
-	/** Oomph option. */
-	protected static final String PROP_SETUP_MIRRORS_STARTUP = "oomph.setup.mirrors.startup"; //$NON-NLS-1$
-
-	/** VM Args option. */
-	protected static final String VMARGS_OPTION = "-D"; //$NON-NLS-1$
 
 	/** Buffer size of the array use to generate an unique id. */
 	private static final int GEN_ID_BUFFER_SIZE = 1024;
@@ -186,12 +174,20 @@ public abstract class AbstractLogicalCommand {
 	 *             propagation.
 	 */
 	public final Integer execute() throws Die, IOException {
+		final Integer result;
 		if (!help) {
-			return internalRun();
+			OS os = getPerformer().getOS();
+			if (!os.isCurrent()) {
+				result = Returns.ERROR.code();
+			} else {
+				result = internalRun();
+			}
+
 		} else {
 			out.print(usage);
+			result = Returns.COMPLETE.code();
 		}
-		return Returns.COMPLETE.code();
+		return result;
 	}
 
 	/**
@@ -840,39 +836,20 @@ public abstract class AbstractLogicalCommand {
 	}
 
 	/**
-	 * Stream goobler.
+	 * Gets the path to the Eclipse executable file.
 	 * 
-	 * @author <a href="mailto:axel.richard@obeo.fr">Axel Richard</a>
+	 * @param setupFileAbsolutePath
+	 *            path the setup file. This path is used to make the path the eclipse file absolute.
+	 * @return the path to the Eclipse executable file.
 	 */
-	class StreamGobbler implements Runnable {
-		/** The stream. */
-		private InputStream is;
-
-		/**
-		 * Reads everything from is until empty.
-		 * 
-		 * @param is
-		 *            the stream to read.
-		 */
-		StreamGobbler(InputStream is) {
-			this.is = is;
-		}
-
-		/**
-		 * {@inheritDoc}.
-		 */
-		public void run() {
-			try {
-				InputStreamReader isr = new InputStreamReader(is);
-				BufferedReader br = new BufferedReader(isr);
-				String line = null;
-				while ((line = br.readLine()) != null) {
-					// performer.log(line);
-					out().println(line);
-				}
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-			}
-		}
+	protected String getEclipsePath(String setupFileAbsolutePath) {
+		String setupFileBasePath = Paths.get(setupFileAbsolutePath).getParent().toString();
+		OS os = getPerformer().getOS();
+		String eclipseDir = os.getEclipseDir();
+		String eclipseExecutable = os.getEclipseExecutable();
+		Path installationPath = Paths.get(getPerformer().getInstallationLocation().getPath(), eclipseDir,
+				eclipseExecutable);
+		File eclipseFile = toFileWithAbsolutePath(setupFileBasePath, installationPath.toString());
+		return eclipseFile.toString();
 	}
 }

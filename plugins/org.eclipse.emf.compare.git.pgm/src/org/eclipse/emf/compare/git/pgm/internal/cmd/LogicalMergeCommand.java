@@ -10,24 +10,14 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.cmd;
 
-import static org.eclipse.emf.compare.git.pgm.internal.Options.SHOW_STACK_TRACE_OPT;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
-import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
-import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
-import org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil;
+import org.eclipse.emf.compare.git.pgm.internal.util.LogicalApplicationLauncher;
 import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.oomph.setup.util.OS;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -51,6 +41,9 @@ import org.kohsuke.args4j.Option;
  */
 @SuppressWarnings("restriction")
 public class LogicalMergeCommand extends AbstractLogicalCommand {
+
+	/** Id of the logicalmerge application. */
+	static final String LOGICALMERGE_APP_ID = "emf.compare.git.logicalmerge"; //$NON-NLS-1$
 
 	/**
 	 * Command name.
@@ -82,105 +75,53 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 	 */
 	@Override
 	protected Integer internalRun() throws Die {
-		// Checks we are not already in a conflict state
-		// Checks that the repository is in conflict state
-		if (getRepository().getRepositoryState() == RepositoryState.MERGING) {
-			StringBuilder msg = new StringBuilder(
-					"error: 'merge' is not possible because you have unmerged files.").append(EOL);
-			msg.append("hint: Use the logicalmergetool command to fix them up un the work tree").append(EOL);
-			msg.append("hint: and then use the 'git add/rm <file>' as").append(EOL);
-			msg.append("hint: appropriate to mark resolution").append(EOL);
-			System.out.println(msg);
-			throw new DiesOn(DeathType.FATAL).displaying("Exiting because of an unresolved conflict.")
-					.ready();
-		}
-
-		OS os = getPerformer().getOS();
-
-		if (!os.isCurrent()) {
-			return Returns.ERROR.code();
-		}
-
-		try {
-			out().println("Launching the installed product...");
-		} catch (IOException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
 
 		String setupFileAbsolutePath = this.getSetupFile().getAbsolutePath();
-		String setupFileBasePath = Paths.get(setupFileAbsolutePath).getParent().toString();
 
-		String eclipseDir = os.getEclipseDir();
-		String eclipseExecutable = os.getEclipseExecutable();
-		File eclipseFile = EMFCompareGitPGMUtil
-				.toFileWithAbsolutePath(setupFileBasePath, Paths.get(
-						getPerformer().getInstallationLocation().getPath(), eclipseDir, eclipseExecutable)
-						.toString());
+		String eclipsePath = getEclipsePath(setupFileAbsolutePath);
 
-		List<String> command = new ArrayList<String>();
-		command.add(eclipseFile.toString());
-		command.add("-nosplash"); //$NON-NLS-1$
-		command.add("--launcher.suppressErrors"); //$NON-NLS-1$
-		command.add("-application"); //$NON-NLS-1$
-		command.add("emf.compare.git.logicalmerge"); //$NON-NLS-1$
+		// Can not be null since it has been set in
+		// org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommand.createSetupTaskPerformer(String,
+		// URI)
+		final String workspacePath = getPerformer().getWorkspaceLocation().toString();
 
-		// Propagates the show stack trace option to the application.
-		if (isShowStackTrace()) {
-			command.add(SHOW_STACK_TRACE_OPT);
-		}
-
-		command.add(getRepository().getDirectory().getAbsolutePath());
-
-		command.add(setupFileAbsolutePath);
+		//@formatter:off
+		LogicalApplicationLauncher launcher = new LogicalApplicationLauncher(out())
+				.setApplicationName(LOGICALMERGE_APP_ID)
+				.setEclipsePath(eclipsePath)
+				.debug(debug)
+				.setSetupFilePath(setupFileAbsolutePath)
+				.setWorkspaceLocation(workspacePath)
+				.setRepositoryPath(getRepository().getDirectory().getAbsolutePath())
+				.showStackTrace(isShowStackTrace());
+		//@formatter:on
 
 		if (commit != null) {
-			command.add(commit.name());
+			launcher.addAttribute(commit.name());
 		} else {
-			command.add("HEAD"); //$NON-NLS-1$
+			launcher.addAttribute("HEAD"); //$NON-NLS-1$
 		}
 
 		if (message != null) {
-			command.add("-m"); //$NON-NLS-1$
-			command.add(message);
+			launcher.addAttribute("-m"); //$NON-NLS-1$
+			launcher.addAttribute(message);
 		}
 
-		if (getPerformer().getWorkspaceLocation() != null) {
-			command.add("-data"); //$NON-NLS-1$
-			command.add(getPerformer().getWorkspaceLocation().toString());
+		return launcher.launch();
+	}
+
+	@Override
+	protected ValidationStatus getValidationStatus() {
+		// Checks we are not already in a conflict state
+		if (getRepository().getRepositoryState() == RepositoryState.MERGING) {
+			String errorMessage = "Exiting because of an unresolved conflict." + EOL;
+			errorMessage += "error: 'merge' is not possible because you have unmerged files." + EOL;
+			errorMessage += "hint: Use the logicalmergetool command to fix them up un the work tree" + EOL;
+			errorMessage += "hint: and then use the 'git add/rm <file>' as" + EOL;
+			errorMessage += "hint: appropriate to mark resolution" + EOL;
+			return ValidationStatus.createErrorStatus(errorMessage);
 		}
-
-		command.add("-vmargs"); //$NON-NLS-1$
-		command.add(VMARGS_OPTION + PROP_SETUP_CONFIRM_SKIP + "=true"); //$NON-NLS-1$ 
-		command.add(VMARGS_OPTION + PROP_SETUP_OFFLINE_STARTUP + "=" + false); //$NON-NLS-1$ 
-		command.add(VMARGS_OPTION + PROP_SETUP_MIRRORS_STARTUP + "=" + true); //$NON-NLS-1$ 
-		if (debug) {
-			command.add("-Xdebug"); //$NON-NLS-1$
-			command.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8123"); //$NON-NLS-1$
-		}
-
-		ProcessBuilder builder = new ProcessBuilder(command);
-		Process process;
-		try {
-			process = builder.start();
-		} catch (IOException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
-
-		// output both stdout and stderr data from proc to stdout of this
-		// process
-		StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream());
-		StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream());
-		new Thread(errorGobbler).start();
-		new Thread(outputGobbler).start();
-
-		int returnValue;
-		try {
-			returnValue = process.waitFor();
-		} catch (InterruptedException e) {
-			throw new DiesOn(DeathType.FATAL).duedTo(e).ready();
-		}
-
-		return Returns.valueOf(returnValue).code();
+		return super.getValidationStatus();
 	}
 
 	// For testing purpose.
