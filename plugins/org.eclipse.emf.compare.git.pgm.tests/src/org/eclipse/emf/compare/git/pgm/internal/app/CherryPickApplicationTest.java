@@ -892,7 +892,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 		expected += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
 		expected += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
 		expected += "hint: by adding them to the index (Team > Add to index) or" + EOL;
-		expected += "hint: by removing them from then index (Team > Remove from index)." + EOL;
+		expected += "hint: by removing them from the index (Team > Remove from index)." + EOL;
 		expected += "hint: Do NOT commit, use one of the following commands instead" + EOL;
 		expected += "hint:  git logical-cherrypick --continue : to continue the cherry pick" + EOL;
 		expected += "hint:  git logical-cherrypick --abort : to abort the cherry pick" + EOL;

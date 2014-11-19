@@ -254,7 +254,7 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 			msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
 			msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
 			msg += "hint: by adding them to the index (Team > Add to index) or" + EOL;
-			msg += "hint: by removing them from then index (Team > Remove from index)." + EOL;
+			msg += "hint: by removing them from the index (Team > Remove from index)." + EOL;
 			msg += "hint: Do NOT commit, use one of the following commands instead" + EOL;
 			msg += "hint:  git logical-cherrypick --continue : to continue the cherry pick" + EOL;
 			msg += "hint:  git logical-cherrypick --abort : to abort the cherry pick" + EOL;
