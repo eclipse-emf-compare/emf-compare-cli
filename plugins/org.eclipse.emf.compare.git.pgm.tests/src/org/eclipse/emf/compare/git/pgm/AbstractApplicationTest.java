@@ -71,10 +71,6 @@ public abstract class AbstractApplicationTest {
 
 	private MockedApplicationContext context;
 
-	private Path repositoryPath;
-
-	private File gitFolderPath;
-
 	private ByteArrayOutputStream outputStream;
 
 	private ByteArrayOutputStream errStream;
@@ -103,9 +99,8 @@ public abstract class AbstractApplicationTest {
 		app = buildApp();
 		setContext(new MockedApplicationContext());
 
-		setRepositoryPath(Files.createTempDirectory(testTmpFolder, REPO_PREFIX, new FileAttribute<?>[] {}));
-		setGitFolderPath(new File(getRepositoryPath().toFile(), Constants.DOT_GIT));
-		git = Git.init().setDirectory(getRepositoryPath().toFile()).call();
+		Path newRepoFile = Files.createTempDirectory(testTmpFolder, REPO_PREFIX, new FileAttribute<?>[] {});
+		git = Git.init().setDirectory(newRepoFile.toFile()).call();
 		// Saves the user.dire property to be able to restore it.( some tests can modify it)
 		userDir = System.getProperty("user.dir"); //$NON-NLS-1$
 
@@ -152,19 +147,11 @@ public abstract class AbstractApplicationTest {
 	}
 
 	public Path getRepositoryPath() {
-		return repositoryPath;
-	}
-
-	public void setRepositoryPath(Path repositoryPath) {
-		this.repositoryPath = repositoryPath;
+		return git.getRepository().getWorkTree().toPath();
 	}
 
 	public File getGitFolderPath() {
-		return gitFolderPath;
-	}
-
-	public void setGitFolderPath(File gitFolderPath) {
-		this.gitFolderPath = gitFolderPath;
+		return git.getRepository().getDirectory();
 	}
 
 	public void deleteRecursively(File f) {
@@ -245,15 +232,21 @@ public abstract class AbstractApplicationTest {
 		return app;
 	}
 
-	protected RevCommit addAllAndCommit(String commitMessage) throws GitAPIException, NoFilepatternException,
-			NoHeadException, NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException {
+	protected RevCommit addAllAndCommit(String commitMessage, Git git) throws GitAPIException,
+			NoFilepatternException, NoHeadException, NoMessageException, UnmergedPathsException,
+			ConcurrentRefUpdateException, WrongRepositoryStateException {
 		DirCache dirChache = git.add().addFilepattern(".").call(); //$NON-NLS-1$
 		// Assert there is something to commit
 		assertTrue(dirChache.getEntriesWithin("").length > 0);
 		RevCommit revCommit = git.commit().setAuthor("Logical test author", "logicaltest@obeo.fr")
 				.setCommitter("Logical test author", "logicaltest@obeo.fr").setMessage(commitMessage).call();
 		return revCommit;
+	}
+
+	protected RevCommit addAllAndCommit(String commitMessage) throws GitAPIException, NoFilepatternException,
+			NoHeadException, NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException,
+			WrongRepositoryStateException {
+		return addAllAndCommit(commitMessage, getGit());
 	}
 
 	protected Ref createBranch(String branchName, String startingPoint) throws RefAlreadyExistsException,
@@ -282,9 +275,9 @@ public abstract class AbstractApplicationTest {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Configuration:").append(EOL);
 		builder.append("\t").append("Tmp folder: ").append(testTmpFolder.toString()).append(EOL);
-		builder.append("\t").append("Git folder: ").append(gitFolderPath.getAbsolutePath()).append(EOL);
+		builder.append("\t").append("Git folder: ").append(getGitFolderPath().getAbsolutePath()).append(EOL);
 		builder.append("\t").append("Git content:").append(EOL);
-		Files.walkFileTree(repositoryPath, new FileVisitor<Path>() {
+		Files.walkFileTree(getRepositoryPath(), new FileVisitor<Path>() {
 
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 				if (dir.endsWith(".git")) {
