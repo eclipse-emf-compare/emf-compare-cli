@@ -52,6 +52,9 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 	/** Command name. */
 	static final String LOGICAL_CHERRY_PICK_CMD_NAME = "logicalcherry-pick"; //$NON-NLS-1$
 
+	/** Id of the logicalcherry-pick application. */
+	static final String LOGICAL_CHERRYPICK_APP_ID = "emf.compare.git.logicalcherry-pick"; //$NON-NLS-1$
+
 	/** Quit option key. */
 	static final String QUIT_OPT = "--quit"; //$NON-NLS-1$
 
@@ -60,9 +63,6 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 
 	/** Continue option key. */
 	static final String CONTINUE_OPT = "--continue"; //$NON-NLS-1$
-
-	/** Id of the logicalcherry-pick application. */
-	static final String LOGICALCHERRYPICK_APP_ID = "emf.compare.git.logicalcherry-pick"; //$NON-NLS-1$
 
 	/** Tab character. */
 	private static final String TAB = "\t"; //$NON-NLS-1$
@@ -83,6 +83,10 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 	@Option(required = false, name = QUIT_OPT, usage = "Use this option to quit a in going cherry-pick")
 	private boolean quitOpt;
 
+	/** Option debug. */
+	@Option(name = "--debug", usage = "Launched the provisionned eclipse in debug mode.", aliases = {"-d" })
+	private boolean debug;
+
 	@Override
 	protected Integer internalRun() throws Die, IOException {
 
@@ -97,8 +101,9 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 
 		//@formatter:off
 		LogicalApplicationLauncher launcher = new LogicalApplicationLauncher(out())
-				.setApplicationName(LOGICALCHERRYPICK_APP_ID)
+				.setApplicationName(LOGICAL_CHERRYPICK_APP_ID)
 				.setEclipsePath(eclipsePath)
+				.debug(debug)
 				.setSetupFilePath(setupFileAbsolutePath)
 				.setWorkspaceLocation(workspacePath)
 				.setRepositoryPath(getRepository().getDirectory().getAbsolutePath())

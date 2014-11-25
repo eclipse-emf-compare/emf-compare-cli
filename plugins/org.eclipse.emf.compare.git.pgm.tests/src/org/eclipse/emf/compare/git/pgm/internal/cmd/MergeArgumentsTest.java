@@ -47,7 +47,7 @@ public class MergeArgumentsTest extends AbstractLogicalCommandTest {
 				+ " <setup>                 : Path to the setup file. The setup file is a Oomph" + EOL 
 				+ "                           model." +EOL
 				+ " <commit>                : Commit ID or branch name to merge." + EOL 
-				+ " --debug (-d)            : Launched the provisonned eclipse in debug mode."+ EOL
+				+ " --debug (-d)            : Launched the provisionned eclipse in debug mode."+ EOL
 				+ " --git-dir gitFolderPath : Path to the .git folder of your repository."+ EOL
 				+ " --help (-h)             : Dispays help for this command." + EOL 
 				+ " --show-stack-trace      : Use this option to display java stack trace in" + EOL
@@ -249,9 +249,9 @@ public class MergeArgumentsTest extends AbstractLogicalCommandTest {
 		setCmdLocation(getRepositoryPath().toString());
 
 		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
-		File newSetupFile = new OomphUserModelBuilder().setInstallationLocation(
-				oomphFolderPath.toString()).setWorkspaceLocation(oomphFolderPath.resolve("ws").toString())
-				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
+		File newSetupFile = new OomphUserModelBuilder().setInstallationLocation(oomphFolderPath.toString())
+				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()).saveTo(
+						getTestTmpFolder().resolve("setup.setup").toString());
 
 		// Creates some content for the first commit.
 		new ProjectBuilder(this) //

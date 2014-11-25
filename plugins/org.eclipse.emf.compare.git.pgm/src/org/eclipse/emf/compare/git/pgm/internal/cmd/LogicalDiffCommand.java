@@ -46,8 +46,8 @@ public class LogicalDiffCommand extends AbstractLogicalCommand {
 	 */
 	static final String LOGICAL_DIFF_CMD_NAME = "logicaldiff"; //$NON-NLS-1$
 
-	/** Command name. */
-	private static final String LOGICALDIFF_APP_ID = "emf.compare.git.logicaldiff"; //$NON-NLS-1$
+	/** Id of the logicaldiff application. */
+	private static final String LOGICAL_DIFF_APP_ID = "emf.compare.git.logicaldiff"; //$NON-NLS-1$
 
 	/**
 	 * Holds the reference from which the differences should be displayed.
@@ -84,7 +84,7 @@ public class LogicalDiffCommand extends AbstractLogicalCommand {
 
 		//@formatter:off
 		LogicalApplicationLauncher launcher = new LogicalApplicationLauncher(out())
-				.setApplicationName(LOGICALDIFF_APP_ID)
+				.setApplicationName(LOGICAL_DIFF_APP_ID)
 				.setEclipsePath(eclipsePath)
 				.setSetupFilePath(setupFileAbsolutePath)
 				.setWorkspaceLocation(workspacePath)

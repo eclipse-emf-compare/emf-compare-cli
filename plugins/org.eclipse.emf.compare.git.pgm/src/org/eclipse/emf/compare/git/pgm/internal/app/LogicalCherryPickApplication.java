@@ -256,9 +256,9 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 			msg += "hint: by adding them to the index (Team > Add to index) or" + EOL;
 			msg += "hint: by removing them from the index (Team > Remove from index)." + EOL;
 			msg += "hint: Do NOT commit, use one of the following commands instead" + EOL;
-			msg += "hint:  git logical-cherrypick --continue : to continue the cherry pick" + EOL;
-			msg += "hint:  git logical-cherrypick --abort : to abort the cherry pick" + EOL;
-			msg += "hint:  git logical-cherrypick --quit : to skip this commit" + EOL;
+			msg += "hint:  git logicalcherry-pick --continue : to continue the cherry pick" + EOL;
+			msg += "hint:  git logicalcherry-pick --abort : to abort the cherry pick" + EOL;
+			msg += "hint:  git logicalcherry-pick --quit : to skip this commit" + EOL;
 
 			messageBuilder.append(msg);
 		}

@@ -42,13 +42,13 @@ import org.kohsuke.args4j.Option;
 @SuppressWarnings("restriction")
 public class LogicalMergeCommand extends AbstractLogicalCommand {
 
-	/** Id of the logicalmerge application. */
-	static final String LOGICALMERGE_APP_ID = "emf.compare.git.logicalmerge"; //$NON-NLS-1$
-
 	/**
 	 * Command name.
 	 */
 	static final String LOGICAL_MERGE_CMD_NAME = "logicalmerge"; //$NON-NLS-1$
+
+	/** Id of the logicalmerge application. */
+	static final String LOGICAL_MERGE_APP_ID = "emf.compare.git.logicalmerge"; //$NON-NLS-1$
 
 	/**
 	 * Holds a ObjectId that need to be merged.
@@ -65,7 +65,7 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 	/**
 	 * Option debug.
 	 */
-	@Option(name = "--debug", usage = "Launched the provisonned eclipse in debug mode.", aliases = {"-d" })
+	@Option(name = "--debug", usage = "Launched the provisionned eclipse in debug mode.", aliases = {"-d" })
 	private boolean debug;
 
 	/**
@@ -87,7 +87,7 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 
 		//@formatter:off
 		LogicalApplicationLauncher launcher = new LogicalApplicationLauncher(out())
-				.setApplicationName(LOGICALMERGE_APP_ID)
+				.setApplicationName(LOGICAL_MERGE_APP_ID)
 				.setEclipsePath(eclipsePath)
 				.debug(debug)
 				.setSetupFilePath(setupFileAbsolutePath)

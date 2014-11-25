@@ -70,7 +70,7 @@ public class LogicalApplicationLauncher {
 	/** Path to the workspace. */
 	private String workspaceLocation;
 
-	/** Debut option. */
+	/** Debug option. */
 	private boolean debug;
 
 	/**

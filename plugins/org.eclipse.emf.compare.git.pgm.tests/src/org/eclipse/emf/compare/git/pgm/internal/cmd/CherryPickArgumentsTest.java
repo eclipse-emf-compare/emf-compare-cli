@@ -46,13 +46,14 @@ public class CherryPickArgumentsTest extends AbstractLogicalCommandTest {
 	protected String getExpectedUsage() {
 		//@formatter:off
 		
-		String usage = "logicalcherry-pick <setup> [<commit> ...] [--abort] [--continue] [--git-dir gitFolderPath] [--help (-h)] [--quit] [--show-stack-trace]" + EOL;
+		String usage = "logicalcherry-pick <setup> [<commit> ...] [--abort] [--continue] [--debug (-d)] [--git-dir gitFolderPath] [--help (-h)] [--quit] [--show-stack-trace]" + EOL;
 		usage += EOL;
 		usage += " <setup>                 : Path to the setup file. The setup file is a Oomph" + EOL;
 		usage += "                           model." +EOL;
 		usage += " <commit>                : Commit IDs to cherry pick." + EOL;
 		usage += " --abort                 : Use this option to abort a in going cherry-pick" + EOL;
 		usage += " --continue              : Use this option to continue a in going cherry-pick" + EOL;
+		usage += " --debug (-d)            : Launched the provisionned eclipse in debug mode." + EOL;
 		usage += " --git-dir gitFolderPath : Path to the .git folder of your repository."+ EOL;
 		usage += " --help (-h)             : Dispays help for this command." + EOL;
 		usage += " --quit                  : Use this option to quit a in going cherry-pick" + EOL;

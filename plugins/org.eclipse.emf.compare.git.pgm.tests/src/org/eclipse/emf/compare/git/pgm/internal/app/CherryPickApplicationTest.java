@@ -894,9 +894,9 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 		expected += "hint: by adding them to the index (Team > Add to index) or" + EOL;
 		expected += "hint: by removing them from the index (Team > Remove from index)." + EOL;
 		expected += "hint: Do NOT commit, use one of the following commands instead" + EOL;
-		expected += "hint:  git logical-cherrypick --continue : to continue the cherry pick" + EOL;
-		expected += "hint:  git logical-cherrypick --abort : to abort the cherry pick" + EOL;
-		expected += "hint:  git logical-cherrypick --quit : to skip this commit" + EOL + EOL;
+		expected += "hint:  git logicalcherry-pick --continue : to continue the cherry pick" + EOL;
+		expected += "hint:  git logicalcherry-pick --abort : to abort the cherry pick" + EOL;
+		expected += "hint:  git logicalcherry-pick --quit : to skip this commit" + EOL + EOL;
 		return expected;
 	}
 

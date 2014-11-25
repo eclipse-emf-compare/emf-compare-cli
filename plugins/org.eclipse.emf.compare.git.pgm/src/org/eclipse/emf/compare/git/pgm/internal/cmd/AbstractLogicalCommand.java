@@ -64,6 +64,7 @@ import org.eclipse.oomph.setup.Product;
 import org.eclipse.oomph.setup.ProductCatalog;
 import org.eclipse.oomph.setup.ProductVersion;
 import org.eclipse.oomph.setup.Project;
+import org.eclipse.oomph.setup.SetupFactory;
 import org.eclipse.oomph.setup.SetupPackage;
 import org.eclipse.oomph.setup.SetupTask;
 import org.eclipse.oomph.setup.Trigger;
@@ -246,7 +247,7 @@ public abstract class AbstractLogicalCommand {
 				performer.perform();
 
 				if (!performer.hasSuccessfullyPerformed()) {
-					throw new DiesOn(DeathType.FATAL).displaying("Error durring Oomph operation").ready();
+					throw new DiesOn(DeathType.FATAL).displaying("Error during Oomph operation").ready();
 				}
 			} catch (Die e) {
 				throw e;
@@ -471,7 +472,7 @@ public abstract class AbstractLogicalCommand {
 			startupSetupProject = (Project)startupSetupRoot;
 		} else {
 			throw new DiesOn(SOFTWARE_ERROR).displaying(
-					"The root of the setup file should be a Setup::PROJECT").ready();
+					"The root of the setup file should be a Setup::Project").ready();
 		}
 
 		progressPageLog = new ProgressPageLog(System.out);
@@ -480,8 +481,8 @@ public abstract class AbstractLogicalCommand {
 		Index eclipseSetupIndex = (Index)EcoreUtil.getObjectByType(environmentSetup.getContents(),
 				SetupPackage.Literals.INDEX);
 
-		handleWorkspace(startupSetupProject, eclipseSetupIndex);
-		handleInstallation(startupSetupProject, eclipseSetupIndex);
+		final String wsPath = handleWorkspace(startupSetupProject, eclipseSetupIndex);
+		final String installPath = handleInstallation(startupSetupProject, eclipseSetupIndex);
 
 		EList<ProductCatalog> productCatalogs = eclipseSetupIndex.getProductCatalogs();
 		ProductCatalog catalog = productCatalogs.get(0);
@@ -507,7 +508,7 @@ public abstract class AbstractLogicalCommand {
 			aPerformer = SetupTaskPerformer.create(uriConverter, SetupPrompter.CANCEL, triggerBootstrap,
 					setupContext, false);
 		} catch (Exception e) {
-			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying("Error during processing of setup mdoel")
+			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying("Error during processing of setup model")
 					.ready();
 		}
 		// CHECKSTYLE.ON: IllegalCatch
@@ -518,10 +519,25 @@ public abstract class AbstractLogicalCommand {
 		aPerformer.setOffline(false);
 		aPerformer.setMirrors(true);
 
-		final String installationPath = getInstallationPath(startupSetupProject);
-		if (installationPathContainsExistingEclipse(installationPath)) {
+		if (installationPathContainsExistingEclipse(installPath)) {
 			aPerformer.getTriggeredSetupTasks().clear();
-			progressPageLog.log("Existing eclipse environment found at : " + installationPath); //$NON-NLS-1$
+			progressPageLog.log("Existing eclipse environment found at : " + installPath); //$NON-NLS-1$
+			// Add installation task and workspace task.
+			InstallationTask installationTask = SetupFactory.eINSTANCE.createInstallationTask();
+			installationTask.setLocation(installPath);
+			aPerformer.getTriggeredSetupTasks().add(installationTask);
+			WorkspaceTask workspaceTask = SetupFactory.eINSTANCE.createWorkspaceTask();
+			workspaceTask.setLocation(wsPath);
+			aPerformer.getTriggeredSetupTasks().add(workspaceTask);
+		} else {
+			// Ensure we use user installation and workspace paths
+			for (SetupTask setupTask : aPerformer.getTriggeredSetupTasks()) {
+				if (setupTask instanceof WorkspaceTask) {
+					((WorkspaceTask)setupTask).setLocation(wsPath);
+				} else if (setupTask instanceof InstallationTask) {
+					((InstallationTask)setupTask).setLocation(installPath);
+				}
+			}
 		}
 
 		return aPerformer;
@@ -579,12 +595,13 @@ public abstract class AbstractLogicalCommand {
 	 *            the root object of the user model.
 	 * @param index
 	 *            the root object of the environment model.
+	 * @return the workspace path.
 	 * @throws IOException
 	 *             e
 	 * @throws Die
 	 *             e
 	 */
-	private void handleWorkspace(Project project, Index index) throws IOException, Die {
+	private String handleWorkspace(Project project, Index index) throws IOException, Die {
 		final String workspaceLocation;
 		if (modelDefinesWorkspacePath(project)) {
 			workspaceLocation = getWorkspacePath(project);
@@ -596,10 +613,11 @@ public abstract class AbstractLogicalCommand {
 			for (SetupTask setupTask : productCatalog.getSetupTasks()) {
 				if (setupTask instanceof WorkspaceTask) {
 					((WorkspaceTask)setupTask).setLocation(workspaceLocation);
-					return;
+					break;
 				}
 			}
 		}
+		return workspaceLocation;
 	}
 
 	/**
@@ -609,12 +627,13 @@ public abstract class AbstractLogicalCommand {
 	 *            the root object of the user model.
 	 * @param index
 	 *            the root object of the environment model.
+	 * @return the installation path.
 	 * @throws IOException
 	 *             e
 	 * @throws Die
 	 *             e
 	 */
-	private void handleInstallation(Project project, Index index) throws IOException, Die {
+	private String handleInstallation(Project project, Index index) throws IOException, Die {
 		final String installationLocation;
 		if (modelDefinesWorkspacePath(project)) {
 			installationLocation = getInstallationPath(project);
@@ -626,10 +645,11 @@ public abstract class AbstractLogicalCommand {
 			for (SetupTask setupTask : productCatalog.getSetupTasks()) {
 				if (setupTask instanceof InstallationTask) {
 					((InstallationTask)setupTask).setLocation(installationLocation);
-					return;
+					break;
 				}
 			}
 		}
+		return installationLocation;
 	}
 
 	/**
