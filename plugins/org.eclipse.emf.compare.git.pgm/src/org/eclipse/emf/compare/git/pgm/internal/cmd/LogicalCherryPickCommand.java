@@ -26,6 +26,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
@@ -199,7 +200,25 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 		} else if (quitOpt && abortOpt) {
 			result = createErrorStatus("logical cherry-pick: --quit cannot be used with --abort");
 		} else {
-			result = super.getValidationStatus();
+			RepositoryState state = getRepository().getRepositoryState();
+			if (continueOpt && state == RepositoryState.REBASING_MERGE) {
+				StringBuilder msgBuilder = new StringBuilder();
+				Status status;
+				try {
+					status = new Git(getRepository()).status().call();
+					for (String conflict : status.getConflicting()) {
+						msgBuilder.append(conflict).append(": needs merge").append(EOL);
+					}
+					msgBuilder.append("You must edit all merge conflicts and then").append(EOL);
+					msgBuilder.append("mark them as resolved using git add").append(EOL);
+					result = createErrorStatus(msgBuilder.toString());
+				} catch (NoWorkTreeException | GitAPIException e) {
+					return createErrorStatus(e.getMessage());
+				}
+
+			} else {
+				result = super.getValidationStatus();
+			}
 		}
 		return result;
 	}
