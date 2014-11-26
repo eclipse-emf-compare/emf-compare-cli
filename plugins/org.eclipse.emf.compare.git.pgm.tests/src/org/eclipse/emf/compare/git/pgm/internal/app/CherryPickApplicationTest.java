@@ -186,7 +186,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 		expected += EOL;
 		expected += "If there is nothing left to stage, chances are that something" + EOL;
 		expected += "else already introduced the same changes; you might want to skip" + EOL;
-		expected += "this patch using git logicalmerge --quit" + EOL + EOL;
+		expected += "this patch using git logicalcherry-pick --quit" + EOL + EOL;
 
 		assertOutputMessageEnd(expected);
 

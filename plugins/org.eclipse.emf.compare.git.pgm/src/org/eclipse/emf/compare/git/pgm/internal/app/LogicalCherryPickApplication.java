@@ -68,7 +68,7 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 			+ EOL //
 			+ "If there is nothing left to stage, chances are that something" + EOL//
 			+ "else already introduced the same changes; you might want to skip" + EOL//
-			+ "this patch using git logicalmerge --quit" + EOL;
+			+ "this patch using git logicalcherry-pick --quit" + EOL;
 
 	/**
 	 * Holds {@link RevCommit}s that need to be merged.

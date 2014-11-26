@@ -59,6 +59,7 @@ import org.eclipse.jgit.util.io.ThrowingPrintWriter;
 import org.eclipse.oomph.base.provider.BaseEditUtil;
 import org.eclipse.oomph.internal.setup.SetupPrompter;
 import org.eclipse.oomph.setup.Index;
+import org.eclipse.oomph.setup.Installation;
 import org.eclipse.oomph.setup.InstallationTask;
 import org.eclipse.oomph.setup.Product;
 import org.eclipse.oomph.setup.ProductCatalog;
@@ -68,7 +69,9 @@ import org.eclipse.oomph.setup.SetupFactory;
 import org.eclipse.oomph.setup.SetupPackage;
 import org.eclipse.oomph.setup.SetupTask;
 import org.eclipse.oomph.setup.Trigger;
+import org.eclipse.oomph.setup.User;
 import org.eclipse.oomph.setup.VariableTask;
+import org.eclipse.oomph.setup.Workspace;
 import org.eclipse.oomph.setup.WorkspaceTask;
 import org.eclipse.oomph.setup.internal.core.SetupContext;
 import org.eclipse.oomph.setup.internal.core.SetupTaskPerformer;
@@ -498,8 +501,24 @@ public abstract class AbstractLogicalCommand {
 		}
 
 		// Create Oomph setup context.
-		final SetupContext setupContext = SetupContext.create(rs);
-		setupContext.getInstallation().setProductVersion(productVersion);
+		Installation installation = SetupContext.createInstallation();
+		installation.setProductVersion(productVersion);
+		Workspace workspace = SetupContext.createWorkspace();
+		User user = SetupContext.createUser();
+		Resource installationResource = rs.createResource(SetupContext.INSTALLATION_SETUP_URI);
+		installationResource.getContents().add(installation);
+		Resource workspaceResource = rs.createResource(SetupContext.WORKSPACE_SETUP_URI);
+		workspaceResource.getContents().add(workspace);
+		Resource userResource = rs.createResource(SetupContext.USER_SETUP_URI);
+		userResource.getContents().add(user);
+		try {
+			userResource.save(null);
+		} catch (IOException ex) {
+			throw new DiesOn(DeathType.ERROR).duedTo(ex).displaying("Error while processing the setup model")
+					.ready();
+		}
+
+		final SetupContext setupContext = SetupContext.create(installation, workspace, user);
 		Trigger triggerBootstrap = Trigger.BOOTSTRAP;
 		URIConverter uriConverter = rs.getURIConverter();
 		SetupTaskPerformer aPerformer;
@@ -508,7 +527,7 @@ public abstract class AbstractLogicalCommand {
 			aPerformer = SetupTaskPerformer.create(uriConverter, SetupPrompter.CANCEL, triggerBootstrap,
 					setupContext, false);
 		} catch (Exception e) {
-			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying("Error during processing of setup model")
+			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying("Error while processing the setup model")
 					.ready();
 		}
 		// CHECKSTYLE.ON: IllegalCatch
