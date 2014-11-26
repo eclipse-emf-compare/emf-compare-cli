@@ -311,6 +311,8 @@ public class CherryPickArgumentsTest extends AbstractLogicalCommandTest {
 		assertEquals(Returns.ERROR.code(), result);
 	}
 
+	// TODO test --continue with unresolved conflict
+
 	@Test
 	public void validRepoTestIncorrectGitDirArg() throws Exception {
 		// Sets context to be sure were are not in a git repository
