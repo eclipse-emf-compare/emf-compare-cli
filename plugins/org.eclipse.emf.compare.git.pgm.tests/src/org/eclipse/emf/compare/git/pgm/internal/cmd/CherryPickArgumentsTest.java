@@ -166,7 +166,7 @@ public class CherryPickArgumentsTest extends AbstractLogicalCommandTest {
 		Object result = getApp().start(getContext());
 
 		String expectedMessage = "fatal: Your local changes would be overwritten by cherry-pick." + EOL;
-		expectedMessage += "hint: Please commit or stash the following file before cherry-picking:" + EOL;
+		expectedMessage += "hint: Please commit or stash the following files before cherry-picking:" + EOL;
 		expectedMessage += "	" + "SomeProject/aFile.txt" + EOL;
 		expectedMessage += EOL;
 

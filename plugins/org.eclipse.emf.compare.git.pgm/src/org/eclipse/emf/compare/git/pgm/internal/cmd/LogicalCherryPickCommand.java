@@ -155,7 +155,8 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 				Status repoStatus = new Git(getRepository()).status().call();
 				if (!repoStatus.getUncommittedChanges().isEmpty()) {
 					String message = "Your local changes would be overwritten by cherry-pick." + EOL;
-					message += "hint: Please commit or stash the following file before cherry-picking:" + EOL;
+					message += "hint: Please commit or stash the following files before cherry-picking:"
+							+ EOL;
 					for (String uncommittedChange : repoStatus.getUncommittedChanges()) {
 						message += TAB + uncommittedChange + EOL;
 					}
