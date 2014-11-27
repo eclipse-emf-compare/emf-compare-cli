@@ -69,6 +69,7 @@ import org.eclipse.oomph.setup.SetupFactory;
 import org.eclipse.oomph.setup.SetupPackage;
 import org.eclipse.oomph.setup.SetupTask;
 import org.eclipse.oomph.setup.Trigger;
+import org.eclipse.oomph.setup.UnsignedPolicy;
 import org.eclipse.oomph.setup.User;
 import org.eclipse.oomph.setup.VariableTask;
 import org.eclipse.oomph.setup.Workspace;
@@ -505,6 +506,8 @@ public abstract class AbstractLogicalCommand {
 		installation.setProductVersion(productVersion);
 		Workspace workspace = SetupContext.createWorkspace();
 		User user = SetupContext.createUser();
+		user.setPreferenceRecorderDefault(false);
+		user.setUnsignedPolicy(UnsignedPolicy.ACCEPT);
 		Resource installationResource = rs.createResource(SetupContext.INSTALLATION_SETUP_URI);
 		installationResource.getContents().add(installation);
 		Resource workspaceResource = rs.createResource(SetupContext.WORKSPACE_SETUP_URI);
