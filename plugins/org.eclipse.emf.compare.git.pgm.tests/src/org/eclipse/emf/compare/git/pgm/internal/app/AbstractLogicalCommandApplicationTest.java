@@ -63,8 +63,10 @@ public abstract class AbstractLogicalCommandApplicationTest extends AbstractAppl
 	}
 
 	/**
-	 * Assert that there is no conflict marker in the file (( <<<<<<<<<< or ========= or >>>>>>>>>>>). In fact
-	 * this test try to load the resource.
+	 * Assert that there is no conflict marker in the file (( <<<<<<<<<< or ========= or >>>>>>>>>>>).
+	 * <p>
+	 * In fact this test tries to load the resource.
+	 * </p>
 	 * 
 	 * @param paths
 	 * @throws IOException
@@ -74,8 +76,12 @@ public abstract class AbstractLogicalCommandApplicationTest extends AbstractAppl
 		ResourceSet resourceSet = new ResourceSetImpl();
 		for (Path p : paths) {
 			try {
-				Resource resource = resourceSet.getResource(URI.createFileURI(p.toString()), true);
-				assertNotNull(resource);
+				if (p.toFile().exists()) {
+					Resource resource = resourceSet.getResource(URI.createFileURI(p.toString()), true);
+					assertNotNull(resource);
+				} else {
+					throw new AssertionError("The file " + p.toString() + " does not exist.");
+				}
 			} catch (Exception e) {
 				throw new AssertionError("Error wile parsing resource " + p.toString() + EOL //$NON-NLS-1$
 						+ getConfigurationMessage(), e);
