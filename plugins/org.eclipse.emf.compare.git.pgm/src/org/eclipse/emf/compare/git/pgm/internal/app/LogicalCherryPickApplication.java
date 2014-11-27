@@ -11,9 +11,11 @@
 package org.eclipse.emf.compare.git.pgm.internal.app;
 
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
+import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.TAB;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.waitEgitJobs;
-
-import com.google.common.collect.Lists;
+import static org.eclipse.emf.compare.git.pgm.internal.util.GitUtils.SHORT_REV_COMMIT_ID_LENGTH;
+import static org.eclipse.emf.compare.git.pgm.internal.util.GitUtils.getCommitsBetween;
+import static org.eclipse.emf.compare.git.pgm.internal.util.GitUtils.getOneLineCommitMsg;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -34,7 +36,6 @@ import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -57,10 +58,6 @@ import org.kohsuke.args4j.Option;
  */
 @SuppressWarnings({"restriction", "nls" })
 public class LogicalCherryPickApplication extends AbstractLogicalApplication {
-
-	/** Short commit ID length. */
-	private static final int SHORT_REV_COMMIT_ID_LENGTH = 7;
-
 	/**
 	 * Message to display when there is nothing to commit.
 	 */
@@ -105,11 +102,11 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 			} else {
 				result = processRebaseStep();
 			}
-		} catch (CoreException e) {
+			waitEgitJobs();
+			return handleRebaseResult(result);
+		} catch (CoreException | IOException e) {
 			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying(e.getMessage()).ready();
 		}
-		waitEgitJobs();
-		return handleRebaseResult(result);
 	}
 
 	/**
@@ -171,22 +168,24 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 	 * @return the return code of this operation.
 	 * @throws Die
 	 *             if an error is found in the result.
+	 * @throws IOException
+	 *             propagates JGit {@link IOException}.
 	 */
-	private Integer handleRebaseResult(RebaseResult rebaseResult) throws Die {
+	private Integer handleRebaseResult(RebaseResult rebaseResult) throws Die, IOException {
 		final Integer result;
 		final String message;
 
 		switch (rebaseResult.getStatus()) {
 			case OK:
 				result = Returns.COMPLETE.code();
-				message = getSuccessfulCherryPickMessage(getNewCommits()) + "Complete.";
+				message = getSuccessfullCherryPickMessage() + "Complete.";
 				break;
 			case FAST_FORWARD:
 				// FIXME: Test this use case again after correction of
 				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=451159
 				result = Returns.COMPLETE.code();
 				message = "Fast forward." + EOL //
-						+ getSuccessfulCherryPickMessage(getNewCommits());
+						+ getSuccessfullCherryPickMessage();
 				break;
 			case UP_TO_DATE:
 				result = Returns.COMPLETE.code();
@@ -233,10 +232,13 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 	 * @param currentCommit
 	 *            {@link RevCommit} where the rebase has stopped.
 	 * @return the message to display.
+	 * @throws IOException
+	 *             propagates JGIt exception.
 	 */
-	private String getConflictMessage(List<String> conflictingFiles, RevCommit currentCommit) {
+	private String getConflictMessage(List<String> conflictingFiles, RevCommit currentCommit)
+			throws IOException {
 		StringBuilder messageBuilder = new StringBuilder();
-		messageBuilder.append(getSuccessfulCherryPickMessage(getNewCommits()));
+		messageBuilder.append(getSuccessfullCherryPickMessage());
 
 		// Displays the list on conflicting files
 		if (conflictingFiles != null && !conflictingFiles.isEmpty()) {
@@ -269,17 +271,19 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 	/**
 	 * Gets the message that notifies the user of new successfully cherry-picked commits.
 	 * 
-	 * @param successfullCommits
-	 *            List of {@link RevCommit}s to display.
 	 * @return the message that notifies the user of new successfully cherry-picked commits.
+	 * @throws IOException
+	 *             propagates JGit exception.
 	 */
-	private String getSuccessfulCherryPickMessage(List<RevCommit> successfullCommits) {
+	private String getSuccessfullCherryPickMessage() throws IOException {
+		ObjectId head = repo.getRef(Constants.HEAD).getObjectId();
+		List<RevCommit> successfullCommits = getCommitsBetween(repo, head, oldHead);
 		if (successfullCommits != null && !successfullCommits.isEmpty()) {
 			final String message;
 			StringBuilder messageBuilder = new StringBuilder();
 			messageBuilder.append("The following revisions were successfully cherry-picked:").append(EOL);
 			for (RevCommit commit : successfullCommits) {
-				messageBuilder.append(getCommitMessage(commit));
+				messageBuilder.append(TAB).append(getOneLineCommitMsg(commit)).append(EOL);
 			}
 			message = messageBuilder.toString();
 			return message;
@@ -287,38 +291,4 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 		return "";
 	}
 
-	/**
-	 * Gets a message to display one {@link RevCommit}.
-	 * 
-	 * @param revCommit
-	 *            {@link RevCommit} to print
-	 * @return a message to display one {@link RevCommit}.
-	 */
-	private String getCommitMessage(RevCommit revCommit) {
-		String id = revCommit.abbreviate(SHORT_REV_COMMIT_ID_LENGTH).name();
-		String message = revCommit.getShortMessage();
-		return "\t[" + id + "] " + message + EOL;
-	}
-
-	/**
-	 * Gets the list of new {@link RevCommit}s since {@link #oldHead}.
-	 * 
-	 * @return the list of new {@link RevCommit}s since {@link #oldHead}
-	 */
-	private List<RevCommit> getNewCommits() {
-		RevWalk revWak = new RevWalk(repo);
-		try {
-			RevCommit oldHeadRev = revWak.parseCommit(oldHead);
-			revWak.markStart(revWak.parseCommit(repo.getRef(Constants.HEAD).getObjectId()));
-			revWak.markUninteresting(oldHeadRev);
-			return Lists.newArrayList(revWak);
-		} catch (IOException e) {
-			if (isShowStackTrace()) {
-				e.printStackTrace();
-			}
-			return Collections.emptyList();
-		} finally {
-			revWak.release();
-		}
-	}
 }

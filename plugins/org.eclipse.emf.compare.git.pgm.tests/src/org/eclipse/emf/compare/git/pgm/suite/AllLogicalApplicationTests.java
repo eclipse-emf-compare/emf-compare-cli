@@ -17,6 +17,7 @@ import junit.textui.TestRunner;
 import org.eclipse.emf.compare.git.pgm.internal.app.CherryPickApplicationTest;
 import org.eclipse.emf.compare.git.pgm.internal.app.DiffApplicationTest;
 import org.eclipse.emf.compare.git.pgm.internal.app.MergeApplicationTest;
+import org.eclipse.emf.compare.git.pgm.internal.app.RebaseApplicationTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -25,8 +26,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @RunWith(Suite.class)
-@SuiteClasses({MergeApplicationTest.class, DiffApplicationTest.class,
-		CherryPickApplicationTest.class })
+@SuiteClasses({MergeApplicationTest.class, DiffApplicationTest.class, CherryPickApplicationTest.class,
+		RebaseApplicationTest.class })
 public class AllLogicalApplicationTests {
 
 	public static void main(String[] args) {

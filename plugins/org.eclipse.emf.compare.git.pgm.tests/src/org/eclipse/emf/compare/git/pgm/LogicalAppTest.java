@@ -30,7 +30,8 @@ public class LogicalAppTest extends AbstractLogicalAppTest {
 				+ "logicalcherry-pick" + EOL
 				+ "logicaldiff" + EOL
 				+ "logicalmerge" + EOL
-				+ "logicalmergetool" + EOL;
+				+ "logicalmergetool" + EOL
+				+ "logicalrebase" + EOL;
 		//@formatter:on
 	}
 

@@ -62,6 +62,7 @@ import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.equinox.p2.metadata.ILicense;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
@@ -125,6 +126,11 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	private boolean showStackTrace;
 
 	/**
+	 * Instance of {@link Git} from {@link #repo}.
+	 */
+	private Git git;
+
+	/**
 	 * {@inheritDoc}.
 	 */
 	@Override
@@ -142,6 +148,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		try {
 			clp.parseArgument(appArgs);
 			repo = clp.getRepo();
+			git = new Git(repo);
 		} catch (CmdLineException err) {
 			if (showStackTrace) {
 				err.printStackTrace();
@@ -250,9 +257,21 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	}
 
 	/**
+	 * Returns a {@link Git} from the current {@link Repository}.
+	 * 
+	 * @return a {@link Git} from the current {@link Repository}.
+	 */
+	protected Git getGit() {
+		return git;
+	}
+
+	/**
 	 * Close the repository and the log.
 	 */
 	protected void dispose() {
+		if (git != null) {
+			git.close();
+		}
 		if (repo != null) {
 			repo.close();
 		}

@@ -40,17 +40,22 @@ import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.NoMessageException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.api.errors.UnmergedPathsException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.dircache.DirCache;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -179,6 +184,19 @@ public abstract class AbstractApplicationTest {
 		System.setProperty("user.dir", path); //$NON-NLS-1$
 	}
 
+	/**
+	 * Sets the current repo for command and assert methods.
+	 * 
+	 * @param currentRepo
+	 *            new repo
+	 * @return the old {@link Git}.
+	 */
+	protected Git setCurrentRepo(Git currentRepo) {
+		Git oldGit = git;
+		git = currentRepo;
+		return oldGit;
+	}
+
 	protected void assertOutputMessageEnd(String expected) throws IOException {
 		String outputStreamContent = outputStream.toString();
 		assertTrue(getAssertOutputMessageEnd(expected, outputStreamContent), outputStreamContent
@@ -259,6 +277,16 @@ public abstract class AbstractApplicationTest {
 		return getGit().checkout().setName(ref).setStartPoint(startingPoint).setCreateBranch(true).call();
 	}
 
+	protected String getShortId(String ref) throws RevisionSyntaxException, AmbiguousObjectException,
+			IncorrectObjectTypeException, IOException {
+		ObjectId resolved = getGit().getRepository().resolve(ref);
+		return getShortId(resolved);
+	}
+
+	protected String getShortId(ObjectId resolved) {
+		return resolved.abbreviate(7).name();
+	}
+
 	protected Git getGit() {
 		return git;
 	}
@@ -269,6 +297,16 @@ public abstract class AbstractApplicationTest {
 
 	protected void printErr() {
 		syserr.println(errStream.toString());
+	}
+
+	protected Git createClone(Git gitToClone) throws InvalidRemoteException, TransportException,
+			GitAPIException, IOException {
+		Path newRepoFile = Files.createTempDirectory(testTmpFolder, REPO_PREFIX, new FileAttribute<?>[] {});
+		return Git.cloneRepository().setDirectory(newRepoFile.toFile()) //
+				.setURI(gitToClone.getRepository().getDirectory().getAbsolutePath()) //
+				.setBare(false) //
+				.setCloneAllBranches(true) //
+				.call();
 	}
 
 	protected String getConfigurationMessage() throws IOException {

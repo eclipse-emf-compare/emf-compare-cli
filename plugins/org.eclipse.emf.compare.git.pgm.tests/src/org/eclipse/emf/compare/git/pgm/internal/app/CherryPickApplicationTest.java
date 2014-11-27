@@ -39,10 +39,6 @@ import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.UnmergedPathsException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
-import org.eclipse.jgit.errors.AmbiguousObjectException;
-import org.eclipse.jgit.errors.IncorrectObjectTypeException;
-import org.eclipse.jgit.errors.RevisionSyntaxException;
-import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Test;
 
@@ -866,16 +862,6 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
 				"--show-stack-trace", "--abort");
 		runCommand(expectedReturnCode);
-	}
-
-	private String getShortId(String ref) throws RevisionSyntaxException, AmbiguousObjectException,
-			IncorrectObjectTypeException, IOException {
-		ObjectId resolved = getGit().getRepository().resolve(ref);
-		return getShortId(resolved);
-	}
-
-	private String getShortId(ObjectId resolved) {
-		return resolved.abbreviate(7).name();
 	}
 
 	@SuppressWarnings("nls")

@@ -41,6 +41,9 @@ public final class EMFCompareGitPGMUtil {
 	 */
 	public static final String EOL = System.getProperty("line.separator"); //$NON-NLS-1$
 
+	/** Tab character. */
+	public static final String TAB = "\t"; //$NON-NLS-1$
+
 	/**
 	 * Empty string.
 	 */

@@ -137,7 +137,7 @@ public class ProjectBuilder {
 		return project;
 	}
 
-	protected File createFile(Path path, String content) throws FileNotFoundException,
+	public static File createFile(Path path, String content) throws FileNotFoundException,
 			UnsupportedEncodingException {
 		File result = path.toFile();
 		path.getParent().toFile().mkdirs();

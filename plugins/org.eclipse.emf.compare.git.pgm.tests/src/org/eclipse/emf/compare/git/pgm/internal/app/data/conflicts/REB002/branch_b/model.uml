@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ActionLanguage="http://www.omg.org/spec/ALF/20120827/ActionLanguage-Profile" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http://www.omg.org/spec/ALF/20120827/ActionLanguage-Profile pathmap://PAPYRUS_ACTIONLANGUAGE_PROFILE/ActionLanguage-Profile.profile.uml#_sYse0YZLEeKyw49uR6nx3g">
+  <uml:Model xmi:id="_pSrwYHVHEeScI5AIfi-cqA" name="model">
+    <packagedElement xmi:type="uml:Class" xmi:id="_tBMCcHVHEeScI5AIfi-cqA" name="C1">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_08kkoHVHEeScI5AIfi-cqA" name="Attr1"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_uKX4EHVHEeScI5AIfi-cqA" name="C2">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_1QhbYHVHEeScI5AIfi-cqA" name="Attr2"/>
+    </packagedElement>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_3c5MUHVHEeScI5AIfi-cqA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3eZBIHVHEeScI5AIfi-cqA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="pathmap://PAPYRUS_ACTIONLANGUAGE_PROFILE/ActionLanguage-Profile.profile.uml#_sYse0YZLEeKyw49uR6nx3g"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://PAPYRUS_ACTIONLANGUAGE_PROFILE/ActionLanguage-Profile.profile.uml#ActionLanguage"/>
+    </profileApplication>
+  </uml:Model>
+  <ActionLanguage:TextualRepresentation xmi:id="_3e1GAHVHEeScI5AIfi-cqA" language="org.eclipse.papyrus.uml.textedit.property.xtext.UmlProperty"/>
+  <ActionLanguage:TextualRepresentation xmi:id="_4L3yMHVHEeScI5AIfi-cqA" language="org.eclipse.papyrus.uml.textedit.property.xtext.UmlProperty"/>
+</xmi:XMI>
