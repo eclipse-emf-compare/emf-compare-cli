@@ -32,6 +32,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.compare.git.pgm.AbstractApplicationTest;
 import org.eclipse.emf.compare.git.pgm.Returns;
+import org.eclipse.emf.compare.git.pgm.internal.app.data.ContextSetup;
 import org.eclipse.emf.compare.git.pgm.util.OomphUserModelBuilder;
 import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
 import org.eclipse.emf.ecore.EObject;
@@ -47,6 +48,8 @@ import org.junit.Test;
  */
 @SuppressWarnings("nls")
 public class MergeApplicationTest extends AbstractApplicationTest {
+
+	private ContextSetup contextSetup;
 
 	/**
 	 * <h3>Test the logical merge application on the current branch</h3>
@@ -243,137 +246,21 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		return (LogicalMergeApplication)super.getApp();
 	}
 
-	// @Test
-	// public void incorrectOomphSetupFile_NoExistingProject() throws Exception {
-	// Path projectPath = getRepositoryPath().resolve("AProject");
-	// File project = new ProjectBuilder(this) //
-	// .addNewFileContent("ATextFile.txt", "SomeContent").create(projectPath);
-	// String branchA = "branch_a";
-	// addAllAndCommit("Initial commit");
-	// createBranch(branchA, "master");
-	//
-	// getGit().close();
-	//
-	// // Creates Oomph model
-	// File userSetupFile = createPapyrusUserOomphModel(getRepositoryPath().resolve("NonExistingProject")
-	// .toFile());
-	//
-	// // Mocks that the commands is lauched from the git repository folder.
-	// setCmdLocation(getRepositoryPath().toString());
-	//
-	// // Sets args
-	// getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-	// branchA);
-	//
-	// // Runs command
-	// Object result = getApp().start(getContext());
-	//
-	// // Uncomments to displays output
-	// printOut();
-	// printErr();
-	//
-	// // IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-	// // assertEquals(1, projectInWorkspace.length);
-	// //
-	// // assertEquals(Returns.ABORTED.code(), result);
-	// //
-	// // StringBuilder expectedOut = new StringBuilder();
-	// // expectedOut.append("Auto-merging failed in ").append("MER001/model.notation").append(EOL);
-	// // expectedOut.append("Auto-merging failed in ").append("MER001/model.uml").append(EOL);
-	// // expectedOut.append("Automatic merge failed; fix conflicts and then commit the result.").append(EOL)
-	// // .append(EOL);
-	// // assertOutputMessageEnd(expectedOut.toString());
-	// //
-	// // assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"));
-	// //
-	// // Set<String> expectedConflictingFilePath = Sets
-	// // .newHashSet("MER001/model.uml", "MER001/model.notation");
-	// // assertEquals(expectedConflictingFilePath, getGit().status().call().getConflicting());
-	// }
-
 	/**
 	 * <h3>Use case MER001</h3>
 	 * <p>
 	 * This use case is used to achive a conflicting merge
 	 * </p>
 	 * 
-	 * <pre>
-	 * * Delete Class1 [branch_c]
-	 * |
-	 * | * Add Attribute1 under Class1 [branch_b]
-	 * |/  
-	 * |   
-	 * Initial Commit [branch_a]
-	 *  -Add project PapyrusProject1
-	 *  -Add ClassDiagram1
-	 *  -Add Class1
-	 * 
-	 * </pre>
-	 * 
+	 * @see ContextSetup#setupMER001()
 	 * @throws Exception
 	 */
 	@Test
 	public void testMER001() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER001();
 
-		Path projectPath = getRepositoryPath().resolve("MER001");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/conflicts/MER001/branch_a/model.di")//
-				.addContentToCopy("data/conflicts/MER001/branch_a/model.uml") //
-				.addContentToCopy("data/conflicts/MER001/branch_a/model.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
-
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER001/branch_c/model.di")//
-				.addContentToCopy("data/conflicts/MER001/branch_c/model.uml") //
-				.addContentToCopy("data/conflicts/MER001/branch_c/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Deletes Class1");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER001/branch_b/model.di")//
-				.addContentToCopy("data/conflicts/MER001/branch_b/model.uml") //
-				.addContentToCopy("data/conflicts/MER001/branch_b/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Adds attribute1 under Class1");
-
-		getGit().close();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchC);
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
-
-		assertEquals(Returns.ABORTED.code(), result);
+		runMerge(Returns.ABORTED, getShortId("branch_c"));
 
 		StringBuilder expectedOut = new StringBuilder();
 		expectedOut.append("Auto-merging failed in ").append("MER001/model.notation").append(EOL);
@@ -382,7 +269,8 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 				.append(EOL);
 		assertOutputMessageEnd(expectedOut.toString());
 
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"));
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), contextSetup
+				.getProjectPath().resolve("model.notation"));
 
 		Set<String> expectedConflictingFilePath = Sets
 				.newHashSet("MER001/model.uml", "MER001/model.notation");
@@ -394,100 +282,15 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * <p>
 	 * This aims to test a merge between two branches with more than commit between them (see history)
 	 * </p>
-	 * <h3>History</h3>
 	 * 
-	 * <pre>
-	 * * Delete Class2 [branch_d]
-	 * | 
-	 * |  
-	 * Delete Class1 [branc_c]
-	 * |     
-	 * |    
-	 * | * Add attribute1 under Class1, attribute2 under Class2 [branch_b]
-	 * |/  
-	 * |   
-	 * |  
-	 * Initial Commit [branch_a]
-	 *  -Add project PapyrusProject2
-	 *  -Add ClassDiagram1
-	 *  -Add Class1, Class2
-	 * 
-	 * </pre>
+	 * @see ContextSetup#setupMER002()
 	 */
 	@Test
 	public void testMER002() throws Exception {
-		Path projectPath = getRepositoryPath().resolve("MER002");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/conflicts/MER002/branch_a/model.di")//
-				.addContentToCopy("data/conflicts/MER002/branch_a/model.uml") //
-				.addContentToCopy("data/conflicts/MER002/branch_a/model.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER002();
 
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER002/branch_c/model.di")//
-				.addContentToCopy("data/conflicts/MER002/branch_c/model.uml") //
-				.addContentToCopy("data/conflicts/MER002/branch_c/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Deletes Class1");
-
-		// Creates branch d
-		String branchD = "branch_d";
-		createBranchAndCheckout(branchD, branchC);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER002/branch_c/model.di")//
-				.addContentToCopy("data/conflicts/MER002/branch_c/model.uml") //
-				.addContentToCopy("data/conflicts/MER002/branch_c/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Delete Class2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER002/branch_b/model.di")//
-				.addContentToCopy("data/conflicts/MER002/branch_b/model.uml") //
-				.addContentToCopy("data/conflicts/MER002/branch_b/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add attribute1 under Class1, attribute2 under Class2");
-
-		getGit().close();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchD);
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
-
-		assertEquals(Returns.ABORTED.code(), result);
+		runMerge(Returns.ABORTED, getShortId("branch_d"));
 
 		StringBuilder expectedOut = new StringBuilder();
 		expectedOut.append("Auto-merging failed in ").append("MER002/model.notation").append(EOL);
@@ -496,7 +299,8 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 				.append(EOL);
 		assertOutputMessageEnd(expectedOut.toString());
 
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"));
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), contextSetup
+				.getProjectPath().resolve("model.notation"));
 
 		Set<String> expectedConflictingFilePath = Sets
 				.newHashSet("MER002/model.uml", "MER002/model.notation");
@@ -522,8 +326,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		createBranch(branchA, "master");
 
 		File notExistinProject = getRepositoryPath().resolve("GhostProject").toFile();
-
-		getGit().close();
 
 		// Creates Oomph model
 		File userSetupFile = createPapyrusUserOomphModel(existingProject, notExistinProject);
@@ -575,7 +377,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		addAllAndCommit("Initial commit [PapyrusProject3]");
 		createBranch(branchA, "master");
 
-		getGit().close();
 
 		// Creates Oomph model
 		File userSetupFile = createPapyrusUserOomphModel(project);
@@ -623,7 +424,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		addAllAndCommit("Initial commit [PapyrusProject3]");
 		createBranch(branchA, "master");
 
-		getGit().close();
 
 		Path folderWithComplexePath = getRepositoryPath().resolve("Folder with space & special char");
 		folderWithComplexePath.toFile().mkdirs();
@@ -676,7 +476,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		addAllAndCommit("Initial commit [PapyrusProject3]");
 		createBranch(branchA, "master");
 
-		getGit().close();
 
 		Path folder = getRepositoryPath().resolve("a" + SEP + "b" + SEP + "c");
 		folder.toFile().mkdirs();
@@ -720,89 +519,28 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * <p>
 	 * This use case aims to test a logical merge on a model with no conflict (Auto merging should succeed).
 	 * </p>
-	 * <h3>History:</h3>
 	 * 
-	 * <pre>
-	 * * Adds Class 1 [branch_b]
-	 * |    
-	 * | * Adds Class 2 [branch_c]
-	 * |/ 
-	 * |  
-	 * Initial commit (PapyrusProject3) [branch_a]
-	 * 
-	 * </pre>
-	 * 
+	 * @see ContextSetup#setupMER003()
 	 * @throws Exception
 	 */
 	@Test
 	public void testMER003() throws Exception {
-		Path projectPath = getRepositoryPath().resolve("MER003");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER003();
 
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/MER003/branch_c/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_c/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_c/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Adds class 2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/MER003/branch_b/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_b/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_b/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Adds class 1");
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is launched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchC, "-m", "My message");
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
+		runMerge(Returns.COMPLETE, getShortId("branch_c"), "My message");
 
 		assertOutputMessageEnd("Merge made by 'recursive' strategy." + EOL + EOL);
-		assertEquals(Returns.COMPLETE.code(), result);
 
 		final String class1URIFragment = "_bB2fYC3HEeSN_5D5iyrZGQ";
 		final String class2URIFragment = "_hfIr4C3HEeSN_5D5iyrZGQ";
-		assertExistInResource(project.toPath().resolve("model.uml"), class1URIFragment, class2URIFragment);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model.uml"), class1URIFragment,
+				class2URIFragment);
 
 		final String class2ShapeURIFragment = "_hfJS8C3HEeSN_5D5iyrZGQ";
 		final String class1ShapeURIFragment = "_bB3tgC3HEeSN_5D5iyrZGQ";
-		assertExistInResource(project.toPath().resolve("model.notation"), class1ShapeURIFragment,
-				class2ShapeURIFragment);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model.notation"),
+				class1ShapeURIFragment, class2ShapeURIFragment);
 
 		Iterator<RevCommit> it = getGit().log().call().iterator();
 		RevCommit newHead = it.next();
@@ -811,206 +549,55 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	}
 
 	/**
-	 * <pre>
-	 *  * [branch_c]
-	 *  |     Add Class3 under Model1
-	 *  |     Add Class4 under Model2
-	 *  |    
-	 *  | * [branch_b)]
-	 *  |/  Add Class1 under Model1
-	 *  |   Add Class2 under Model2
-	 *  |  
-	 * [branch_a]
-	 *  Initial commit
-	 *   - A project with 2 models, 2 diagrams
-	 * </pre>
-	 * 
+	 * @see ContextSetup#setupMER004()
 	 * @throws Exception
 	 */
 	@Test
 	public void testMER004() throws Exception {
-		Path projectPath = getRepositoryPath().resolve("MER004");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER004/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER004/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_a/model.notation") //
-				.addContentToCopy("data/automerging/MER004/branch_a/model2.di")//
-				.addContentToCopy("data/automerging/MER004/branch_a/model2.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_a/model2.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit" + EOL + "- A project with 2 models, 2 diagrams");
-		createBranch(branchA, "master");
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE004();
 
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/MER004/branch_c/model.di")//
-				.addContentToCopy("data/automerging/MER004/branch_c/model.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_c/model.notation") //
-				.addContentToCopy("data/automerging/MER004/branch_c/model2.di")//
-				.addContentToCopy("data/automerging/MER004/branch_c/model2.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_c/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add Class3 under Model1" + EOL + "Add Class4 under Model2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/MER004/branch_b/model.di")//
-				.addContentToCopy("data/automerging/MER004/branch_b/model.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_b/model.notation") //
-				.addContentToCopy("data/automerging/MER004/branch_b/model2.di")//
-				.addContentToCopy("data/automerging/MER004/branch_b/model2.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_b/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add Class1 under Model1" + EOL + "Add Class2 under Model2");
-
-		getGit().close();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchC);
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
+		runMerge(Returns.COMPLETE, getShortId("branch_c"));
 
 		assertOutputMessageEnd("Merge made by 'recursive' strategy." + EOL + EOL);
-		assertEquals(Returns.COMPLETE.code(), result);
 
 		final String class1URIFragment = "_adib0C9QEeShUolneTgohg";
 		final String class3URIFragment = "_lztC0C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model.uml"), class1URIFragment, class3URIFragment);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model.uml"), class1URIFragment,
+				class3URIFragment);
 
 		final String class2URIFragment = "_a7N2UC9QEeShUolneTgohg";
 		final String class4URIFragment = "_m3mv0C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model2.uml"), class2URIFragment, class4URIFragment);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model2.uml"), class2URIFragment,
+				class4URIFragment);
 
 		final String class1ShapeURIFragment = "_adjp8C9QEeShUolneTgohg";
 		final String class3ShapeURIFragment = "_lzuQ8C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model.notation"), class1ShapeURIFragment,
-				class3ShapeURIFragment);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model.notation"),
+				class1ShapeURIFragment, class3ShapeURIFragment);
 
 		final String class2ShapeURIFragment = "_a7PEcC9QEeShUolneTgohg";
 		final String class4ShapeURIFragment = "_m3nW4C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model2.notation"), class2ShapeURIFragment,
-				class4ShapeURIFragment);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model2.notation"),
+				class2ShapeURIFragment, class4ShapeURIFragment);
 
 	}
 
 	/**
-	 * <pre>
-	 * * [HEAD] [branch_c]
-	 * |     Delete Class1 and Class2
-	 * |    
-	 * | * [branch_b]
-	 * |/  Add attribute1 under Class1
-	 * |   Add attribute2 under Class2
-	 * |  
-	 * [branch_a]
-	 * Initial commit
-	 *  - 1 project with 2 models, 2 diagrams
-	 *  - add Class1 under Model1, Class2 under Model2
-	 * 
-	 * </pre>
-	 * 
+	 * @see ContextSetup#setupMER005()
 	 * @throws Exception
 	 */
 	@Test
 	public void testMER005() throws Exception {
-		Path projectPath = getRepositoryPath().resolve("MER005");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/conflicts/MER005/branch_a/model.di")//
-				.addContentToCopy("data/conflicts/MER005/branch_a/model.uml") //
-				.addContentToCopy("data/conflicts/MER005/branch_a/model.notation") //
-				.addContentToCopy("data/conflicts/MER005/branch_a/model2.di")//
-				.addContentToCopy("data/conflicts/MER005/branch_a/model2.uml") //
-				.addContentToCopy("data/conflicts/MER005/branch_a/model2.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit" + EOL + " - 1 project with 2 models, 2 diagrams" + EOL
-				+ " - add Class1 under Model1, Class2 under Model2");
-		createBranch(branchA, "master");
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER005();
 
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
+		runMerge(Returns.ABORTED, getShortId("branch_c"));
 
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER005/branch_c/model.di")//
-				.addContentToCopy("data/conflicts/MER005/branch_c/model.uml") //
-				.addContentToCopy("data/conflicts/MER005/branch_c/model.notation") //
-				.addContentToCopy("data/conflicts/MER005/branch_c/model2.di")//
-				.addContentToCopy("data/conflicts/MER005/branch_c/model2.uml") //
-				.addContentToCopy("data/conflicts/MER005/branch_c/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Delete Class1 and Class2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER005/branch_b/model.di")//
-				.addContentToCopy("data/conflicts/MER005/branch_b/model.uml") //
-				.addContentToCopy("data/conflicts/MER005/branch_b/model.notation") //
-				.addContentToCopy("data/conflicts/MER005/branch_b/model2.di")//
-				.addContentToCopy("data/conflicts/MER005/branch_b/model2.uml") //
-				.addContentToCopy("data/conflicts/MER005/branch_b/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add attribute1 under Class1" + EOL + "Add attribute2 under Class2");
-
-		getGit().close();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchC);
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
-
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"),
-				projectPath.resolve("model2.uml"), projectPath.resolve("model2.notation"));
-
-		assertEquals(Returns.ABORTED.code(), result);
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"),//
+				contextSetup.getProjectPath().resolve("model.notation"),//
+				contextSetup.getProjectPath().resolve("model2.uml"), //
+				contextSetup.getProjectPath().resolve("model2.notation"));
 
 		StringBuilder expectedOut = new StringBuilder();
 		expectedOut.append("Auto-merging failed in ").append("MER005/model.notation").append(EOL);
@@ -1033,115 +620,20 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * Successives conflicts on multiple models in multiple files (one file per model)
 	 * </p>
 	 * 
-	 * <pre>
-	 *  * [branch_d]
-	 *  |     Delete Class2
-	 *  |  
-	 *  [branch_c] Delete Class1
-	 *  |    
-	 *  | *  [branch_b]
-	 *  |/   Add attribute1 under Class1
-	 *  |    Add attribute2 under Class2
-	 *  |   
-	 *  [branch_a]
-	 * Initial commit
-	 *   - 1 project with 2 models, 2 diagrams
-	 *   - add Class1 under Model1, Class2 under Model2
-	 * 
-	 * </pre>
-	 * 
+	 * @see ContextSetup#setupMER006()
 	 * @throws Exception
 	 */
 	@Test
 	public void testMER006() throws Exception {
-		Path projectPath = getRepositoryPath().resolve("MER006");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/conflicts/MER006/branch_a/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_a/model.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_a/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_a/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_a/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_a/model2.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit" + EOL + "   - 1 project with 2 models, 2 diagrams" + EOL
-				+ "   - add Class1 under Model1, Class2 under Model2");
-		createBranch(branchA, "master");
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE006();
 
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
+		runMerge(Returns.ABORTED, getShortId("branch_d"));
 
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_c/model.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_c/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit(" Delete Class1");
-
-		// Creates branch d
-		String branchD = "branch_d";
-		createBranchAndCheckout(branchD, branchC);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_d/model.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_d/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Delete Class2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_b/model.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_b/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add attribute1 under Class1, attribute2 under Class2");
-
-		getGit().close();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchD);
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
-
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"),
-				projectPath.resolve("model2.uml"), projectPath.resolve("model2.notation"));
-
-		assertEquals(Returns.ABORTED.code(), result);
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), //
+				contextSetup.getProjectPath().resolve("model.notation"), //
+				contextSetup.getProjectPath().resolve("model2.uml"), //
+				contextSetup.getProjectPath().resolve("model2.notation"));
 
 		StringBuilder expectedOut = new StringBuilder();
 		expectedOut.append("Auto-merging failed in ").append("MER006/model.notation").append(EOL);
@@ -1157,4 +649,32 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		assertEquals(expectedConflictingFilePath, getGit().status().call().getConflicting());
 	}
 
+	private void runCommand(Returns expectedReturnCode) throws Exception {
+		resetApp();
+		// Runs command
+		Object result = getApp().start(getContext());
+
+		printOut();
+		printErr();
+
+		assertEquals(expectedReturnCode.code(), result);
+		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		assertEquals(1, projectInWorkspace.length);
+	}
+
+	private void runMerge(Returns expectedReturnCode, String commit) throws Exception {
+		runMerge(expectedReturnCode, commit, null);
+	}
+
+	private void runMerge(Returns expectedReturnCode, String commit, String message) throws Exception {
+		resetContext();
+
+		getContext().addArg(getGit().getRepository().getDirectory().getAbsolutePath(),
+				contextSetup.getUserSetupFile().getAbsolutePath(), "--show-stack-trace", commit);
+		if (message != null) {
+			getContext().addArg("-m", message);
+		}
+
+		runCommand(expectedReturnCode);
+	}
 }

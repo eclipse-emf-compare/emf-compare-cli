@@ -37,18 +37,12 @@ import org.eclipse.emf.compare.git.pgm.util.MockedApplicationContext;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
-import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.NoMessageException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.api.errors.UnmergedPathsException;
-import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -65,6 +59,7 @@ import org.junit.Before;
 /**
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
+@SuppressWarnings("nls")
 public abstract class AbstractApplicationTest {
 	private static final String TMP_DIRECTORY_PREFIX = "emfcompare-git-pgm"; //$NON-NLS-1$
 
@@ -250,21 +245,13 @@ public abstract class AbstractApplicationTest {
 		return app;
 	}
 
-	protected RevCommit addAllAndCommit(String commitMessage, Git git) throws GitAPIException,
-			NoFilepatternException, NoHeadException, NoMessageException, UnmergedPathsException,
-			ConcurrentRefUpdateException, WrongRepositoryStateException {
+	protected RevCommit addAllAndCommit(String commitMessage) throws Exception {
 		DirCache dirChache = git.add().addFilepattern(".").call(); //$NON-NLS-1$
 		// Assert there is something to commit
 		assertTrue(dirChache.getEntriesWithin("").length > 0);
 		RevCommit revCommit = git.commit().setAuthor("Logical test author", "logicaltest@obeo.fr")
 				.setCommitter("Logical test author", "logicaltest@obeo.fr").setMessage(commitMessage).call();
 		return revCommit;
-	}
-
-	protected RevCommit addAllAndCommit(String commitMessage) throws GitAPIException, NoFilepatternException,
-			NoHeadException, NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException {
-		return addAllAndCommit(commitMessage, getGit());
 	}
 
 	protected Ref createBranch(String branchName, String startingPoint) throws RefAlreadyExistsException,

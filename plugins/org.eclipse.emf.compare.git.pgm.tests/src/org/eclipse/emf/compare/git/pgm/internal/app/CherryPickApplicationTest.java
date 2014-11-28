@@ -17,8 +17,6 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -26,19 +24,9 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.compare.git.pgm.Returns;
+import org.eclipse.emf.compare.git.pgm.internal.app.data.ContextSetup;
 import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
 import org.eclipse.equinox.app.IApplication;
-import org.eclipse.jgit.api.errors.CheckoutConflictException;
-import org.eclipse.jgit.api.errors.ConcurrentRefUpdateException;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRefNameException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.NoMessageException;
-import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
-import org.eclipse.jgit.api.errors.RefNotFoundException;
-import org.eclipse.jgit.api.errors.UnmergedPathsException;
-import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Test;
 
@@ -47,20 +35,17 @@ import org.junit.Test;
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
+@SuppressWarnings("nls")
 public class CherryPickApplicationTest extends AbstractLogicalCommandApplicationTest {
 
-	private File project;
-
-	private File userSetupFile;
-
-	private Path projectPath;
+	private ContextSetup contextSetup;
 
 	/**
 	 * <p>
 	 * This use case aims to test a logical cherry-pick on a model with successive conflicts.
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER002()}
+	 * History see {@link ContextSetup#setupCHE002()}
 	 * </p>
 	 * <h3>Operation</h3>
 	 * <ul>
@@ -73,24 +58,24 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
-	public void testCHER002() throws Exception {
-		setupCHER002();
-
+	public void testCHE002() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE002();
 		runCherryPick(Returns.ABORTED, "branch_c", "branch_d");
 
 		assertOutputMessageEnd(getExpectedConflictMessage("[" + getShortId("branch_c") + "]... Delete C1"));
 
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"));
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), contextSetup
+				.getProjectPath().resolve("model.notation"));
 
 		// Resolves conflits
-		project = new ProjectBuilder(this) //
+		new ProjectBuilder(this) //
 				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.notation") //
-				.create(projectPath);
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.di")//
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.uml") //
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.notation") //
+				.create(contextSetup.getProjectPath());
 
 		getGit().add().addFilepattern(".").call(); //$NON-NLS-1$
 
@@ -100,12 +85,12 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 				"[" + getShortId("HEAD") + "] Delete C1"));
 
 		// Resolves conflicts
-		project = new ProjectBuilder(this) //
+		new ProjectBuilder(this) //
 				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution2/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution2/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution2/model.notation") //
-				.create(projectPath);
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution2/model.di")//
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution2/model.uml") //
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution2/model.notation") //
+				.create(contextSetup.getProjectPath());
 
 		getGit().add().addFilepattern(".").call(); //$NON-NLS-1$
 
@@ -127,7 +112,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * In this case the user is expected to use the command --quit.
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER002()}
+	 * History see {@link ContextSetup#setupCHE002()}
 	 * </p>
 	 * <h3>Operation</h3>
 	 * <ul>
@@ -140,24 +125,24 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
 	public void testCHER002_nothingToCommit() throws Exception {
-		setupCHER002();
-
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE002();
 		runCherryPick(Returns.ABORTED, "branch_c", "branch_d");
 
 		assertOutputMessageEnd(getExpectedConflictMessage("[" + getShortId("branch_c") + "]... Delete C1"));
 
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"));
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), contextSetup
+				.getProjectPath().resolve("model.notation"));
 
 		// Resolve conflicts
-		project = new ProjectBuilder(this) //
+		new ProjectBuilder(this) //
 				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.notation") //
-				.create(projectPath);
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.di")//
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.uml") //
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.notation") //
+				.create(contextSetup.getProjectPath());
 
 		getGit().add().addFilepattern(".").call(); //$NON-NLS-1$
 
@@ -167,12 +152,12 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 				"[" + getShortId("HEAD") + "] Delete C1"));
 
 		// Resolve conflicts by reverting changes to previsous version
-		project = new ProjectBuilder(this) //
+		new ProjectBuilder(this) //
 				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.notation") //
-				.create(projectPath);
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.di")//
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.uml") //
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.notation") //
+				.create(contextSetup.getProjectPath());
 
 		getGit().add().addFilepattern(".").call(); //$NON-NLS-1$
 
@@ -202,7 +187,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * user use the --abort option.
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER002()}
+	 * History see {@link ContextSetup#setupCHE002()}
 	 * </p>
 	 * <h3>Operation</h3>
 	 * <ul>
@@ -212,18 +197,18 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
-	public void testCHER002_aborted() throws Exception {
-		setupCHER002();
-
+	public void testCHE002_aborted() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE002();
 		String previousHead = getShortId("HEAD");
 
 		runCherryPick(Returns.ABORTED, "branch_c", "branch_d");
 
 		assertOutputMessageEnd(getExpectedConflictMessage("[" + getShortId("branch_c") + "]... Delete C1"));
 
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"));
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), contextSetup
+				.getProjectPath().resolve("model.notation"));
 
 		runAbort(Returns.ABORTED);
 
@@ -240,7 +225,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * user use the --quit option.
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER002()}
+	 * History see {@link ContextSetup#setupCHE002()}
 	 * </p>
 	 * <h3>Operation</h3>
 	 * <ul>
@@ -250,24 +235,24 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
-	public void testCHER002_quit() throws Exception {
-		setupCHER002();
-
+	public void testCHE002_quit() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE002();
 		runCherryPick(Returns.ABORTED, "branch_c", "branch_d");
 
 		assertOutputMessageEnd(getExpectedConflictMessage("[" + getShortId("branch_c") + "]... Delete C1"));
 
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"));
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), contextSetup
+				.getProjectPath().resolve("model.notation"));
 
 		// Resolve conflicts
-		project = new ProjectBuilder(this) //
+		new ProjectBuilder(this) //
 				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/conflict/resolution1/model.notation") //
-				.create(projectPath);
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.di")//
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.uml") //
+				.addContentToCopy("data/conflicts/CHE002/conflict/resolution1/model.notation") //
+				.create(contextSetup.getProjectPath());
 
 		getGit().add().addFilepattern(".").call(); //$NON-NLS-1$
 
@@ -284,7 +269,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * branch.
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER003()}
+	 * History see {@link ContextSetup#setupCHE003()}
 	 * </p>
 	 * <h3>Operation</h3>
 	 * <ul>
@@ -293,12 +278,12 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
-	public void testCHER003() throws Exception {
-		RevCommit branchCLastCommit = setupCHER003();
+	public void testCHE003() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE003();
 
-		runCherryPick(Returns.COMPLETE, branchCLastCommit.getName()// uses commit id
+		runCherryPick(Returns.COMPLETE, getShortId("branch_c")// uses commit id
 				, "branch_d"/* uses branch name */);
 
 		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD") + "] Adds class 3",//
@@ -307,14 +292,14 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 		final String class1URIFragment = "_bB2fYC3HEeSN_5D5iyrZGQ";
 		final String class2URIFragment = "_hfIr4C3HEeSN_5D5iyrZGQ";
 		final String class3URIFragment = "_aDUsIGWiEeSuO4qBAOfkWA";
-		assertExistInResource(project.toPath().resolve("model.uml"), class1URIFragment, class2URIFragment,
-				class3URIFragment);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model.uml"), class1URIFragment,
+				class2URIFragment, class3URIFragment);
 
 		final String class2ShapeURIFragment = "_hfJS8C3HEeSN_5D5iyrZGQ";
 		final String class1ShapeURIFragment = "_bB3tgC3HEeSN_5D5iyrZGQ";
 		final String class3ShapeURIFragement = "_aGWK8GWiEeSuO4qBAOfkWA";
-		assertExistInResource(project.toPath().resolve("model.notation"), class1ShapeURIFragment,
-				class2ShapeURIFragment, class3ShapeURIFragement);
+		assertExistInResource(contextSetup.getProjectPath().resolve("model.notation"),
+				class1ShapeURIFragment, class2ShapeURIFragment, class3ShapeURIFragement);
 	}
 
 	/**
@@ -322,7 +307,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * Tests the "up to date" use case.
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER003()}
+	 * History see {@link ContextSetup#setupCHE003()}
 	 * </p>
 	 * <h3>Operation</h3>
 	 * <ul>
@@ -331,11 +316,10 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
-	public void testCHER003_upToDate() throws Exception {
-		setupCHER003();
-
+	public void testCHE003_upToDate() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE003();
 		runCherryPick(Returns.COMPLETE, "branch_b");
 
 		assertOutputMessageEnd("Fast forward." + EOL + EOL);
@@ -347,7 +331,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * This use case aims to test a logical cherry-pick on a model with fragment.
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER004()}
+	 * History see {@link ContextSetup#setupCHE004()}
 	 * </p>
 	 * <h3>Operation</h3>
 	 * <ul>
@@ -356,11 +340,10 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
-	public void testCHER004() throws Exception {
-		setupCHER004();
-
+	public void testCHE004() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE004();
 		runCherryPick(Returns.COMPLETE, "branch_c");
 
 		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD")
@@ -368,20 +351,21 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 
 		final String class1URIFragment = "_adib0C9QEeShUolneTgohg";
 		final String class3URIFragment = "_lztC0C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model.uml"), class1URIFragment, class3URIFragment);
+		Path projectPath = contextSetup.getProjectPath();
+		assertExistInResource(projectPath.resolve("model.uml"), class1URIFragment, class3URIFragment);
 
 		final String class2URIFragment = "_a7N2UC9QEeShUolneTgohg";
 		final String class4URIFragment = "_m3mv0C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model2.uml"), class2URIFragment, class4URIFragment);
+		assertExistInResource(projectPath.resolve("model2.uml"), class2URIFragment, class4URIFragment);
 
 		final String class1ShapeURIFragment = "_adjp8C9QEeShUolneTgohg";
 		final String class3ShapeURIFragment = "_lzuQ8C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model.notation"), class1ShapeURIFragment,
+		assertExistInResource(projectPath.resolve("model.notation"), class1ShapeURIFragment,
 				class3ShapeURIFragment);
 
 		final String class2ShapeURIFragment = "_a7PEcC9QEeShUolneTgohg";
 		final String class4ShapeURIFragment = "_m3nW4C9QEeShUolneTgohg";
-		assertExistInResource(project.toPath().resolve("model2.notation"), class2ShapeURIFragment,
+		assertExistInResource(projectPath.resolve("model2.notation"), class2ShapeURIFragment,
 				class4ShapeURIFragment);
 	}
 
@@ -391,20 +375,20 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * Successives conflicts on multiple models in multiple files (one file per model).
 	 * </p>
 	 * <p>
-	 * History see {@link #setupCHER006()}
+	 * History see {@link ContextSetup#setupCHE006()}
 	 * </p>
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	@Test
-	public void testCHER006() throws Exception {
-		setupCHER006();
-
+	public void testCHE006() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupCHE006();
 		runCherryPick(Returns.ABORTED, "branch_c", "branch_d");
 
-		assertNoConflitMarker(projectPath.resolve("model.uml"), projectPath.resolve("model.notation"),
-				projectPath.resolve("model2.uml"), projectPath.resolve("model2.notation"));
+		assertNoConflitMarker(contextSetup.getProjectPath().resolve("model.uml"), contextSetup
+				.getProjectPath().resolve("model.notation"), contextSetup.getProjectPath().resolve(
+				"model2.uml"), contextSetup.getProjectPath().resolve("model2.notation"));
 
 		assertOutputMessageEnd(getExpectedConflictMessage("[" + getShortId("branch_c") + "]... Delete Class1"));
 
@@ -413,12 +397,12 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 		assertEquals(expectedConflictingFilePath, getGit().status().call().getConflicting());
 
 		// Resolve conflicts
-		project = new ProjectBuilder(this) //
+		new ProjectBuilder(this) //
 				.clean(true) //
 				.addContentToCopy("data/conflicts/MER006/conflict/resolution1/model.di")//
 				.addContentToCopy("data/conflicts/MER006/conflict/resolution1/model.uml") //
 				.addContentToCopy("data/conflicts/MER006/conflict/resolution1/model.notation") //
-				.create(projectPath);
+				.create(contextSetup.getProjectPath());
 
 		getGit().add().addFilepattern(".").call(); //$NON-NLS-1$
 
@@ -436,375 +420,6 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 
 		runContinue(Returns.COMPLETE);
 
-	}
-
-	/**
-	 * <h3>History:</h3>
-	 * 
-	 * <pre>
-	 *  * [branch_d]
-	 *  |     Delete Class2
-	 *  |  
-	 *  * [branch_c] Delete Class1
-	 *  |    
-	 *  | *  [branch_b]
-	 *  |/   Add attribute1 under Class1
-	 *  |    Add attribute2 under Class2
-	 *  |   
-	 *  [branch_a]
-	 * Initial commit
-	 *   - 1 project with 2 models, 2 diagrams
-	 *   - add Class1 under Model1, Class2 under Model2
-	 * 
-	 * </pre>
-	 * 
-	 * @throws IOException
-	 * @throws GitAPIException
-	 * @throws NoFilepatternException
-	 * @throws NoHeadException
-	 * @throws NoMessageException
-	 * @throws UnmergedPathsException
-	 * @throws ConcurrentRefUpdateException
-	 * @throws WrongRepositoryStateException
-	 * @throws RefAlreadyExistsException
-	 * @throws RefNotFoundException
-	 * @throws InvalidRefNameException
-	 * @throws CheckoutConflictException
-	 */
-	@SuppressWarnings("nls")
-	private void setupCHER006() throws IOException, GitAPIException, NoFilepatternException, NoHeadException,
-			NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException, RefAlreadyExistsException, RefNotFoundException,
-			InvalidRefNameException, CheckoutConflictException {
-		projectPath = getRepositoryPath().resolve("MER006");
-		project = new ProjectBuilder(this) //
-				.addContentToCopy("data/conflicts/MER006/branch_a/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_a/model.uml") // //$NON-NLS-1$
-				.addContentToCopy("data/conflicts/MER006/branch_a/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_a/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_a/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_a/model2.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit" + EOL + "   - 1 project with 2 models, 2 diagrams" + EOL
-				+ "   - add Class1 under Model1, Class2 under Model2");
-		createBranch(branchA, "master");
-
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_c/model.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_c/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_c/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Delete Class1");
-
-		// Creates branch d
-		String branchD = "branch_d";
-		createBranchAndCheckout(branchD, branchC);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_d/model.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_d/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_d/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Delete Class2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_b/model.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model.notation") //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model2.di")//
-				.addContentToCopy("data/conflicts/MER006/branch_b/model2.uml") //
-				.addContentToCopy("data/conflicts/MER006/branch_b/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add attribute1 under Class1, attribute2 under Class2");
-
-		// Creates Oomph model
-		userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-	}
-
-	/**
-	 * <h3>History</h3>
-	 * 
-	 * <pre>
-	 * * Adds Attr1 to C1 and adds Attr2 to C2 [branch_b, HEAD]
-	 * |
-	 * |
-	 * | * Delete C2 [branch d]
-	 * | |
-	 * | * Delete C1 [branch_c]
-	 * |/ 
-	 * |  
-	 * Initial commit - Create C1 and C2 [branch_a]
-	 * </pre>
-	 * 
-	 * @throws IOException
-	 * @throws NoFilepatternException
-	 * @throws NoHeadException
-	 * @throws NoMessageException
-	 * @throws UnmergedPathsException
-	 * @throws ConcurrentRefUpdateException
-	 * @throws WrongRepositoryStateException
-	 * @throws GitAPIException
-	 */
-	@SuppressWarnings("nls")
-	private void setupCHER002() throws IOException, NoFilepatternException, NoHeadException,
-			NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException, GitAPIException {
-		projectPath = getRepositoryPath().resolve("CHER002");
-		project = new ProjectBuilder(this) //
-				.addContentToCopy("data/conflicts/CHER002/branch_a/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/branch_a/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/branch_a/model.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit - Create C1 and C2");
-		createBranch(branchA, "master");
-
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/branch_c/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/branch_c/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/branch_c/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Delete C1");
-
-		String branchD = "branch_d";
-		createBranchAndCheckout(branchD, branchC);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/branch_d/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/branch_d/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/branch_d/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Delete C2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/conflicts/CHER002/branch_b/model.di")//
-				.addContentToCopy("data/conflicts/CHER002/branch_b/model.uml") //
-				.addContentToCopy("data/conflicts/CHER002/branch_b/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Adds Attr1 to C1 and adds Attr2 to C2");
-
-		// Creates Oomph model
-		userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the command is launched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-	}
-
-	/**
-	 * <h3>History</h3>
-	 * 
-	 * <pre>
-	 *  * [branch_c]
-	 *  |     Add Class3 under Model1
-	 *  |     Add Class4 under Model2
-	 *  |    
-	 *  | * [branch_b)]
-	 *  |/  Add Class1 under Model1
-	 *  |   Add Class2 under Model2
-	 *  |  
-	 * [branch_a]
-	 *  Initial commit
-	 *   - A project with 2 models, 2 diagrams
-	 * </pre>
-	 * 
-	 * @throws IOException
-	 * @throws GitAPIException
-	 * @throws NoFilepatternException
-	 * @throws NoHeadException
-	 * @throws NoMessageException
-	 * @throws UnmergedPathsException
-	 * @throws ConcurrentRefUpdateException
-	 * @throws WrongRepositoryStateException
-	 * @throws RefAlreadyExistsException
-	 * @throws RefNotFoundException
-	 * @throws InvalidRefNameException
-	 * @throws CheckoutConflictException
-	 */
-	@SuppressWarnings("nls")
-	private void setupCHER004() throws IOException, GitAPIException, NoFilepatternException, NoHeadException,
-			NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException, RefAlreadyExistsException, RefNotFoundException,
-			InvalidRefNameException, CheckoutConflictException {
-		projectPath = getRepositoryPath().resolve("MER004");
-		project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER004/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER004/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_a/model.notation") //
-				.addContentToCopy("data/automerging/MER004/branch_a/model2.di")//
-				.addContentToCopy("data/automerging/MER004/branch_a/model2.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_a/model2.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit" + EOL + "- A project with 2 models, 2 diagrams");
-		createBranch(branchA, "master");
-
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/MER004/branch_c/model.di")//
-				.addContentToCopy("data/automerging/MER004/branch_c/model.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_c/model.notation") //
-				.addContentToCopy("data/automerging/MER004/branch_c/model2.di")//
-				.addContentToCopy("data/automerging/MER004/branch_c/model2.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_c/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add Class3 under Model1" + EOL + "Add Class4 under Model2");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/MER004/branch_b/model.di")//
-				.addContentToCopy("data/automerging/MER004/branch_b/model.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_b/model.notation") //
-				.addContentToCopy("data/automerging/MER004/branch_b/model2.di")//
-				.addContentToCopy("data/automerging/MER004/branch_b/model2.uml") //
-				.addContentToCopy("data/automerging/MER004/branch_b/model2.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Add Class1 under Model1" + EOL + "Add Class2 under Model2");
-
-		getGit().close();
-
-		// Creates Oomph model
-		userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the command is launched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-	}
-
-	/**
-	 * <h3>History:</h3>
-	 * 
-	 * <pre>
-	 * * Adds Class 1 [branch_b, HEAD]
-	 * |
-	 * |
-	 * | * Adds Class 3 [branch d]
-	 * | |
-	 * | * Adds Class 2 [branch_c]
-	 * |/ 
-	 * |  
-	 * Initial commit [branch_a]
-	 * </pre>
-	 * 
-	 * @return
-	 * @throws IOException
-	 * @throws GitAPIException
-	 * @throws NoFilepatternException
-	 * @throws NoHeadException
-	 * @throws NoMessageException
-	 * @throws UnmergedPathsException
-	 * @throws ConcurrentRefUpdateException
-	 * @throws WrongRepositoryStateException
-	 * @throws RefAlreadyExistsException
-	 * @throws RefNotFoundException
-	 * @throws InvalidRefNameException
-	 * @throws CheckoutConflictException
-	 */
-	@SuppressWarnings("nls")
-	private RevCommit setupCHER003() throws IOException, GitAPIException, NoFilepatternException,
-			NoHeadException, NoMessageException, UnmergedPathsException, ConcurrentRefUpdateException,
-			WrongRepositoryStateException, RefAlreadyExistsException, RefNotFoundException,
-			InvalidRefNameException, CheckoutConflictException {
-		projectPath = getRepositoryPath().resolve("CHER003");
-		project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/CHER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/CHER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/CHER003/branch_a/model.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit");
-		createBranch(branchA, "master");
-
-		// Creates branch c
-		String branchC = "branch_c";
-		createBranchAndCheckout(branchC, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/CHER003/branch_c/model.di")//
-				.addContentToCopy("data/automerging/CHER003/branch_c/model.uml") //
-				.addContentToCopy("data/automerging/CHER003/branch_c/model.notation") //
-				.create(projectPath);
-
-		RevCommit branchCLastCommit = addAllAndCommit("Adds class 2");
-
-		String branchD = "branch_d";
-		createBranchAndCheckout(branchD, branchC);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/CHER003/branch_d/model.di")//
-				.addContentToCopy("data/automerging/CHER003/branch_d/model.uml") //
-				.addContentToCopy("data/automerging/CHER003/branch_d/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Adds class 3");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/CHER003/branch_b/model.di")//
-				.addContentToCopy("data/automerging/CHER003/branch_b/model.uml") //
-				.addContentToCopy("data/automerging/CHER003/branch_b/model.notation") //
-				.create(projectPath);
-
-		addAllAndCommit("Adds class 1");
-
-		// Creates Oomph model
-		userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the command is launched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-		return branchCLastCommit;
 	}
 
 	@Override
@@ -833,38 +448,34 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	private void runCherryPick(Returns expectedReturnCode, String... commitsToCherryPick) throws Exception {
 		resetContext();
 
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				"--show-stack-trace");
+		getContext().addArg(getRepositoryPath().resolve(".git").toString(),
+				contextSetup.getUserSetupFile().getAbsolutePath(), "--show-stack-trace");
 		getContext().addArg(commitsToCherryPick);
 		runCommand(expectedReturnCode);
 	}
 
-	@SuppressWarnings("nls")
 	private void runContinue(Returns expectedReturnCode) throws Exception {
 		resetContext();
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				"--show-stack-trace", "--continue");
+		getContext().addArg(getRepositoryPath().resolve(".git").toString(),
+				contextSetup.getUserSetupFile().getAbsolutePath(), "--show-stack-trace", "--continue");
 		runCommand(expectedReturnCode);
 
 	}
 
-	@SuppressWarnings("nls")
 	private void runQuit(Returns expectedReturnCode) throws Exception {
 		resetContext();
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				"--show-stack-trace", "--quit");
+		getContext().addArg(getRepositoryPath().resolve(".git").toString(),
+				contextSetup.getUserSetupFile().getAbsolutePath(), "--show-stack-trace", "--quit");
 		runCommand(expectedReturnCode);
 	}
 
-	@SuppressWarnings("nls")
 	private void runAbort(Returns expectedReturnCode) throws Exception {
 		resetContext();
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				"--show-stack-trace", "--abort");
+		getContext().addArg(getRepositoryPath().resolve(".git").toString(),
+				contextSetup.getUserSetupFile().getAbsolutePath(), "--show-stack-trace", "--abort");
 		runCommand(expectedReturnCode);
 	}
 
-	@SuppressWarnings("nls")
 	private String getExpectedConflictMessage(String conflictingCommitMessage,
 			String... successfulCommitMessages) {
 		String expected = "";
@@ -886,7 +497,6 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 		return expected;
 	}
 
-	@SuppressWarnings("nls")
 	private String getCompleteMessage(String... successfulCommits) {
 		String expected = "The following revisions were successfully cherry-picked:" + EOL;
 		for (String success : successfulCommits) {
