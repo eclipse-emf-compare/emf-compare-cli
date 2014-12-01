@@ -154,7 +154,7 @@ public class CherryPickApplicationTest extends AbstractApplicationTest {
 	}
 
 	/**
-	 * <h3>Use case CHE008</h3>
+	 * <h3>Test CHER008</h3>
 	 * <p>
 	 * Single conflict on a fragmented model in multiple files (two files per model)
 	 * </p>
@@ -164,11 +164,13 @@ public class CherryPickApplicationTest extends AbstractApplicationTest {
 	 */
 	@Test
 	public void testCHE008() throws Exception {
-		// implement this test once https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709 resolved
+		// This test has no more sense since it is now impossible to cherry pick several commits with EGit
+		// (see
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709)
 	}
 
 	/**
-	 * <h3>Use case CHE009</h3>
+	 * <h3>Test CHE009</h3>
 	 * <p>
 	 * Single conflict on a fragmented model in multiple files (two files per model)
 	 * </p>
@@ -178,7 +180,9 @@ public class CherryPickApplicationTest extends AbstractApplicationTest {
 	 */
 	@Test
 	public void testCHE009() throws Exception {
-		// implement this test once https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709 resolved
+		// This test has no more sense since it is now impossible to cherry pick several commits with EGit
+		// (see
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709)
 	}
 
 	/**
