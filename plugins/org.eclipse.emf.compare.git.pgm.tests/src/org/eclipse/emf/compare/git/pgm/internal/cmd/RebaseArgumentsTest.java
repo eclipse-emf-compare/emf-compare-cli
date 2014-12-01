@@ -53,8 +53,10 @@ public class RebaseArgumentsTest extends AbstractLogicalCommandTest {
 				+" <upstream>              : Upstream reference on top of which commits will be" + EOL
 				+"                           rebased." + EOL
 				+" <branch>                : Branch to rebase." + EOL
-				+" --abort                 : Use this option to abort an in going cherry-pick." + EOL
-				+" --continue              : Use this option to continue an in going cherry-pick." + EOL
+				+" --abort                 : Use this option to abort an in going rebase" + EOL
+				+"                           operation." + EOL
+				+" --continue              : Use this option to continue an in going rebase" + EOL
+				+"                           operation." + EOL
 				+" --git-dir gitFolderPath : Path to the .git folder of your repository." + EOL
 				+" --help (-h)             : Dispays help for this command." + EOL
 				+" --show-stack-trace      : Use this option to display java stack trace in" + EOL

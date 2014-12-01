@@ -58,12 +58,6 @@ import org.kohsuke.args4j.Option;
 @SuppressWarnings("nls")
 public class RebaseCommand extends AbstractLogicalCommand {
 
-	/** Command name. */
-	static final String LOGICAL_REBASE_CMD_NAME = "logicalrebase"; //$NON-NLS-1$
-
-	/** Id of the logicalrebase application. */
-	static final String LOGICAL_REBASE_APP_ID = "emf.compare.git.logicalrebase"; //$NON-NLS-1$
-
 	/** Continue option key. */
 	public static final String CONTINUE_OPT = "--continue"; //$NON-NLS-1$
 
@@ -72,6 +66,12 @@ public class RebaseCommand extends AbstractLogicalCommand {
 
 	/** Skip option key. */
 	public static final String SKIP_OPT = "--skip"; //$NON-NLS-1$
+
+	/** Command name. */
+	static final String LOGICAL_REBASE_CMD_NAME = "logicalrebase"; //$NON-NLS-1$
+
+	/** Id of the logicalrebase application. */
+	static final String LOGICAL_REBASE_APP_ID = "emf.compare.git.logicalrebase"; //$NON-NLS-1$
 
 	/** Reference on top of which commits will be rebased. */
 	@Argument(index = 1, required = false, metaVar = "<upstream>", usage = "Upstream reference on top of which commits will be rebased.", handler = RefHandler.class)
@@ -82,11 +82,11 @@ public class RebaseCommand extends AbstractLogicalCommand {
 	private Ref toRebase;
 
 	/** Continue option. */
-	@Option(required = false, name = CONTINUE_OPT, usage = "Use this option to continue an in going cherry-pick.")
+	@Option(required = false, name = CONTINUE_OPT, usage = "Use this option to continue an in going rebase operation.")
 	private boolean continueOpt;
 
 	/** Abort option. */
-	@Option(required = false, name = ABORT_OPT, usage = "Use this option to abort an in going cherry-pick.")
+	@Option(required = false, name = ABORT_OPT, usage = "Use this option to abort an in going rebase operation.")
 	private boolean abortOpt;
 
 	/** Skip option. */
