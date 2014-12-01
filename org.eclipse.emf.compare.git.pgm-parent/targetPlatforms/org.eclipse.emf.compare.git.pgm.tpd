@@ -36,6 +36,7 @@ location "http://download.eclipse.org/oomph/updates" {
 }
 
 location "http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/" {
+	org.eclipse.egit.source.feature.group lazy
 	org.eclipse.egit.feature.group lazy
 }
 
