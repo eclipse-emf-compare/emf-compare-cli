@@ -95,7 +95,7 @@
           <repository
               url="http://download.eclipse.org/technology/epp/packages/luna"/>
           <repository
-              url="http://download.eclipse.org/releases/luna/201406250900"/>
+              url="http://download.eclipse.org/releases/luna/201409261001"/>
         </setupTask>
       </version>
     </product>
