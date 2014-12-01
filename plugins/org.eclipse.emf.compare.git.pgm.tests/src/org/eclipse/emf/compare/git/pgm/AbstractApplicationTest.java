@@ -40,6 +40,7 @@ import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
 import org.eclipse.jgit.api.errors.TransportException;
@@ -327,6 +328,20 @@ public abstract class AbstractApplicationTest {
 		});
 
 		return builder.toString();
+	}
+
+	protected void assertLog(String... messages) throws NoHeadException, MissingObjectException,
+			IncorrectObjectTypeException, GitAPIException, IOException {
+		List<RevCommit> revCommits = Lists.newArrayList(getGit().log().setMaxCount(messages.length).add(
+				getHeadCommit()).call());
+		assertEquals(messages.length, revCommits.size());
+		for (int i = 0; i < messages.length; i++) {
+			assertEquals(messages[i], revCommits.get(i).getShortMessage());
+		}
+	}
+
+	protected void assertFileContent(Path pathfile, String expected) throws IOException {
+		assertEquals(expected, new String(Files.readAllBytes(pathfile)));
 	}
 
 	/**

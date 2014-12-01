@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.app;
 
+import static org.eclipse.emf.compare.git.pgm.internal.app.data.ContextSetup.LYRICS_1;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -126,7 +127,7 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * @throws Exception
 	 */
 	@Test
-	public void testCHER002_nothingToCommit() throws Exception {
+	public void testCHE002_nothingToCommit() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupCHE002();
 		runCherryPick(Returns.ABORTED, "branch_c", "branch_d");
@@ -179,6 +180,42 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 				.call());
 		assertEquals("Delete C1", revCommits.get(0).getShortMessage());
 		assertEquals("Adds Attr1 to C1 and adds Attr2 to C2", revCommits.get(1).getShortMessage());
+	}
+
+	/**
+	 * @see ContextSetup#setupREB016()
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE016() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB016();
+
+		runCherryPick(Returns.COMPLETE, "branch_b");
+
+		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD") + "] Creates C1 in P1"));
+
+		assertLog("Creates C1 in P1",//
+				"Adds in.txt && out.txt",//
+				"Creates P1");
+
+		Path projectPath = contextSetup.getProjectPath();
+		final String p1FragmentId = "_142C4HlpEeSjSr5E4B1VMw";
+		final String c1FragmentId = "_Di70UHlqEeSjSr5E4B1VMw";
+		assertExistInResource(projectPath.resolve("model.uml"), //
+				p1FragmentId, //
+				c1FragmentId);
+
+		final String p1ShapeFragmentId = "_16b-UHlpEeSjSr5E4B1VMw";
+		final String c1ShapeFragmentId = "_Di_esHlqEeSjSr5E4B1VMw";
+		assertExistInResource(projectPath.resolve("model.notation"), //
+				c1ShapeFragmentId,//
+				p1ShapeFragmentId);
+
+		// Checks the content of the test file located in the workspace
+		assertFileContent(contextSetup.getProjectPath().resolve("in.txt"), LYRICS_1 + EOL);
+		// Check the content of the test file located in the workspace
+		assertFileContent(contextSetup.getProjectPath().resolve("../out.txt"), LYRICS_1 + EOL);
 	}
 
 	/**
@@ -373,6 +410,58 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	 * <h3>Test CHER006</h3>
 	 * <p>
 	 * Successives conflicts on multiple models in multiple files (one file per model).
+	 * </p>
+	 * <p>
+	 * History see {@link ContextSetup#setupCHE007()}
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE007() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB007();
+		runCherryPick(Returns.COMPLETE, "branch_b");
+
+		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD")
+				+ "] Creates Attr1 in Class1.uml + Creates C2 in model.uml"));
+
+		assertLog("Creates Attr1 in Class1.uml + Creates C2 in model.uml",//
+				"Creates Attr2 in Class1.uml + Creates C3 in model.uml",//
+				"Creates C1 in Class1.uml");
+
+		Path projectPath = contextSetup.getProjectPath();
+		final String c2FragmentId = "_mq6J8HVUEeScI5AIfi-cqA";
+		final String c3FragmentId = "_pYd8YHVUEeScI5AIfi-cqA";
+		assertExistInResource(projectPath.resolve("model.uml"), //
+				c3FragmentId, //
+				c2FragmentId);
+		final String c1FragmentId = "_mqPRAHVTEeScI5AIfi-cqA";
+		final String attr1FragmentId = "_DIRX4HVUEeScI5AIfi-cqA";
+		final String attr2FragmentId = "_M6nbsHVUEeScI5AIfi-cqA";
+		assertExistInResource(projectPath.resolve("Class1.uml"), //
+				c1FragmentId, //
+				attr1FragmentId,//
+				attr2FragmentId);
+
+		final String c1ShapeFragmentId = "_mqRtQHVTEeScI5AIfi-cqA";
+		final String c2ShapeFragmentId = "_mq-bYHVUEeScI5AIfi-cqA";
+		final String c3ShapeFragmentId = "_pYgYoHVUEeScI5AIfi-cqA";
+		final String attr1ShapeFragmentId = "_DIT0IHVUEeScI5AIfi-cqA";
+		final String attr2ShapeFragmentId = "_M6rGEHVUEeScI5AIfi-cqA";
+		assertExistInResource(projectPath.resolve("model.notation"), //
+				c1ShapeFragmentId,//
+				c2ShapeFragmentId,//
+				c3ShapeFragmentId,//
+				attr1ShapeFragmentId,//
+				attr2ShapeFragmentId);
+
+	}
+
+	/**
+	 * <h3>Test CHER007</h3>
+	 * <p>
+	 * Test no conflicting cherry-pick on fragmented model.
 	 * </p>
 	 * <p>
 	 * History see {@link ContextSetup#setupCHE006()}

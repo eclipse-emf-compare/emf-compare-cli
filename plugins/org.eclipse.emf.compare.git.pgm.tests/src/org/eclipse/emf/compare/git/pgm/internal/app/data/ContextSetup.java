@@ -600,6 +600,141 @@ public class ContextSetup {
 	 * <h3>History</h3>
 	 * 
 	 * <pre>
+	 * * Creates C1 in P1 [branch_b]
+	 * |
+	 * | * Adds in.txt && out.txt [branch_c,HEAD]
+	 * |/ 
+	 * |  
+	 * Creates P1 [branch_a]
+	 * </pre>
+	 * 
+	 * @throws Exception
+	 */
+	public void setupREB016() throws Exception {
+		projectPath = getRepositoryPath().resolve("REB016");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("automerging/REB016/branch_a/model.di")//
+				.addContentToCopy("automerging/REB016/branch_a/model.uml") //
+				.addContentToCopy("automerging/REB016/branch_a/model.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Creates P1");
+
+		String branchA = "branch_a";
+		createBranch(branchA, "master");
+
+		// Creates branch b
+		String branchB = "branch_b";
+		createBranchAndCheckout(branchB, branchA);
+
+		new ProjectBuilder(this) //
+				.clean(true) //
+				.addContentToCopy("automerging/REB016/branch_b/model.di")//
+				.addContentToCopy("automerging/REB016/branch_b/model.uml") //
+				.addContentToCopy("automerging/REB016/branch_b/model.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Creates C1 in P1");
+
+		// Creates branch_c
+		String branchC = "branch_c";
+		createBranchAndCheckout(branchC, branchA);
+
+		new ProjectBuilder(this) //
+				.clean(true) //
+				.addContentToCopy("automerging/REB016/branch_a/model.di")//
+				.addContentToCopy("automerging/REB016/branch_a/model.uml") //
+				.addContentToCopy("automerging/REB016/branch_a/model.notation") //
+				.addNewFileContent("in.txt", LYRICS_1) //
+				.create(projectPath);
+
+		ProjectBuilder.createFile(projectPath.resolve("../out.txt"), LYRICS_1);
+
+		addAllAndCommit("Adds in.txt && out.txt");
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
+	/**
+	 * <h3>History</h3>
+	 * 
+	 * <pre>
+	 * * Deletes C2[branch_c, HEAD]
+	 * |
+	 * | * Creates association between C1 & C2 [branch_b]
+	 * |/ 
+	 * |  
+	 * Creates C1 in P1 in P1.uml && C2 in P2 in P2.uml[branch_a]
+	 * </pre>
+	 * 
+	 * @throws Exception
+	 */
+	public void setupREB014() throws Exception {
+		projectPath = getRepositoryPath().resolve("REB014");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("conflicts/REB014/branch_a/model.di")//
+				.addContentToCopy("conflicts/REB014/branch_a/model.uml") //
+				.addContentToCopy("conflicts/REB014/branch_a/model.notation") //
+				.addContentToCopy("conflicts/REB014/branch_a/P1.di")//
+				.addContentToCopy("conflicts/REB014/branch_a/P1.uml") //
+				.addContentToCopy("conflicts/REB014/branch_a/P1.notation") //
+				.addContentToCopy("conflicts/REB014/branch_a/P2.di")//
+				.addContentToCopy("conflicts/REB014/branch_a/P2.uml") //
+				.addContentToCopy("conflicts/REB014/branch_a/P2.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Creates C1 in P1 in P1.uml && C2 in P2 in P2.uml");
+
+		String branchA = "branch_a";
+		createBranch(branchA, "master");
+
+		// Creates branch b
+		String branchB = "branch_b";
+		createBranchAndCheckout(branchB, branchA);
+
+		new ProjectBuilder(this) //
+				.clean(true) //
+				.addContentToCopy("conflicts/REB014/branch_b/model.di")//
+				.addContentToCopy("conflicts/REB014/branch_b/model.uml") //
+				.addContentToCopy("conflicts/REB014/branch_b/model.notation") //
+				.addContentToCopy("conflicts/REB014/branch_b/P1.di")//
+				.addContentToCopy("conflicts/REB014/branch_b/P1.uml") //
+				.addContentToCopy("conflicts/REB014/branch_b/P1.notation") //
+				.addContentToCopy("conflicts/REB014/branch_b/P2.di")//
+				.addContentToCopy("conflicts/REB014/branch_b/P2.uml") //
+				.addContentToCopy("conflicts/REB014/branch_b/P2.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Creates association between C1 & C2");
+
+		// Creates branch_c
+		String branchC = "branch_c";
+		createBranchAndCheckout(branchC, branchA);
+
+		new ProjectBuilder(this) //
+				.clean(true) //
+				.addContentToCopy("conflicts/REB014/branch_c/model.di")//
+				.addContentToCopy("conflicts/REB014/branch_c/model.uml") //
+				.addContentToCopy("conflicts/REB014/branch_c/model.notation") //
+				.addContentToCopy("conflicts/REB014/branch_c/P1.di")//
+				.addContentToCopy("conflicts/REB014/branch_c/P1.uml") //
+				.addContentToCopy("conflicts/REB014/branch_c/P1.notation") //
+				.addContentToCopy("conflicts/REB014/branch_c/P2.di")//
+				.addContentToCopy("conflicts/REB014/branch_c/P2.uml") //
+				.addContentToCopy("conflicts/REB014/branch_c/P2.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Deletes C2");
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
+	/**
+	 * <h3>History</h3>
+	 * 
+	 * <pre>
 	 * * Delete Class2 [branch_d]
 	 * | 
 	 * |  

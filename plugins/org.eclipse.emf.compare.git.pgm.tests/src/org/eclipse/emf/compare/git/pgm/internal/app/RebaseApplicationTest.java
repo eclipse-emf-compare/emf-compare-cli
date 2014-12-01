@@ -16,13 +16,10 @@ import static org.eclipse.emf.compare.git.pgm.internal.app.data.ContextSetup.LYR
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.HashSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -32,11 +29,6 @@ import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.errors.IncorrectObjectTypeException;
-import org.eclipse.jgit.errors.MissingObjectException;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Test;
 
 /**
@@ -61,7 +53,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB000() throws Exception {
+	public void testREB000() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB000();
 
@@ -115,7 +107,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB000_Upstream() throws Exception {
+	public void testREB000_Upstream() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB000();
 
@@ -173,7 +165,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB000_Upstream2() throws Exception {
+	public void testREB000_Upstream2() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB000();
 
@@ -233,7 +225,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB000_UpstreamFromConfig() throws Exception {
+	public void testREB000_UpstreamFromConfig() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB000();
 
@@ -297,7 +289,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB000_UpToDate() throws Exception {
+	public void testREB000_UpToDate() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB000();
 
@@ -345,7 +337,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB001() throws Exception {
+	public void testREB001() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB001();
 
@@ -406,7 +398,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB001_abort() throws Exception {
+	public void testREB001_abort() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB001();
 
@@ -454,7 +446,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB001_skip() throws Exception {
+	public void testREB001_skip() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB001();
 
@@ -501,7 +493,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB002() throws Exception {
+	public void testREB002() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB002();
 
@@ -598,7 +590,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB002_abort() throws Exception {
+	public void testREB002_abort() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB002();
 
@@ -647,7 +639,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB002_skip() throws Exception {
+	public void testREB002_skip() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB002();
 
@@ -730,7 +722,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB003() throws Exception {
+	public void testREB003() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB003();
 
@@ -767,22 +759,22 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	}
 
 	/**
-	 * Test no conflicting rebase on fragemented model.
+	 * Test no conflicting rebase on fragmented model.
 	 * 
 	 * @see ContextSetup#setupREB007()
 	 * @throws Exception
 	 */
 	@Test
-	public void REB007() throws Exception {
+	public void testREB007() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB007();
 
 		runRebase(Returns.COMPLETE, "branch_b");
 
 		//@formatter:off
-				String expected = "Has rewinded head to replay your work on top of.." + EOL;
-				expected += "Applied ["+getShortId("HEAD")+"] Creates Attr2 in Class1.uml + Creates C3 in model.uml" + EOL + EOL;
-				//@formatter:on
+		String expected = "Has rewinded head to replay your work on top of.." + EOL;
+		expected += "Applied ["+getShortId("HEAD")+"] Creates Attr2 in Class1.uml + Creates C3 in model.uml" + EOL + EOL;
+		//@formatter:on
 		assertOutputMessageEnd(expected);
 
 		assertLog("Creates Attr2 in Class1.uml + Creates C3 in model.uml",//
@@ -823,7 +815,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB009() throws Exception {
+	public void testREB009() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB009();
 
@@ -898,8 +890,10 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 
 		runContinue(Returns.COMPLETE);
 
-		msg = "Importing project REB009" + EOL + EOL;
+		msg = "Importing project REB009" + EOL;
 		msg += "Applied [" + getShortId("HEAD") + "] Deletes C2" + EOL + EOL;
+
+		assertOutputMessageEnd(msg);
 
 		assertLog("Deletes C2",//
 				"Deletes C1 (Deletes Class1.uml)",//
@@ -915,7 +909,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 	 * @throws Exception
 	 */
 	@Test
-	public void REB009_nothingToCommit() throws Exception {
+	public void testREB009_nothingToCommit() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB009();
 
@@ -1017,18 +1011,87 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 				"Creates C1 in Class1.uml + Creates C2 in model.uml");
 	}
 
-	private static void assertFileContent(Path pathfile, String expected) throws IOException {
-		assertEquals(expected, new String(Files.readAllBytes(pathfile)));
+	/**
+	 * @see ContextSetup#setupREB016()
+	 * @throws Exception
+	 */
+	@Test
+	public void testREB016() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB016();
+
+		runRebase(Returns.COMPLETE, "branch_b");
+
+		//@formatter:off
+		String expected = "Has rewinded head to replay your work on top of.." + EOL;
+		expected += "Applied ["+getShortId("HEAD")+"] Adds in.txt && out.txt" + EOL + EOL;
+		//@formatter:on
+		assertOutputMessageEnd(expected);
+
+		assertLog("Adds in.txt && out.txt",//
+				"Creates C1 in P1",//
+				"Creates P1");
+
+		Path projectPath = contextSetup.getProjectPath();
+		final String p1FragmentId = "_142C4HlpEeSjSr5E4B1VMw";
+		final String c1FragmentId = "_Di70UHlqEeSjSr5E4B1VMw";
+		assertExistInResource(projectPath.resolve("model.uml"), //
+				p1FragmentId, //
+				c1FragmentId);
+
+		final String p1ShapeFragmentId = "_16b-UHlpEeSjSr5E4B1VMw";
+		final String c1ShapeFragmentId = "_Di_esHlqEeSjSr5E4B1VMw";
+		assertExistInResource(projectPath.resolve("model.notation"), //
+				c1ShapeFragmentId,//
+				p1ShapeFragmentId);
+
+		// Checks the content of the test file located in the workspace
+		assertFileContent(contextSetup.getProjectPath().resolve("in.txt"), LYRICS_1 + EOL);
+		// Check the content of the test file located in the workspace
+		assertFileContent(contextSetup.getProjectPath().resolve("../out.txt"), LYRICS_1 + EOL);
 	}
 
-	private void assertLog(String... messages) throws NoHeadException, MissingObjectException,
-			IncorrectObjectTypeException, GitAPIException, IOException {
-		List<RevCommit> revCommits = Lists.newArrayList(getGit().log().setMaxCount(messages.length).add(
-				getHeadCommit()).call());
-		assertEquals(messages.length, revCommits.size());
-		for (int i = 0; i < messages.length; i++) {
-			assertEquals(messages[i], revCommits.get(i).getShortMessage());
-		}
+	/**
+	 * @see ContextSetup#setupREB014()
+	 * @throws Exception
+	 */
+	@Test
+	public void testREB014() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB014();
+
+		runRebase(Returns.ABORTED, "branch_b");
+
+		String id = getShortId("branch_c");
+		String msg = "Has rewinded head to replay your work on top of.." + EOL;
+		msg += "error: Could not apply [" + id + "] Deletes C2" + EOL;
+		msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
+		msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
+		msg += "hint: by adding them to the index (Team > Add to index) or" + EOL;
+		msg += "hint: by removing them from the index (Team > Remove from index)." + EOL;
+		msg += "hint: Do NOT commit, use one of the following commands instead" + EOL;
+		msg += "hint:  git logicalrebase --continue : to continue the rebase operation" + EOL;
+		msg += "hint:  git logicalrebase --abort : to abort the rebase operation" + EOL;
+		msg += "hint:  git logicalrebase --skip : to skip this commit" + EOL + EOL;
+
+		assertOutputMessageEnd(msg);
+
+		// Checks that the expected file are marked as conflicting
+		HashSet<String> conflictingFile = Sets.newHashSet("REB014/model.notation",//
+				"REB014/P1.uml",//
+				"REB014/P2.uml");
+		assertEquals(conflictingFile, getGit().status().call().getConflicting());
+		// Checks that the model files were not corrupted by <<< and >>> markers.
+		Path projectPath = contextSetup.getProjectPath();
+		assertNoConflitMarker(projectPath.resolve("model.uml"), //
+				projectPath.resolve("model.notation"),//
+				projectPath.resolve("model.di"),//
+				projectPath.resolve("P1.uml"),//
+				projectPath.resolve("P1.notation"),//
+				projectPath.resolve("P1.di"),//
+				projectPath.resolve("P2.uml"),//
+				projectPath.resolve("P2.notation"),//
+				projectPath.resolve("P2.di"));
 	}
 
 	private void runCommand(Returns expectedReturnCode) throws Exception {
