@@ -30,7 +30,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Test;
 
 /**
- * Test of {@link LogicalDiffCommand}.
+ * Test of {@link DiffCommand}.
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
@@ -39,7 +39,7 @@ public class CherryPickArgumentsTest extends AbstractLogicalCommandTest {
 
 	@Override
 	protected String getCommandName() {
-		return LogicalCherryPickCommand.LOGICAL_CHERRY_PICK_CMD_NAME;
+		return CherryPickCommand.LOGICAL_CHERRY_PICK_CMD_NAME;
 	}
 
 	@Override

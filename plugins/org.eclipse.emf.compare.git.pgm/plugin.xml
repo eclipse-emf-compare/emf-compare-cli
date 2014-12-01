@@ -15,7 +15,7 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="org.eclipse.emf.compare.git.pgm.internal.app.LogicalDiffApplication">
+               class="org.eclipse.emf.compare.git.pgm.internal.app.DiffApplication">
          </run>
       </application>
    </extension>
@@ -24,7 +24,25 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="org.eclipse.emf.compare.git.pgm.internal.app.LogicalMergeApplication">
+               class="org.eclipse.emf.compare.git.pgm.internal.app.MergeApplication">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="emf.compare.git.logicalcherry-pick"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.eclipse.emf.compare.git.pgm.internal.app.CherryPickApplication">
+         </run>
+      </application>
+   </extension>
+      <extension
+         id="emf.compare.git.logicalrebase"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.eclipse.emf.compare.git.pgm.internal.app.RebaseApplication">
          </run>
       </application>
    </extension>
@@ -35,23 +53,5 @@
             application="emf.compare.git.launcherApp"
             name="EMF Compare Git PGM">
       </product>
-   </extension>
-   <extension
-         id="emf.compare.git.logicalcherry-pick"
-         point="org.eclipse.core.runtime.applications">
-      <application>
-         <run
-               class="org.eclipse.emf.compare.git.pgm.internal.app.LogicalCherryPickApplication">
-         </run>
-      </application>
-   </extension>
-      <extension
-         id="emf.compare.git.logicalrebase"
-         point="org.eclipse.core.runtime.applications">
-      <application>
-         <run
-               class="org.eclipse.emf.compare.git.pgm.internal.app.LogicalRebaseApplication">
-         </run>
-      </application>
    </extension>
 </plugin>

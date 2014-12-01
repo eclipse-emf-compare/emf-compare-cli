@@ -33,7 +33,7 @@ import org.kohsuke.args4j.spi.Setter;
  *
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-public class RevCommitOptionHandler extends OptionHandler<RevCommit> {
+public class RevCommitHandler extends OptionHandler<RevCommit> {
 
 	/**
 	 * Constructor.
@@ -45,7 +45,7 @@ public class RevCommitOptionHandler extends OptionHandler<RevCommit> {
 	 * @param setter
 	 *            {@link OptionHandler#setter}
 	 */
-	public RevCommitOptionHandler(CmdLineParser parser, OptionDef option,
+	public RevCommitHandler(CmdLineParser parser, OptionDef option,
 			Setter<? super ObjectId> setter) {
 		super(parser, option, setter);
 		Preconditions.checkArgument(parser instanceof CmdLineParserRepositoryBuilder);

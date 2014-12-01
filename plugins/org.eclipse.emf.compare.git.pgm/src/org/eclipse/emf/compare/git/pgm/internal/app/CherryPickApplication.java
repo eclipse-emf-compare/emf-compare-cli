@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.egit.core.op.CherryPickOperation;
 import org.eclipse.egit.core.op.RebaseOperation;
 import org.eclipse.emf.compare.git.pgm.Returns;
-import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
@@ -57,7 +57,7 @@ import org.kohsuke.args4j.Option;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings({"restriction", "nls" })
-public class LogicalCherryPickApplication extends AbstractLogicalApplication {
+public class CherryPickApplication extends AbstractLogicalApplication {
 	/**
 	 * Message to display when there is nothing to commit.
 	 */
@@ -70,7 +70,7 @@ public class LogicalCherryPickApplication extends AbstractLogicalApplication {
 	/**
 	 * Holds {@link RevCommit}s that need to be merged.
 	 */
-	@Argument(index = 2, required = false, multiValued = true, metaVar = "<commit>", usage = "Commit IDs to cherry pick.", handler = RevCommitOptionHandler.class)
+	@Argument(index = 2, required = false, multiValued = true, metaVar = "<commit>", usage = "Commit IDs to cherry pick.", handler = RevCommitHandler.class)
 	private List<RevCommit> commits;
 
 	/** Continue option. */

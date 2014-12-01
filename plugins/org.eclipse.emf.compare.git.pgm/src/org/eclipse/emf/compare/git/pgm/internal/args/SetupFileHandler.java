@@ -27,7 +27,7 @@ import org.kohsuke.args4j.spi.Setter;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 // TODO: Load the Oomph configuration here
-public class SetupFileOptionHandler extends FileOptionHandler {
+public class SetupFileHandler extends FileOptionHandler {
 	/**
 	 * Constructor.
 	 * 
@@ -38,7 +38,7 @@ public class SetupFileOptionHandler extends FileOptionHandler {
 	 * @param setter
 	 *            {@link org.kohsuke.args4j.spi.OptionHandler.OptionHandler#setter}
 	 */
-	public SetupFileOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super File> setter) {
+	public SetupFileHandler(CmdLineParser parser, OptionDef option, Setter<? super File> setter) {
 		super(parser, option, setter);
 	}
 

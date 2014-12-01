@@ -41,7 +41,7 @@ import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.ProgressPageLog;
 import org.eclipse.emf.compare.git.pgm.internal.args.CmdLineParserRepositoryBuilder;
 import org.eclipse.emf.compare.git.pgm.internal.args.GitDirHandler;
-import org.eclipse.emf.compare.git.pgm.internal.args.SetupFileOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.SetupFileHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.ArgumentValidationError;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
@@ -109,7 +109,7 @@ public abstract class AbstractLogicalCommand {
 	/**
 	 * Holds the Oomph model setup file.
 	 */
-	@Argument(index = 0, metaVar = "<setup>", required = true, usage = "Path to the setup file. The setup file is a Oomph model.", handler = SetupFileOptionHandler.class)
+	@Argument(index = 0, metaVar = "<setup>", required = true, usage = "Path to the setup file. The setup file is a Oomph model.", handler = SetupFileHandler.class)
 	private File setupFile;
 
 	/**

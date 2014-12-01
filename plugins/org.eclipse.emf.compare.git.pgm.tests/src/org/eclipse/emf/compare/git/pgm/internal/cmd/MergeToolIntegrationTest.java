@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.cmd;
 
-import static org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeToolCommand.LOGICAL_MERGE_TOOL_CMD_NAME;
+import static org.eclipse.emf.compare.git.pgm.internal.cmd.MergeToolCommand.LOGICAL_MERGE_TOOL_CMD_NAME;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.junit.Assert.assertEquals;
 

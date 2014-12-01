@@ -40,7 +40,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Test;
 
 /**
- * Test the {@link LogicalCherryPickApplication}.
+ * Test the {@link RebaseApplication}.
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
@@ -51,7 +51,7 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 
 	@Override
 	protected IApplication buildApp() {
-		return new LogicalRebaseApplication();
+		return new RebaseApplication();
 	}
 
 	/**

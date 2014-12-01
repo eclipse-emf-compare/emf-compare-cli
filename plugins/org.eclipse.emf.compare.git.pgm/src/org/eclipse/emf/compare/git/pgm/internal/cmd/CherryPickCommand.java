@@ -17,7 +17,7 @@ import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil
 import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.util.LogicalApplicationLauncher;
@@ -48,7 +48,7 @@ import org.kohsuke.args4j.Option;
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-public class LogicalCherryPickCommand extends AbstractLogicalCommand {
+public class CherryPickCommand extends AbstractLogicalCommand {
 
 	/** Command name. */
 	static final String LOGICAL_CHERRY_PICK_CMD_NAME = "logicalcherry-pick"; //$NON-NLS-1$
@@ -69,7 +69,7 @@ public class LogicalCherryPickCommand extends AbstractLogicalCommand {
 	private static final String TAB = "\t"; //$NON-NLS-1$
 
 	/** Holds the {@link RevCommit}s that need to be merged. */
-	@Argument(index = 1, required = false, multiValued = true, metaVar = "<commit>", usage = "Commit IDs to cherry pick.", handler = RevCommitOptionHandler.class)
+	@Argument(index = 1, required = false, multiValued = true, metaVar = "<commit>", usage = "Commit IDs to cherry pick.", handler = RevCommitHandler.class)
 	private List<RevCommit> commits;
 
 	/** Continue options. */

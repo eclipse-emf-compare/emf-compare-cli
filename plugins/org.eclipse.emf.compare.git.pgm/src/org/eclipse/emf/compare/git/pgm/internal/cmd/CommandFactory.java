@@ -33,11 +33,11 @@ public final class CommandFactory {
 	 */
 	private CommandFactory() {
 		cmds = new HashMap<String, Class<? extends AbstractLogicalCommand>>(3);
-		cmds.put(LogicalMergeCommand.LOGICAL_MERGE_CMD_NAME, LogicalMergeCommand.class);
-		cmds.put(LogicalMergeToolCommand.LOGICAL_MERGE_TOOL_CMD_NAME, LogicalMergeToolCommand.class);
-		cmds.put(LogicalDiffCommand.LOGICAL_DIFF_CMD_NAME, LogicalDiffCommand.class);
-		cmds.put(LogicalCherryPickCommand.LOGICAL_CHERRY_PICK_CMD_NAME, LogicalCherryPickCommand.class);
-		cmds.put(LogicalRebaseCommand.LOGICAL_REBASE_CMD_NAME, LogicalRebaseCommand.class);
+		cmds.put(MergeCommand.LOGICAL_MERGE_CMD_NAME, MergeCommand.class);
+		cmds.put(MergeToolCommand.LOGICAL_MERGE_TOOL_CMD_NAME, MergeToolCommand.class);
+		cmds.put(DiffCommand.LOGICAL_DIFF_CMD_NAME, DiffCommand.class);
+		cmds.put(CherryPickCommand.LOGICAL_CHERRY_PICK_CMD_NAME, CherryPickCommand.class);
+		cmds.put(RebaseCommand.LOGICAL_REBASE_CMD_NAME, RebaseCommand.class);
 	}
 
 	/**

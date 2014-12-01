@@ -63,7 +63,7 @@ public class DiffIntegrationTest extends AbstractLogicalAppTest {
 		addAllAndCommit("First commit");
 
 		// No reference
-		getContext().addArg(LogicalDiffCommand.LOGICAL_DIFF_CMD_NAME, newSetupFile.getAbsolutePath(),
+		getContext().addArg(DiffCommand.LOGICAL_DIFF_CMD_NAME, newSetupFile.getAbsolutePath(),
 				"master", "master");
 		Object result = getApp().start(getContext());
 

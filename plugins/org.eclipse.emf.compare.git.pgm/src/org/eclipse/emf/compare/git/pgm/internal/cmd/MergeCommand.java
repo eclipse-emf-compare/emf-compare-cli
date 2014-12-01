@@ -12,7 +12,7 @@ package org.eclipse.emf.compare.git.pgm.internal.cmd;
 
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 
-import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.util.LogicalApplicationLauncher;
@@ -40,7 +40,7 @@ import org.kohsuke.args4j.Option;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("restriction")
-public class LogicalMergeCommand extends AbstractLogicalCommand {
+public class MergeCommand extends AbstractLogicalCommand {
 
 	/**
 	 * Command name.
@@ -53,7 +53,7 @@ public class LogicalMergeCommand extends AbstractLogicalCommand {
 	/**
 	 * Holds a ObjectId that need to be merged.
 	 */
-	@Argument(index = 1, required = true, metaVar = "<commit>", usage = "Commit ID or branch name to merge.", handler = RevCommitOptionHandler.class)
+	@Argument(index = 1, required = true, metaVar = "<commit>", usage = "Commit ID or branch name to merge.", handler = RevCommitHandler.class)
 	private RevCommit commit;
 
 	/**

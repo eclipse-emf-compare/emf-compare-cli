@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.cmd;
 
-import static org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeCommand.LOGICAL_MERGE_CMD_NAME;
+import static org.eclipse.emf.compare.git.pgm.internal.cmd.MergeCommand.LOGICAL_MERGE_CMD_NAME;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +27,7 @@ import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
 import org.junit.Test;
 
 /**
- * Test of {@link LogicalMergeCommand}.
+ * Test of {@link MergeCommand}.
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
@@ -236,8 +236,8 @@ public class MergeArgumentsTest extends AbstractLogicalCommandTest {
 		// Tests referencing a commit using the name of a branch
 		getContext().addArg(getCommandName(), newSetupFile.getAbsolutePath(), "master", "-m");
 		getApp().start(getContext());
-		assertTrue(getLogicalCommand() instanceof LogicalMergeCommand);
-		LogicalMergeCommand mergeCmd = (LogicalMergeCommand)getLogicalCommand();
+		assertTrue(getLogicalCommand() instanceof MergeCommand);
+		MergeCommand mergeCmd = (MergeCommand)getLogicalCommand();
 		assertNotNull(mergeCmd.getCommit());
 		String extectedOutput = "fatal: Option \"-m\" takes an operand in:" + EOL + getExpectedUsage() + EOL;
 		assertOutput(extectedOutput);
@@ -262,10 +262,10 @@ public class MergeArgumentsTest extends AbstractLogicalCommandTest {
 		getContext().addArg(getCommandName(), newSetupFile.getAbsolutePath(), "master", "-m", "My message",
 				"--help");
 		getApp().start(getContext());
-		assertTrue(getLogicalCommand() instanceof LogicalMergeCommand);
-		LogicalMergeCommand mergeCmd = (LogicalMergeCommand)getLogicalCommand();
+		assertTrue(getLogicalCommand() instanceof MergeCommand);
+		MergeCommand mergeCmd = (MergeCommand)getLogicalCommand();
 		assertNotNull(mergeCmd.getCommit());
-		assertEquals("My message", ((LogicalMergeCommand)getLogicalCommand()).getMessage());
+		assertEquals("My message", ((MergeCommand)getLogicalCommand()).getMessage());
 
 	}
 }

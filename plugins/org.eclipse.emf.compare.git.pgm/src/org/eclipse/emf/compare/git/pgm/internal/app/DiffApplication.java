@@ -30,7 +30,7 @@ import org.eclipse.emf.compare.Comparison;
 import org.eclipse.emf.compare.EMFCompare;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.PathFilterHandler;
-import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
@@ -72,18 +72,18 @@ import org.kohsuke.args4j.Option;
  * @author <a href="mailto:axel.richard@obeo.fr">Axel Richard</a>
  */
 @SuppressWarnings({"restriction" })
-public class LogicalDiffApplication extends AbstractLogicalApplication {
+public class DiffApplication extends AbstractLogicalApplication {
 
 	/**
 	 * Holds the reference from which the differences should be displayed.
 	 */
-	@Argument(index = 2, multiValued = false, required = true, metaVar = "<commit>", usage = "Commit ID or branch name.", handler = RevCommitOptionHandler.class)
+	@Argument(index = 2, multiValued = false, required = true, metaVar = "<commit>", usage = "Commit ID or branch name.", handler = RevCommitHandler.class)
 	private RevCommit commit;
 
 	/**
 	 * Optional reference used to view the differences between {@link #commit} and {@link #commitWith}.
 	 */
-	@Argument(index = 3, multiValued = false, required = false, metaVar = "<compareWithCommit>", usage = "Commit ID or branch name. This is to view the changes between <commit> and <compareWithCommit> or HEAD if not specified.", handler = RevCommitOptionHandler.class)
+	@Argument(index = 3, multiValued = false, required = false, metaVar = "<compareWithCommit>", usage = "Commit ID or branch name. This is to view the changes between <commit> and <compareWithCommit> or HEAD if not specified.", handler = RevCommitHandler.class)
 	private RevCommit commitWith;
 
 	/**

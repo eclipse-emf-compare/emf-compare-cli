@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.cmd;
 
-import static org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalMergeCommand.LOGICAL_MERGE_CMD_NAME;
+import static org.eclipse.emf.compare.git.pgm.internal.cmd.MergeCommand.LOGICAL_MERGE_CMD_NAME;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -100,8 +100,8 @@ public class MergeIntegrationTest extends AbstractLogicalAppTest {
 		assertOutputMessageEnd("Already up to date." + EOL + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.COMPLETE.code(), result);
-		assertTrue(getLogicalCommand() instanceof LogicalMergeCommand);
-		LogicalMergeCommand mergeCmd = (LogicalMergeCommand)getLogicalCommand();
+		assertTrue(getLogicalCommand() instanceof MergeCommand);
+		MergeCommand mergeCmd = (MergeCommand)getLogicalCommand();
 		assertNotNull(mergeCmd.getCommit());
 	}
 
@@ -132,8 +132,8 @@ public class MergeIntegrationTest extends AbstractLogicalAppTest {
 		assertOutputMessageEnd("Already up to date." + EOL + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.COMPLETE.code(), result);
-		assertTrue(getLogicalCommand() instanceof LogicalMergeCommand);
-		LogicalMergeCommand mergeCmd = (LogicalMergeCommand)getLogicalCommand();
+		assertTrue(getLogicalCommand() instanceof MergeCommand);
+		MergeCommand mergeCmd = (MergeCommand)getLogicalCommand();
 		assertNotNull(mergeCmd.getCommit());
 	}
 
@@ -162,8 +162,8 @@ public class MergeIntegrationTest extends AbstractLogicalAppTest {
 		assertOutputMessageEnd("Already up to date." + EOL + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.COMPLETE.code(), result);
-		assertTrue(getLogicalCommand() instanceof LogicalMergeCommand);
-		LogicalMergeCommand mergeCmd = (LogicalMergeCommand)getLogicalCommand();
+		assertTrue(getLogicalCommand() instanceof MergeCommand);
+		MergeCommand mergeCmd = (MergeCommand)getLogicalCommand();
 		assertNotNull(mergeCmd.getCommit());
 	}
 
@@ -193,8 +193,8 @@ public class MergeIntegrationTest extends AbstractLogicalAppTest {
 		assertOutputMessageEnd("Already up to date." + EOL + EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.COMPLETE.code(), result);
-		assertTrue(getLogicalCommand() instanceof LogicalMergeCommand);
-		LogicalMergeCommand mergeCmd = (LogicalMergeCommand)getLogicalCommand();
+		assertTrue(getLogicalCommand() instanceof MergeCommand);
+		MergeCommand mergeCmd = (MergeCommand)getLogicalCommand();
 		assertNotNull(mergeCmd.getCommit());
 		assertEquals("My message", mergeCmd.getMessage());
 

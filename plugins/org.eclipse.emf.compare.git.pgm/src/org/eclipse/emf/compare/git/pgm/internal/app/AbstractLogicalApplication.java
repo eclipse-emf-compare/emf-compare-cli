@@ -47,7 +47,7 @@ import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.ProgressPageLog;
 import org.eclipse.emf.compare.git.pgm.internal.args.CmdLineParserRepositoryBuilder;
 import org.eclipse.emf.compare.git.pgm.internal.args.GitDirHandler;
-import org.eclipse.emf.compare.git.pgm.internal.args.SetupFileOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.SetupFileHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
@@ -116,7 +116,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	/**
 	 * Holds the Oomph model setup file.
 	 */
-	@Argument(index = 1, metaVar = "<setup>", required = true, usage = "Path to the setup file. The setup file is a Oomph model.", handler = SetupFileOptionHandler.class)
+	@Argument(index = 1, metaVar = "<setup>", required = true, usage = "Path to the setup file. The setup file is a Oomph model.", handler = SetupFileHandler.class)
 	protected File setupFile;
 
 	/**

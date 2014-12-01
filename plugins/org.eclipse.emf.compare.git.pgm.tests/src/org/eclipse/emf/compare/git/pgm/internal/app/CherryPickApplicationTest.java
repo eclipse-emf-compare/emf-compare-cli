@@ -31,7 +31,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Test;
 
 /**
- * Test of {@link LogicalCherryPickApplication}.
+ * Test of {@link CherryPickApplication}.
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
@@ -424,12 +424,12 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 
 	@Override
 	protected IApplication buildApp() {
-		return new LogicalCherryPickApplication();
+		return new CherryPickApplication();
 	}
 
 	@Override
-	protected LogicalCherryPickApplication getApp() {
-		return (LogicalCherryPickApplication)super.getApp();
+	protected CherryPickApplication getApp() {
+		return (CherryPickApplication)super.getApp();
 	}
 
 	private void runCommand(Returns expectedReturnCode) throws Exception {

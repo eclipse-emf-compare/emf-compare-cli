@@ -36,7 +36,7 @@ import org.kohsuke.args4j.spi.Setter;
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-public class RefOptionHandler extends OptionHandler<Ref> {
+public class RefHandler extends OptionHandler<Ref> {
 
 	/**
 	 * Constructor.
@@ -48,7 +48,7 @@ public class RefOptionHandler extends OptionHandler<Ref> {
 	 * @param setter
 	 *            {@link OptionHandler#setter}
 	 */
-	public RefOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super Ref> setter) {
+	public RefHandler(CmdLineParser parser, OptionDef option, Setter<? super Ref> setter) {
 		super(parser, option, setter);
 		Preconditions.checkArgument(parser instanceof CmdLineParserRepositoryBuilder);
 	}

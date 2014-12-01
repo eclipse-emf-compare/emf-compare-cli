@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm.internal.app;
 
-import static org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalRebaseCommand.ABORT_OPT;
-import static org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalRebaseCommand.CONTINUE_OPT;
-import static org.eclipse.emf.compare.git.pgm.internal.cmd.LogicalRebaseCommand.SKIP_OPT;
+import static org.eclipse.emf.compare.git.pgm.internal.cmd.RebaseCommand.ABORT_OPT;
+import static org.eclipse.emf.compare.git.pgm.internal.cmd.RebaseCommand.CONTINUE_OPT;
+import static org.eclipse.emf.compare.git.pgm.internal.cmd.RebaseCommand.SKIP_OPT;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.TAB;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.waitEgitJobs;
@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.egit.core.op.BranchOperation;
 import org.eclipse.egit.core.op.RebaseOperation;
 import org.eclipse.emf.compare.git.pgm.Returns;
-import org.eclipse.emf.compare.git.pgm.internal.args.RefOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RefHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
@@ -53,7 +53,7 @@ import org.kohsuke.args4j.Option;
  * </p>
  * <h4>Synopsis</h4>
  * <p>
- * logicalrebase &lt;setup&gt; [&lt;upstream&gt;] [&lt;branch&gt;] [--abort] [--continue] [--quit]
+ * logicalrebase &lt;setup&gt; [&lt;upstream&gt;] [&lt;branch&gt;] [--abort] [--continue] [--skip]
  * [--show-stack-trace] [--git-dir &lt;gitDirectory&gt;]
  * </p>
  * <h4>Description</h4>
@@ -64,14 +64,14 @@ import org.kohsuke.args4j.Option;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings({"restriction", "nls" })
-public class LogicalRebaseApplication extends AbstractLogicalApplication {
+public class RebaseApplication extends AbstractLogicalApplication {
 
 	/** Reference on top of which commits will be rebased. */
-	@Argument(index = 2, required = false, metaVar = "<upstream>", usage = "Upstream reference on top of which commits will be rebased.", handler = RefOptionHandler.class)
+	@Argument(index = 2, required = false, metaVar = "<upstream>", usage = "Upstream reference on top of which commits will be rebased.", handler = RefHandler.class)
 	private Ref upstream;
 
 	/** Reference to rebase. */
-	@Argument(index = 3, required = false, metaVar = "<branch>", usage = "Branch to rebase.", handler = RefOptionHandler.class)
+	@Argument(index = 3, required = false, metaVar = "<branch>", usage = "Branch to rebase.", handler = RefHandler.class)
 	private Ref toRebase;
 
 	/** Continue options. */

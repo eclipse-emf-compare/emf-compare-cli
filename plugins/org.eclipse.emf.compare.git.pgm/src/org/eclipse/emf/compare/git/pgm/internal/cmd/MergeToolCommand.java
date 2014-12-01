@@ -33,7 +33,7 @@ import org.eclipse.emf.compare.git.pgm.internal.util.LogicalApplicationLauncher;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("restriction")
-public class LogicalMergeToolCommand extends AbstractLogicalCommand {
+public class MergeToolCommand extends AbstractLogicalCommand {
 
 	/**
 	 * Command name.

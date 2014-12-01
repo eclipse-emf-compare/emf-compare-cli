@@ -37,7 +37,7 @@ public class DiffApplicationTest extends AbstractApplicationTest {
 	 */
 	@Override
 	protected IApplication buildApp() {
-		return new LogicalDiffApplication();
+		return new DiffApplication();
 	}
 
 	/**

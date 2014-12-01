@@ -171,7 +171,7 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 */
 	@Override
 	protected IApplication buildApp() {
-		return new LogicalMergeApplication();
+		return new MergeApplication();
 	}
 
 	/**
@@ -242,8 +242,8 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#getApp()
 	 */
 	@Override
-	protected LogicalMergeApplication getApp() {
-		return (LogicalMergeApplication)super.getApp();
+	protected MergeApplication getApp() {
+		return (MergeApplication)super.getApp();
 	}
 
 	/**

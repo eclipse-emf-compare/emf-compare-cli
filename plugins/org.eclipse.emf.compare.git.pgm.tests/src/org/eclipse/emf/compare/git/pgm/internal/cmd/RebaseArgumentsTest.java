@@ -40,7 +40,7 @@ public class RebaseArgumentsTest extends AbstractLogicalCommandTest {
 
 	@Override
 	protected String getCommandName() {
-		return LogicalRebaseCommand.LOGICAL_REBASE_CMD_NAME;
+		return RebaseCommand.LOGICAL_REBASE_CMD_NAME;
 	}
 
 	@Override

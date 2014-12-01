@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 import org.eclipse.emf.compare.git.pgm.Returns;
-import org.eclipse.emf.compare.git.pgm.internal.args.RefOptionHandler;
+import org.eclipse.emf.compare.git.pgm.internal.args.RefHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.util.LogicalApplicationLauncher;
@@ -56,29 +56,29 @@ import org.kohsuke.args4j.Option;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class LogicalRebaseCommand extends AbstractLogicalCommand {
-
-	/** Skip option key. */
-	public static final String SKIP_OPT = "--skip"; //$NON-NLS-1$
-
-	/** Abort option key. */
-	public static final String ABORT_OPT = "--abort"; //$NON-NLS-1$
-
-	/** Continue option key. */
-	public static final String CONTINUE_OPT = "--continue"; //$NON-NLS-1$
+public class RebaseCommand extends AbstractLogicalCommand {
 
 	/** Command name. */
 	static final String LOGICAL_REBASE_CMD_NAME = "logicalrebase"; //$NON-NLS-1$
 
 	/** Id of the logicalrebase application. */
-	static final String LOGICALCHERRYPICK_APP_ID = "emf.compare.git.logicalrebase"; //$NON-NLS-1$
+	static final String LOGICAL_REBASE_APP_ID = "emf.compare.git.logicalrebase"; //$NON-NLS-1$
+
+	/** Continue option key. */
+	public static final String CONTINUE_OPT = "--continue"; //$NON-NLS-1$
+
+	/** Abort option key. */
+	public static final String ABORT_OPT = "--abort"; //$NON-NLS-1$
+
+	/** Skip option key. */
+	public static final String SKIP_OPT = "--skip"; //$NON-NLS-1$
 
 	/** Reference on top of which commits will be rebased. */
-	@Argument(index = 1, required = false, metaVar = "<upstream>", usage = "Upstream reference on top of which commits will be rebased.", handler = RefOptionHandler.class)
+	@Argument(index = 1, required = false, metaVar = "<upstream>", usage = "Upstream reference on top of which commits will be rebased.", handler = RefHandler.class)
 	private Ref upstream;
 
 	/** Reference to rebase. */
-	@Argument(index = 2, required = false, metaVar = "<branch>", usage = "Branch to rebase.", handler = RefOptionHandler.class)
+	@Argument(index = 2, required = false, metaVar = "<branch>", usage = "Branch to rebase.", handler = RefHandler.class)
 	private Ref toRebase;
 
 	/** Continue option. */
@@ -123,7 +123,7 @@ public class LogicalRebaseCommand extends AbstractLogicalCommand {
 
 		//@formatter:off
 		LogicalApplicationLauncher appLauncher = new LogicalApplicationLauncher(out())
-				.setApplicationName(LOGICALCHERRYPICK_APP_ID)
+				.setApplicationName(LOGICAL_REBASE_APP_ID)
 				.setEclipsePath(eclipseFile.toString())
 				.setSetupFilePath(setupFileAbsolutePath)
 				.setWorkspaceLocation(workspaceLocation)

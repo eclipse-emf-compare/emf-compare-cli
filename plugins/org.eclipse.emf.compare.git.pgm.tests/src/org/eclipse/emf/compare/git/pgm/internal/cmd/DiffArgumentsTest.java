@@ -24,7 +24,7 @@ import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
 import org.junit.Test;
 
 /**
- * Test of {@link LogicalDiffCommand}.
+ * Test of {@link DiffCommand}.
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
@@ -38,7 +38,7 @@ public class DiffArgumentsTest extends AbstractLogicalCommandTest {
 	 */
 	@Override
 	protected String getCommandName() {
-		return LogicalDiffCommand.LOGICAL_DIFF_CMD_NAME;
+		return DiffCommand.LOGICAL_DIFF_CMD_NAME;
 	}
 
 	/**
@@ -189,8 +189,8 @@ public class DiffArgumentsTest extends AbstractLogicalCommandTest {
 	// Object result = getApp().start(context);
 	// assertOutputs("", "");
 	// assertEquals(Returns.COMPLETE, result);
-	// assertTrue(getLogicalCommand() instanceof LogicalDiffCommand);
-	// LogicalDiffCommand diffCmd = (LogicalDiffCommand)getLogicalCommand();
+	// assertTrue(getLogicalCommand() instanceof DiffCommand);
+	// DiffCommand diffCmd = (DiffCommand)getLogicalCommand();
 	// assertNotNull(diffCmd.getPathFilter());
 	// assertNotNull(diffCmd.getCommit());
 	// assertNull(diffCmd.getOptionalCommit());
