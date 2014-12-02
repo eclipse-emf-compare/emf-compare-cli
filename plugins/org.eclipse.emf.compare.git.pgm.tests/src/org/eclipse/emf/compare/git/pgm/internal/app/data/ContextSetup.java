@@ -1455,4 +1455,60 @@ public class ContextSetup {
 		userSetupFile = createPapyrusUserOomphModel(project);
 	}
 
+	/**
+	 * <h3>History</h3>
+	 * 
+	 * <pre>
+	 * * Deletes C1 [branch_c, HEAD]
+	 * |
+	 * | * Moves C1 to P2 [branch_b]
+	 * |/ 
+	 * |  
+	 * Creates C1 in P1 & P2 [branch_a]
+	 * </pre>
+	 * 
+	 * @throws Exception
+	 */
+	public void setupREB011() throws Exception {
+		projectPath = getRepositoryPath().resolve("REB011");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("conflicts/REB011/branch_a/model.di")//
+				.addContentToCopy("conflicts/REB011/branch_a/model.uml") //
+				.addContentToCopy("conflicts/REB011/branch_a/model.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Creates C1 in P1 & P2");
+
+		String branchA = "branch_a";
+		createBranch(branchA, "master");
+
+		// Creates branch b
+		String branchB = "branch_b";
+		createBranchAndCheckout(branchB, branchA);
+
+		new ProjectBuilder(this) //
+				.clean(true) //
+				.addContentToCopy("conflicts/REB011/branch_b/model.di")//
+				.addContentToCopy("conflicts/REB011/branch_b/model.uml") //
+				.addContentToCopy("conflicts/REB011/branch_b/model.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Moves C1 to P2");
+
+		String branchC = "branch_c";
+		createBranchAndCheckout(branchC, branchA);
+
+		new ProjectBuilder(this) //
+				.clean(true) //
+				.addContentToCopy("conflicts/REB011/branch_c/model.di")//
+				.addContentToCopy("conflicts/REB011/branch_c/model.uml") //
+				.addContentToCopy("conflicts/REB011/branch_c/model.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Deletes C1");
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
 }

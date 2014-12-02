@@ -511,6 +511,31 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 
 	}
 
+	/**
+	 * @see ContextSetup#setupREB011()
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE011() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB011();
+
+		runCherryPick(Returns.ABORTED, "branch_b");
+
+		assertOutputMessageEnd(getExpectedConflictMessage("[" + getShortId("branch_b")
+				+ "]... Moves C1 to P2"));
+
+		// Checks that the expected file are marked as conflicting
+		assertEquals(Sets.newHashSet("REB011/model.notation", "REB011/model.uml"), getGit().status().call()
+				.getConflicting());
+		// Checks that the model files were not corrupted by <<< and >>> markers.
+		Path projectPath = contextSetup.getProjectPath();
+		assertNoConflitMarker(projectPath.resolve("model.uml"), //
+				projectPath.resolve("model.notation"),//
+				projectPath.resolve("model.di"));
+
+	}
+
 	@Override
 	protected IApplication buildApp() {
 		return new CherryPickApplication();

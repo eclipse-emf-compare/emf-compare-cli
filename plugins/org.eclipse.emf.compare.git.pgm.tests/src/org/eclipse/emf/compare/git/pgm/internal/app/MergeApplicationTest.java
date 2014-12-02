@@ -649,6 +649,34 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		assertEquals(expectedConflictingFilePath, getGit().status().call().getConflicting());
 	}
 
+	/**
+	 * @see ContextSetup#setupREB011()
+	 * @throws Exception
+	 */
+	@Test
+	public void testMER011() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB011();
+
+		runMerge(Returns.ABORTED, "branch_b");
+
+		StringBuilder expectedOut = new StringBuilder();
+		expectedOut.append("Auto-merging failed in ").append("REB011/model.notation").append(EOL);
+		expectedOut.append("Auto-merging failed in ").append("REB011/model.uml").append(EOL);
+		expectedOut.append("Automatic merge failed; fix conflicts and then commit the result.").append(EOL)
+				.append(EOL);
+		assertOutputMessageEnd(expectedOut.toString());
+
+		// Checks that the expected file are marked as conflicting
+		assertEquals(Sets.newHashSet("REB011/model.notation", "REB011/model.uml"), getGit().status().call()
+				.getConflicting());
+		// Checks that the model files were not corrupted by <<< and >>> markers.
+		Path projectPath = contextSetup.getProjectPath();
+		assertNoConflitMarker(projectPath.resolve("model.uml"), //
+				projectPath.resolve("model.notation"),//
+				projectPath.resolve("model.di"));
+	}
+
 	private void runCommand(Returns expectedReturnCode) throws Exception {
 		resetApp();
 		// Runs command

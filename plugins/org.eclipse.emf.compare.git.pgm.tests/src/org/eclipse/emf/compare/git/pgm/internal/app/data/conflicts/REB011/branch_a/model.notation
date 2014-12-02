@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmlns:style="http://www.eclipse.org/papyrus/infra/viewpoints/policy/style" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_qNdngHoyEeSekqb7so0TcA" type="PapyrusUMLClassDiagram" name="ClassDiagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Shape" xmi:id="_sm3H0HoyEeSekqb7so0TcA" type="2007">
+    <children xmi:type="notation:DecorationNode" xmi:id="_sm7ZQHoyEeSekqb7so0TcA" type="5026"/>
+    <children xmi:type="notation:DecorationNode" xmi:id="_sm8AUHoyEeSekqb7so0TcA" type="7016">
+      <children xmi:type="notation:Shape" xmi:id="_tTPssHoyEeSekqb7so0TcA" type="3010">
+        <children xmi:type="notation:DecorationNode" xmi:id="_tTQTwHoyEeSekqb7so0TcA" type="5014"/>
+        <children xmi:type="notation:BasicCompartment" xmi:id="_tTQ60HoyEeSekqb7so0TcA" type="7011">
+          <styles xmi:type="notation:TitleStyle" xmi:id="_tTQ60XoyEeSekqb7so0TcA"/>
+          <styles xmi:type="notation:SortingStyle" xmi:id="_tTQ60noyEeSekqb7so0TcA"/>
+          <styles xmi:type="notation:FilteringStyle" xmi:id="_tTQ603oyEeSekqb7so0TcA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tTQ61HoyEeSekqb7so0TcA"/>
+        </children>
+        <children xmi:type="notation:BasicCompartment" xmi:id="_tTRh4HoyEeSekqb7so0TcA" type="7012">
+          <styles xmi:type="notation:TitleStyle" xmi:id="_tTRh4XoyEeSekqb7so0TcA"/>
+          <styles xmi:type="notation:SortingStyle" xmi:id="_tTRh4noyEeSekqb7so0TcA"/>
+          <styles xmi:type="notation:FilteringStyle" xmi:id="_tTRh43oyEeSekqb7so0TcA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tTRh5HoyEeSekqb7so0TcA"/>
+        </children>
+        <children xmi:type="notation:BasicCompartment" xmi:id="_tTSI8HoyEeSekqb7so0TcA" type="7013">
+          <styles xmi:type="notation:TitleStyle" xmi:id="_tTSI8XoyEeSekqb7so0TcA"/>
+          <styles xmi:type="notation:SortingStyle" xmi:id="_tTSI8noyEeSekqb7so0TcA"/>
+          <styles xmi:type="notation:FilteringStyle" xmi:id="_tTSI83oyEeSekqb7so0TcA"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tTSI9HoyEeSekqb7so0TcA"/>
+        </children>
+        <element xmi:type="uml:Class" href="model.uml#_tSfewHoyEeSekqb7so0TcA"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tTPssXoyEeSekqb7so0TcA" x="89" y="67"/>
+      </children>
+      <styles xmi:type="notation:TitleStyle" xmi:id="_sm8AUXoyEeSekqb7so0TcA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_sm8AUnoyEeSekqb7so0TcA"/>
+    </children>
+    <element xmi:type="uml:Package" href="model.uml#_slmjkHoyEeSekqb7so0TcA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_sm3H0XoyEeSekqb7so0TcA" x="137" y="195" width="525" height="443"/>
+  </children>
+  <children xmi:type="notation:Shape" xmi:id="_wAdrcHozEeSekqb7so0TcA" type="2007">
+    <children xmi:type="notation:DecorationNode" xmi:id="_wAfgoHozEeSekqb7so0TcA" type="5026"/>
+    <children xmi:type="notation:DecorationNode" xmi:id="_wAij8HozEeSekqb7so0TcA" type="7016">
+      <styles xmi:type="notation:TitleStyle" xmi:id="_wAij8XozEeSekqb7so0TcA"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wAij8nozEeSekqb7so0TcA"/>
+    </children>
+    <element xmi:type="uml:Package" href="model.uml#_wAZaAHozEeSekqb7so0TcA"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_wAdrcXozEeSekqb7so0TcA" x="137" y="663" width="527" height="198"/>
+  </children>
+  <styles xmi:type="notation:StringValueStyle" xmi:id="_qNdngXoyEeSekqb7so0TcA" name="diagram_compatibility_version" stringValue="1.0.0"/>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_qNdngnoyEeSekqb7so0TcA"/>
+  <styles xmi:type="style:PapyrusViewStyle" xmi:id="_qNdng3oyEeSekqb7so0TcA">
+    <owner xmi:type="uml:Model" href="model.uml#_lzuAEHoyEeSekqb7so0TcA"/>
+  </styles>
+  <element xmi:type="uml:Model" href="model.uml#_lzuAEHoyEeSekqb7so0TcA"/>
+</notation:Diagram>

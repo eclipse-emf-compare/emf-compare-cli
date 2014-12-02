@@ -1094,6 +1094,42 @@ public class RebaseApplicationTest extends AbstractLogicalCommandApplicationTest
 				projectPath.resolve("P2.di"));
 	}
 
+	/**
+	 * @see ContextSetup#setupREB011()
+	 * @throws Exception
+	 */
+	@Test
+	public void testREB011() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB011();
+
+		runRebase(Returns.ABORTED, "branch_b");
+
+		String id = getShortId("branch_c");
+		String msg = "Has rewinded head to replay your work on top of.." + EOL;
+		msg += "error: Could not apply [" + id + "] Deletes C1" + EOL;
+		msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
+		msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
+		msg += "hint: by adding them to the index (Team > Add to index) or" + EOL;
+		msg += "hint: by removing them from the index (Team > Remove from index)." + EOL;
+		msg += "hint: Do NOT commit, use one of the following commands instead" + EOL;
+		msg += "hint:  git logicalrebase --continue : to continue the rebase operation" + EOL;
+		msg += "hint:  git logicalrebase --abort : to abort the rebase operation" + EOL;
+		msg += "hint:  git logicalrebase --skip : to skip this commit" + EOL + EOL;
+
+		assertOutputMessageEnd(msg);
+
+		// Checks that the expected file are marked as conflicting
+		assertEquals(Sets.newHashSet("REB011/model.notation", "REB011/model.uml"), getGit().status().call()
+				.getConflicting());
+		// Checks that the model files were not corrupted by <<< and >>> markers.
+		Path projectPath = contextSetup.getProjectPath();
+		assertNoConflitMarker(projectPath.resolve("model.uml"), //
+				projectPath.resolve("model.notation"),//
+				projectPath.resolve("model.di"));
+
+	}
+
 	private void runCommand(Returns expectedReturnCode) throws Exception {
 		resetApp();
 		// Runs command
