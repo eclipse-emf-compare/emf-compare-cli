@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.Sets;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -176,7 +177,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 				contextSetup.getUserSetupFile().getAbsolutePath(), getShortId("branch_a"));
 
 		runCommand(Returns.COMPLETE);
-
 		assertOutputMessageEnd("Already up to date." + EOL + EOL);
 
 		assertTrue(getGit().status().call().isClean());
@@ -445,6 +445,43 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		assertNoConflitMarker(projectPath.resolve("model.uml"), //
 				projectPath.resolve("model.notation"),//
 				projectPath.resolve("model.di"));
+	}
+
+	/**
+	 * @see ContextSetup#setupREB014()
+	 * @throws Exception
+	 */
+	@Test
+	public void testMER014() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB014();
+
+		runMerge(Returns.ABORTED, "branch_b");
+
+		StringBuilder expectedOut = new StringBuilder();
+		expectedOut.append("Auto-merging failed in ").append("REB014/P1.uml").append(EOL);
+		expectedOut.append("Auto-merging failed in ").append("REB014/P2.uml").append(EOL);
+		expectedOut.append("Auto-merging failed in ").append("REB014/model.notation").append(EOL);
+		expectedOut.append("Automatic merge failed; fix conflicts and then commit the result.").append(EOL)
+				.append(EOL);
+		assertOutputMessageEnd(expectedOut.toString());
+
+		// Checks that the expected file are marked as conflicting
+		HashSet<String> conflictingFile = Sets.newHashSet("REB014/model.notation",//
+				"REB014/P1.uml",//
+				"REB014/P2.uml");
+		assertEquals(conflictingFile, getGit().status().call().getConflicting());
+		// Checks that the model files were not corrupted by <<< and >>> markers.
+		Path projectPath = contextSetup.getProjectPath();
+		assertNoConflitMarker(projectPath.resolve("model.uml"), //
+				projectPath.resolve("model.notation"),//
+				projectPath.resolve("model.di"),//
+				projectPath.resolve("P1.uml"),//
+				projectPath.resolve("P1.notation"),//
+				projectPath.resolve("P1.di"),//
+				projectPath.resolve("P2.uml"),//
+				projectPath.resolve("P2.notation"),//
+				projectPath.resolve("P2.di"));
 	}
 
 	/**

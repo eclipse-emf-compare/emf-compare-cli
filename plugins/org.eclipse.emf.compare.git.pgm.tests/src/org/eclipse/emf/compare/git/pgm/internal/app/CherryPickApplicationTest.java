@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import com.google.common.collect.Sets;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -211,6 +212,39 @@ public class CherryPickApplicationTest extends AbstractApplicationTest {
 				projectPath.resolve("model.notation"),//
 				projectPath.resolve("model.di"));
 
+	}
+
+	/**
+	 * @see ContextSetup#setupREB014()
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE014() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB014();
+
+		runCherryPick(Returns.ABORTED, "branch_b");
+
+		assertOutputMessageEnd(getExpectedConflictMessage("[" + getShortId("branch_b")
+				+ "]... Creates association between C1 & C2", null)
+				+ EOL);
+
+		// Checks that the expected file are marked as conflicting
+		HashSet<String> conflictingFile = Sets.newHashSet("REB014/model.notation",//
+				"REB014/P1.uml",//
+				"REB014/P2.uml");
+		assertEquals(conflictingFile, getGit().status().call().getConflicting());
+		// Checks that the model files were not corrupted by <<< and >>> markers.
+		Path projectPath = contextSetup.getProjectPath();
+		assertNoConflitMarker(projectPath.resolve("model.uml"), //
+				projectPath.resolve("model.notation"),//
+				projectPath.resolve("model.di"),//
+				projectPath.resolve("P1.uml"),//
+				projectPath.resolve("P1.notation"),//
+				projectPath.resolve("P1.di"),//
+				projectPath.resolve("P2.uml"),//
+				projectPath.resolve("P2.notation"),//
+				projectPath.resolve("P2.di"));
 	}
 
 	/**
