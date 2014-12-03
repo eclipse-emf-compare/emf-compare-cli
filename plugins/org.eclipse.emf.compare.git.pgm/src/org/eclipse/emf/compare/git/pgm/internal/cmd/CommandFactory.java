@@ -38,6 +38,7 @@ public final class CommandFactory {
 		cmds.put(DiffCommand.LOGICAL_DIFF_CMD_NAME, DiffCommand.class);
 		cmds.put(CherryPickCommand.LOGICAL_CHERRY_PICK_CMD_NAME, CherryPickCommand.class);
 		cmds.put(RebaseCommand.LOGICAL_REBASE_CMD_NAME, RebaseCommand.class);
+		cmds.put(PullCommand.LOGICAL_PULL_CMD_NAME, PullCommand.class);
 	}
 
 	/**

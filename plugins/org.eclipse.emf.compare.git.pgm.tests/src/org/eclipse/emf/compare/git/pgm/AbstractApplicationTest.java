@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IWorkspace;
@@ -294,6 +295,16 @@ public abstract class AbstractApplicationTest {
 				.setURI(gitToClone.getRepository().getDirectory().getAbsolutePath()) //
 				.setBare(false) //
 				.setCloneAllBranches(true) //
+				.call();
+	}
+
+	protected Git createClone(Git gitToClone, Collection<String> branchesToClone)
+			throws InvalidRemoteException, TransportException, GitAPIException, IOException {
+		Path newRepoFile = Files.createTempDirectory(testTmpFolder, REPO_PREFIX, new FileAttribute<?>[] {});
+		return Git.cloneRepository().setDirectory(newRepoFile.toFile()) //
+				.setURI(gitToClone.getRepository().getDirectory().getAbsolutePath()) //
+				.setBare(false) //
+				.setBranchesToClone(branchesToClone) //
 				.call();
 	}
 

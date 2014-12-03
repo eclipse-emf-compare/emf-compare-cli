@@ -85,7 +85,7 @@ public class CherryPickCommand extends AbstractLogicalCommand {
 	private boolean quitOpt;
 
 	/** Option debug. */
-	@Option(name = "--debug", usage = "Launched the provisionned eclipse in debug mode.", aliases = {"-d" })
+	@Option(name = "--debug", usage = "Launches the provisionned eclipse in debug mode.", aliases = {"-d" })
 	private boolean debug;
 
 	@Override

@@ -165,91 +165,9 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#buildApp()
-	 */
-	@Override
-	protected IApplication buildApp() {
-		return new MergeApplication();
-	}
-
-	/**
-	 * Create a Oomph setup file being able to handle the merge of a Papyrus model.
-	 * 
-	 * @param project
-	 * @return
-	 * @throws IOException
-	 */
-	private File createPapyrusUserOomphModel(File... project) throws IOException {
-		return createPapyrusUserOomphModel(getTestTmpFolder().resolve("setup.setup"), project);
-	}
-
-	private File createPapyrusUserOomphModel(Path setupFilePath, File... project) throws IOException {
-		OomphUserModelBuilder userModelBuilder = new OomphUserModelBuilder();
-		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
-		File userSetupFile = userModelBuilder.setInstallationLocation(oomphFolderPath.toString()) //
-				.setWorkspaceLocation(getWorkspaceLocation().getAbsolutePath()) //
-				.setProjectPaths(Arrays.stream(project).map(p -> p.getAbsolutePath()).toArray(String[]::new)) //
-				.setRepositories("http://download.eclipse.org/releases/luna/201409261001",
-						"http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest/",
-						"http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/luna") //
-				.setRequirements("org.eclipse.uml2.feature.group",
-						"org.eclipse.papyrus.sdk.feature.feature.group",
-						"org.eclipse.emf.compare.rcp.ui.feature.group",
-						"org.eclipse.emf.compare.uml2.feature.group",
-						"org.eclipse.emf.compare.diagram.gmf.feature.group",
-						"org.eclipse.emf.compare.diagram.papyrus.feature.group") //
-				.saveTo(setupFilePath.toString());
-		return userSetupFile;
-	}
-
-	/**
-	 * Assert that there is no conflict marker in the file (( <<<<<<<<<< or ========= or >>>>>>>>>>>). In fact
-	 * this test try to load the resource.
-	 * 
-	 * @param paths
-	 * @throws IOException
-	 * @throws AssertionError
-	 */
-	private void assertNoConflitMarker(Path... paths) throws AssertionError, IOException {
-		ResourceSet resourceSet = new ResourceSetImpl();
-		for (Path p : paths) {
-			try {
-				Resource resource = resourceSet.getResource(URI.createFileURI(p.toString()), true);
-				assertNotNull(resource);
-			} catch (Exception e) {
-				throw new AssertionError("Error wile parsing resource " + p.toString() + EOL
-						+ getConfigurationMessage(), e);
-			}
-		}
-	}
-
-	private void assertExistInResource(Path resourcePath, String... fragments) throws IOException {
-		ResourceSet resourceSet = new ResourceSetImpl();
-		Resource resource = resourceSet.getResource(URI.createFileURI(resourcePath.toString()), true);
-		assertNotNull(resource);
-		for (String fragment : fragments) {
-			EObject eObject = resource.getEObject(fragment);
-			assertNotNull("Element with framgment " + fragment + " does not exist" + EOL
-					+ getConfigurationMessage(), eObject);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#getApp()
-	 */
-	@Override
-	protected MergeApplication getApp() {
-		return (MergeApplication)super.getApp();
-	}
-
-	/**
 	 * <h3>Use case MER001</h3>
 	 * <p>
-	 * This use case is used to achive a conflicting merge
+	 * This use case is used to achieve a conflicting merge
 	 * </p>
 	 * 
 	 * @see ContextSetup#setupMER001()
@@ -377,7 +295,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		addAllAndCommit("Initial commit [PapyrusProject3]");
 		createBranch(branchA, "master");
 
-
 		// Creates Oomph model
 		File userSetupFile = createPapyrusUserOomphModel(project);
 
@@ -423,7 +340,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		String branchA = "branch_a";
 		addAllAndCommit("Initial commit [PapyrusProject3]");
 		createBranch(branchA, "master");
-
 
 		Path folderWithComplexePath = getRepositoryPath().resolve("Folder with space & special char");
 		folderWithComplexePath.toFile().mkdirs();
@@ -475,7 +391,6 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		String branchA = "branch_a";
 		addAllAndCommit("Initial commit [PapyrusProject3]");
 		createBranch(branchA, "master");
-
 
 		Path folder = getRepositoryPath().resolve("a" + SEP + "b" + SEP + "c");
 		folder.toFile().mkdirs();
@@ -617,7 +532,7 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	/**
 	 * <h3>Test MER006</h3>
 	 * <p>
-	 * Successives conflicts on multiple models in multiple files (one file per model)
+	 * Successive conflicts on multiple models in multiple files (one file per model)
 	 * </p>
 	 * 
 	 * @see ContextSetup#setupMER006()
@@ -650,6 +565,36 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	}
 
 	/**
+	 * <h3>Use case MER008</h3>
+	 * <p>
+	 * Single conflict on a fragmented model in multiple files (two files per model)
+	 * </p>
+	 * 
+	 * @see ContextSetup#setupMER008()
+	 * @throws Exception
+	 */
+	@Test
+	public void testMER008() throws Exception {
+		// implement this test once https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709 resolved
+	}
+
+	/**
+	 * <h3>Use case MER009</h3>
+	 * <p>
+	 * Single conflict on a fragmented model in multiple files (two files per model)
+	 * </p>
+	 * 
+	 * @see ContextSetup#setupMER009()
+	 * @throws Exception
+	 */
+	@Test
+	public void testMER009() throws Exception {
+		// implement this test once https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709 resolved
+	}
+
+	/**
+	 * Model conflict but no textual conflict.
+	 * 
 	 * @see ContextSetup#setupREB011()
 	 * @throws Exception
 	 */
@@ -675,6 +620,88 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		assertNoConflitMarker(projectPath.resolve("model.uml"), //
 				projectPath.resolve("model.notation"),//
 				projectPath.resolve("model.di"));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#buildApp()
+	 */
+	@Override
+	protected IApplication buildApp() {
+		return new MergeApplication();
+	}
+
+	/**
+	 * Create a Oomph setup file being able to handle the merge of a Papyrus model.
+	 * 
+	 * @param project
+	 * @return
+	 * @throws IOException
+	 */
+	private File createPapyrusUserOomphModel(File... project) throws IOException {
+		return createPapyrusUserOomphModel(getTestTmpFolder().resolve("setup.setup"), project);
+	}
+
+	private File createPapyrusUserOomphModel(Path setupFilePath, File... project) throws IOException {
+		OomphUserModelBuilder userModelBuilder = new OomphUserModelBuilder();
+		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
+		File userSetupFile = userModelBuilder.setInstallationLocation(oomphFolderPath.toString()) //
+				.setWorkspaceLocation(getWorkspaceLocation().getAbsolutePath()) //
+				.setProjectPaths(Arrays.stream(project).map(p -> p.getAbsolutePath()).toArray(String[]::new)) //
+				.setRepositories("http://download.eclipse.org/releases/luna/201409261001",
+						"http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest/",
+						"http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/luna") //
+				.setRequirements("org.eclipse.uml2.feature.group",
+						"org.eclipse.papyrus.sdk.feature.feature.group",
+						"org.eclipse.emf.compare.rcp.ui.feature.group",
+						"org.eclipse.emf.compare.uml2.feature.group",
+						"org.eclipse.emf.compare.diagram.gmf.feature.group",
+						"org.eclipse.emf.compare.diagram.papyrus.feature.group") //
+				.saveTo(setupFilePath.toString());
+		return userSetupFile;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#getApp()
+	 */
+	@Override
+	protected MergeApplication getApp() {
+		return (MergeApplication)super.getApp();
+	}
+
+	/**
+	 * Assert that there is no conflict marker in the file (( <<<<<<<<<< or ========= or >>>>>>>>>>>). In fact
+	 * this test try to load the resource.
+	 * 
+	 * @param paths
+	 * @throws IOException
+	 * @throws AssertionError
+	 */
+	private void assertNoConflitMarker(Path... paths) throws AssertionError, IOException {
+		ResourceSet resourceSet = new ResourceSetImpl();
+		for (Path p : paths) {
+			try {
+				Resource resource = resourceSet.getResource(URI.createFileURI(p.toString()), true);
+				assertNotNull(resource);
+			} catch (Exception e) {
+				throw new AssertionError("Error wile parsing resource " + p.toString() + EOL
+						+ getConfigurationMessage(), e);
+			}
+		}
+	}
+
+	private void assertExistInResource(Path resourcePath, String... fragments) throws IOException {
+		ResourceSet resourceSet = new ResourceSetImpl();
+		Resource resource = resourceSet.getResource(URI.createFileURI(resourcePath.toString()), true);
+		assertNotNull(resource);
+		for (String fragment : fragments) {
+			EObject eObject = resource.getEObject(fragment);
+			assertNotNull("Element with framgment " + fragment + " does not exist" + EOL
+					+ getConfigurationMessage(), eObject);
+		}
 	}
 
 	private void runCommand(Returns expectedReturnCode) throws Exception {

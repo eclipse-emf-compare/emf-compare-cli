@@ -47,7 +47,7 @@ public class MergeArgumentsTest extends AbstractLogicalCommandTest {
 				+ " <setup>                 : Path to the setup file. The setup file is a Oomph" + EOL 
 				+ "                           model." +EOL
 				+ " <commit>                : Commit ID or branch name to merge." + EOL 
-				+ " --debug (-d)            : Launched the provisionned eclipse in debug mode."+ EOL
+				+ " --debug (-d)            : Launches the provisionned eclipse in debug mode."+ EOL
 				+ " --git-dir gitFolderPath : Path to the .git folder of your repository."+ EOL
 				+ " --help (-h)             : Dispays help for this command." + EOL 
 				+ " --show-stack-trace      : Use this option to display java stack trace in" + EOL

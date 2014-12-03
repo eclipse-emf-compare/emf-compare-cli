@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Class xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_mqPRAHVTEeScI5AIfi-cqA" name="Class1">
+  <ownedAttribute xmi:type="uml:Property" xmi:id="_M6nbsHVUEeScI5AIfi-cqA" name="Attr2"/>
+</uml:Class>

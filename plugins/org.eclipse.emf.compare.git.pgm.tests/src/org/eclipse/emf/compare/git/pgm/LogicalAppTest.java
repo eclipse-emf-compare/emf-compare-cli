@@ -31,6 +31,7 @@ public class LogicalAppTest extends AbstractLogicalAppTest {
 				+ "logicaldiff" + EOL
 				+ "logicalmerge" + EOL
 				+ "logicalmergetool" + EOL
+				+ "logicalpull" + EOL
 				+ "logicalrebase" + EOL;
 		//@formatter:on
 	}

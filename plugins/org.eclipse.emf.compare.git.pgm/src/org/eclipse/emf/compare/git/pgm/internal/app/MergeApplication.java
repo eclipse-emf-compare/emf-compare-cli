@@ -184,7 +184,7 @@ public class MergeApplication extends AbstractLogicalApplication {
 	 * @return a message.
 	 */
 	private String buildConflictingMessage(MergeResult mergeResult) {
-		final StringBuilder messageBuildder = new StringBuilder();
+		final StringBuilder messageBuilder = new StringBuilder();
 		try {
 			// Should use mergeResult.getConflicting() however due to its random result we prefer using the
 			// status of the git repository.
@@ -193,7 +193,7 @@ public class MergeApplication extends AbstractLogicalApplication {
 			// In order to have a determinist order.
 			Collections.sort(conflictingFile);
 			for (String conflicting : conflictingFile) {
-				messageBuildder.append("Auto-merging failed in ").append(conflicting).append(EOL);
+				messageBuilder.append("Auto-merging failed in ").append(conflicting).append(EOL);
 
 			}
 		} catch (NoWorkTreeException e) {
@@ -201,10 +201,10 @@ public class MergeApplication extends AbstractLogicalApplication {
 		} catch (GitAPIException e) {
 			// Does nothing since this for console message
 		}
-		messageBuildder.append("Automatic merge failed; fix conflicts and then commit the result.").append(
-				EOL);
+		messageBuilder.append("Automatic merge failed; fix conflicts and then commit the result.")
+				.append(EOL);
 
-		return messageBuildder.toString();
+		return messageBuilder.toString();
 	}
 
 	/**

@@ -112,7 +112,7 @@ public class ProjectBuilder {
 
 	protected File createProject(Path projectPath) throws IOException {
 		File project = projectPath.toFile();
-		if (!project.mkdirs()) {
+		if (!project.exists() && !project.mkdirs()) {
 			throw new AssertionError("Can create a project at " + projectPath.toString());
 		}
 		// Creates ".project" file

@@ -183,42 +183,6 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	}
 
 	/**
-	 * @see ContextSetup#setupREB016()
-	 * @throws Exception
-	 */
-	@Test
-	public void testCHE016() throws Exception {
-		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
-		contextSetup.setupREB016();
-
-		runCherryPick(Returns.COMPLETE, "branch_b");
-
-		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD") + "] Creates C1 in P1"));
-
-		assertLog("Creates C1 in P1",//
-				"Adds in.txt && out.txt",//
-				"Creates P1");
-
-		Path projectPath = contextSetup.getProjectPath();
-		final String p1FragmentId = "_142C4HlpEeSjSr5E4B1VMw";
-		final String c1FragmentId = "_Di70UHlqEeSjSr5E4B1VMw";
-		assertExistInResource(projectPath.resolve("model.uml"), //
-				p1FragmentId, //
-				c1FragmentId);
-
-		final String p1ShapeFragmentId = "_16b-UHlpEeSjSr5E4B1VMw";
-		final String c1ShapeFragmentId = "_Di_esHlqEeSjSr5E4B1VMw";
-		assertExistInResource(projectPath.resolve("model.notation"), //
-				c1ShapeFragmentId,//
-				p1ShapeFragmentId);
-
-		// Checks the content of the test file located in the workspace
-		assertFileContent(contextSetup.getProjectPath().resolve("in.txt"), LYRICS_1 + EOL);
-		// Check the content of the test file located in the workspace
-		assertFileContent(contextSetup.getProjectPath().resolve("../out.txt"), LYRICS_1 + EOL);
-	}
-
-	/**
 	 * <p>
 	 * This use case aims to test a logical cherry-pick on a model with successive conflicts. In this test the
 	 * user use the --abort option.
@@ -409,58 +373,6 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	/**
 	 * <h3>Test CHER006</h3>
 	 * <p>
-	 * Successives conflicts on multiple models in multiple files (one file per model).
-	 * </p>
-	 * <p>
-	 * History see {@link ContextSetup#setupCHE007()}
-	 * </p>
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testCHE007() throws Exception {
-		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
-		contextSetup.setupREB007();
-		runCherryPick(Returns.COMPLETE, "branch_b");
-
-		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD")
-				+ "] Creates Attr1 in Class1.uml + Creates C2 in model.uml"));
-
-		assertLog("Creates Attr1 in Class1.uml + Creates C2 in model.uml",//
-				"Creates Attr2 in Class1.uml + Creates C3 in model.uml",//
-				"Creates C1 in Class1.uml");
-
-		Path projectPath = contextSetup.getProjectPath();
-		final String c2FragmentId = "_mq6J8HVUEeScI5AIfi-cqA";
-		final String c3FragmentId = "_pYd8YHVUEeScI5AIfi-cqA";
-		assertExistInResource(projectPath.resolve("model.uml"), //
-				c3FragmentId, //
-				c2FragmentId);
-		final String c1FragmentId = "_mqPRAHVTEeScI5AIfi-cqA";
-		final String attr1FragmentId = "_DIRX4HVUEeScI5AIfi-cqA";
-		final String attr2FragmentId = "_M6nbsHVUEeScI5AIfi-cqA";
-		assertExistInResource(projectPath.resolve("Class1.uml"), //
-				c1FragmentId, //
-				attr1FragmentId,//
-				attr2FragmentId);
-
-		final String c1ShapeFragmentId = "_mqRtQHVTEeScI5AIfi-cqA";
-		final String c2ShapeFragmentId = "_mq-bYHVUEeScI5AIfi-cqA";
-		final String c3ShapeFragmentId = "_pYgYoHVUEeScI5AIfi-cqA";
-		final String attr1ShapeFragmentId = "_DIT0IHVUEeScI5AIfi-cqA";
-		final String attr2ShapeFragmentId = "_M6rGEHVUEeScI5AIfi-cqA";
-		assertExistInResource(projectPath.resolve("model.notation"), //
-				c1ShapeFragmentId,//
-				c2ShapeFragmentId,//
-				c3ShapeFragmentId,//
-				attr1ShapeFragmentId,//
-				attr2ShapeFragmentId);
-
-	}
-
-	/**
-	 * <h3>Test CHER007</h3>
-	 * <p>
 	 * Test no conflicting cherry-pick on fragmented model.
 	 * </p>
 	 * <p>
@@ -512,6 +424,88 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 	}
 
 	/**
+	 * <h3>Test CHE007</h3>
+	 * <p>
+	 * Successive conflicts on multiple models in multiple files (one file per model).
+	 * </p>
+	 * <p>
+	 * History see {@link ContextSetup#setupCHE007()}
+	 * </p>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE007() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB007();
+		runCherryPick(Returns.COMPLETE, "branch_b");
+
+		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD")
+				+ "] Creates Attr1 in Class1.uml + Creates C2 in model.uml"));
+
+		assertLog("Creates Attr1 in Class1.uml + Creates C2 in model.uml",//
+				"Creates Attr2 in Class1.uml + Creates C3 in model.uml",//
+				"Creates C1 in Class1.uml");
+
+		Path projectPath = contextSetup.getProjectPath();
+		final String c2FragmentId = "_mq6J8HVUEeScI5AIfi-cqA";
+		final String c3FragmentId = "_pYd8YHVUEeScI5AIfi-cqA";
+		assertExistInResource(projectPath.resolve("model.uml"), //
+				c3FragmentId, //
+				c2FragmentId);
+		final String c1FragmentId = "_mqPRAHVTEeScI5AIfi-cqA";
+		final String attr1FragmentId = "_DIRX4HVUEeScI5AIfi-cqA";
+		final String attr2FragmentId = "_M6nbsHVUEeScI5AIfi-cqA";
+		assertExistInResource(projectPath.resolve("Class1.uml"), //
+				c1FragmentId, //
+				attr1FragmentId,//
+				attr2FragmentId);
+
+		final String c1ShapeFragmentId = "_mqRtQHVTEeScI5AIfi-cqA";
+		final String c2ShapeFragmentId = "_mq-bYHVUEeScI5AIfi-cqA";
+		final String c3ShapeFragmentId = "_pYgYoHVUEeScI5AIfi-cqA";
+		final String attr1ShapeFragmentId = "_DIT0IHVUEeScI5AIfi-cqA";
+		final String attr2ShapeFragmentId = "_M6rGEHVUEeScI5AIfi-cqA";
+		assertExistInResource(projectPath.resolve("model.notation"), //
+				c1ShapeFragmentId,//
+				c2ShapeFragmentId,//
+				c3ShapeFragmentId,//
+				attr1ShapeFragmentId,//
+				attr2ShapeFragmentId);
+
+	}
+
+	/**
+	 * <h3>Use case CHE008</h3>
+	 * <p>
+	 * Single conflict on a fragmented model in multiple files (two files per model)
+	 * </p>
+	 * 
+	 * @see ContextSetup#setupCHE008()
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE008() throws Exception {
+		// implement this test once https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709 resolved
+	}
+
+	/**
+	 * <h3>Use case CHE009</h3>
+	 * <p>
+	 * Single conflict on a fragmented model in multiple files (two files per model)
+	 * </p>
+	 * 
+	 * @see ContextSetup#setupCHE009()
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE009() throws Exception {
+		// implement this test once https://bugs.eclipse.org/bugs/show_bug.cgi?id=453709 resolved
+	}
+
+	/**
+	 * Model conflict but no textual conflict.
+	 * 
 	 * @see ContextSetup#setupREB011()
 	 * @throws Exception
 	 */
@@ -534,6 +528,42 @@ public class CherryPickApplicationTest extends AbstractLogicalCommandApplication
 				projectPath.resolve("model.notation"),//
 				projectPath.resolve("model.di"));
 
+	}
+
+	/**
+	 * @see ContextSetup#setupREB016()
+	 * @throws Exception
+	 */
+	@Test
+	public void testCHE016() throws Exception {
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupREB016();
+
+		runCherryPick(Returns.COMPLETE, "branch_b");
+
+		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD") + "] Creates C1 in P1"));
+
+		assertLog("Creates C1 in P1",//
+				"Adds in.txt && out.txt",//
+				"Creates P1");
+
+		Path projectPath = contextSetup.getProjectPath();
+		final String p1FragmentId = "_142C4HlpEeSjSr5E4B1VMw";
+		final String c1FragmentId = "_Di70UHlqEeSjSr5E4B1VMw";
+		assertExistInResource(projectPath.resolve("model.uml"), //
+				p1FragmentId, //
+				c1FragmentId);
+
+		final String p1ShapeFragmentId = "_16b-UHlpEeSjSr5E4B1VMw";
+		final String c1ShapeFragmentId = "_Di_esHlqEeSjSr5E4B1VMw";
+		assertExistInResource(projectPath.resolve("model.notation"), //
+				c1ShapeFragmentId,//
+				p1ShapeFragmentId);
+
+		// Checks the content of the test file located in the workspace
+		assertFileContent(contextSetup.getProjectPath().resolve("in.txt"), LYRICS_1 + EOL);
+		// Check the content of the test file located in the workspace
+		assertFileContent(contextSetup.getProjectPath().resolve("../out.txt"), LYRICS_1 + EOL);
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import org.eclipse.emf.compare.git.pgm.internal.cmd.CherryPickArgumentsTest;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.DiffArgumentsTest;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.MergeArgumentsTest;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.MergeToolArgumentsTest;
+import org.eclipse.emf.compare.git.pgm.internal.cmd.PullArgumentsTest;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.RebaseArgumentsTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -29,7 +30,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({LogicalAppTest.class, MergeArgumentsTest.class, MergeToolArgumentsTest.class,
-		DiffArgumentsTest.class, CherryPickArgumentsTest.class, RebaseArgumentsTest.class })
+		DiffArgumentsTest.class, CherryPickArgumentsTest.class, RebaseArgumentsTest.class,
+		PullArgumentsTest.class })
 public class AllCommandLineArgumentTests {
 
 	public static void main(String[] args) {

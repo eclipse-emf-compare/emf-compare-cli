@@ -53,7 +53,7 @@ public class CherryPickArgumentsTest extends AbstractLogicalCommandTest {
 		usage += " <commit>                : Commit IDs to cherry pick." + EOL;
 		usage += " --abort                 : Use this option to abort a in going cherry-pick" + EOL;
 		usage += " --continue              : Use this option to continue a in going cherry-pick" + EOL;
-		usage += " --debug (-d)            : Launched the provisionned eclipse in debug mode." + EOL;
+		usage += " --debug (-d)            : Launches the provisionned eclipse in debug mode." + EOL;
 		usage += " --git-dir gitFolderPath : Path to the .git folder of your repository."+ EOL;
 		usage += " --help (-h)             : Dispays help for this command." + EOL;
 		usage += " --quit                  : Use this option to quit a in going cherry-pick" + EOL;
