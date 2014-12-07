@@ -15,30 +15,18 @@ import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.PARENT;
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.SEP;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.compare.git.pgm.AbstractApplicationTest;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.app.data.ContextSetup;
-import org.eclipse.emf.compare.git.pgm.util.OomphUserModelBuilder;
-import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.Test;
@@ -50,119 +38,6 @@ import org.junit.Test;
 public class MergeApplicationTest extends AbstractApplicationTest {
 
 	private ContextSetup contextSetup;
-
-	/**
-	 * <h3>Test the logical merge application on the current branch</h3>
-	 * <p>
-	 * This use case aims to produce a "Already up to date message".
-	 * </p>
-	 * <h3>History:</h3>
-	 * 
-	 * <pre>
-	 * Initial commit (PapyrusProject3) [Master]
-	 * </pre>
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void alreadyUpToDate0() throws Exception {
-		Path projectPath = getRepositoryPath().resolve("PapyrusModel");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.notation") //
-				.create(projectPath);
-		RevCommit rev = addAllAndCommit("Initial commit [PapyrusProject3]");
-
-		getGit().close();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				"master");
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		// printOut();
-		// printErr();
-
-		assertTrue(getGit().status().call().isClean());
-		assertEquals(getGit().getRepository().resolve("HEAD").getName(), rev.getId().getName());
-		assertOutputMessageEnd("Already up to date." + EOL + EOL);
-		assertEquals(Returns.COMPLETE.code(), result);
-
-	}
-
-	/**
-	 * <h3>Test the logical application on previous commit of the current branch</h3> <h3>History:</h3>
-	 * 
-	 * <pre>
-	 * * Adds Class 1 [branch_b]
-	 * |    
-	 * |  
-	 * Initial commit (PapyrusProject3) [branch_a]
-	 * 
-	 * </pre>
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void alreadyUpToDate1() throws Exception {
-		Path projectPath = getRepositoryPath().resolve("PapyrusModel");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.notation") //
-				.create(projectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
-
-		// Creates branch b
-		String branchB = "branch_b";
-		createBranchAndCheckout(branchB, branchA);
-
-		project = new ProjectBuilder(this) //
-				.clean(true) //
-				.addContentToCopy("data/automerging/MER003/branch_b/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_b/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_b/model.notation") //
-				.create(projectPath);
-
-		RevCommit commitB = addAllAndCommit("Adds class 1");
-
-		getGit().close();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is launched from the git repository folder.
-		setCmdLocation(getRepositoryPath().toString());
-
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchA);
-
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		assertOutputMessageEnd("Already up to date." + EOL + EOL);
-		assertEquals(Returns.COMPLETE.code(), result);
-
-		assertTrue(getGit().status().call().isClean());
-		assertEquals(getGit().getRepository().resolve("HEAD").getName(), commitB.getId().getName());
-	}
 
 	/**
 	 * <h3>Use case MER001</h3>
@@ -227,53 +102,88 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	}
 
 	/**
+	 * <h3>Test the logical merge application on the current branch</h3>
+	 * <p>
+	 * This use case aims to produce a "Already up to date message".
+	 * </p>
+	 * <h3>History:</h3>
+	 * 
+	 * <pre>
+	 * Initial commit (PapyrusProject3) [Master]
+	 * </pre>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testMER003_alreadyUpToDate0() throws Exception {
+		// Mocks that the commands is launched from the git repository folder.
+		setCmdLocation(getRepositoryPath().toString());
+
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER003_alreadyUpToDate0();
+
+		runMerge(Returns.COMPLETE, getShortId("master"));
+
+		assertTrue(getGit().status().call().isClean());
+		assertEquals(getGit().getRepository().resolve("HEAD").getName(), getLongId("master"));
+		assertOutputMessageEnd("Already up to date." + EOL + EOL);
+	}
+
+	/**
+	 * <h3>Test the logical application on previous commit of the current branch</h3> <h3>History:</h3>
+	 * 
+	 * <pre>
+	 * * Adds Class 1 [branch_b]
+	 * |    
+	 * |  
+	 * Initial commit (PapyrusProject3) [branch_a]
+	 * 
+	 * </pre>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testMER003_alreadyUpToDate1() throws Exception {
+		// Mocks that the commands is launched from the git repository folder.
+		setCmdLocation(getRepositoryPath().toString());
+
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER003_alreadyUpToDate1();
+
+		runMerge(Returns.COMPLETE, getShortId("branch_a"));
+
+		assertOutputMessageEnd("Already up to date." + EOL + EOL);
+
+		assertTrue(getGit().status().call().isClean());
+		assertEquals(getGit().getRepository().resolve("HEAD").getName(), getLongId("branch_b"));
+	}
+
+	/**
 	 * <h3>Test with a setup file that references incorrect projects.</h3>
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	public void testIncorrectProjectToImport_NotExistingProject() throws Exception {
-		Path existinProjectPath = getRepositoryPath().resolve("MER003");
-		File existingProject = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.notation") //
-				.create(existinProjectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
-
-		File notExistinProject = getRepositoryPath().resolve("GhostProject").toFile();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(existingProject, notExistinProject);
-
-		// Mocks that the commands is lauched from the git repository folder.
+	public void testMER003_IncorrectProjectToImport_NotExistingProject() throws Exception {
+		// Mocks that the commands is launched from the git repository folder.
 		setCmdLocation(getRepositoryPath().toString());
 
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER003_IncorrectProjectToImport_NotExistingProject();
+
 		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchA);
+		getContext().addArg(getRepositoryPath().resolve(".git").toString(),
+				contextSetup.getUserSetupFile().getAbsolutePath(), getShortId("branch_a"));
 
-		// Runs command
-		Object result = getApp().start(getContext());
-
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
+		runCommand(Returns.ERROR);
 
 		StringBuilder expectedOut = new StringBuilder();
 		expectedOut.append("fatal: Projects Import Analysis Projects Import Analysis of '").append(
-				notExistinProject.getAbsolutePath()).append("'").append(EOL);
-		expectedOut.append("  The root folder '").append(notExistinProject.getAbsolutePath()).append(
+				getRepositoryPath().resolve("GhostProject")).append("'").append(EOL);
+		expectedOut.append("  The root folder '").append(getRepositoryPath().resolve("GhostProject")).append(
 				"' doesn't exist").append(EOL).append(EOL);
 
 		assertOutputMessageEnd(expectedOut.toString());
-		assertEquals(Returns.ERROR.code(), result);
-
 	}
 
 	/**
@@ -282,45 +192,18 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testProjectToImport_complexPath() throws Exception {
-		Path folderWithComplexePath = getRepositoryPath().resolve("Folder with space & special char");
-		folderWithComplexePath.toFile().mkdirs();
-		Path existinProjectPath = folderWithComplexePath.resolve("Project with path and spécial character");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.notation") //
-				.create(existinProjectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(project);
-
-		// Mocks that the commands is lauched from the git repository folder.
+	public void testMER003_ProjectToImport_complexPath() throws Exception {
+		// Mocks that the commands is launched from the git repository folder.
 		setCmdLocation(getRepositoryPath().toString());
 
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchA);
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER003_ProjectToImport_complexPath();
 
-		// Runs command
-		Object result = getApp().start(getContext());
+		runMerge(Returns.COMPLETE, getShortId("branch_a"));
 
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
-
-		assertEquals(Returns.COMPLETE.code(), result);
 		StringBuilder expectedOut = new StringBuilder();
-		expectedOut.append("Performing setup task Projects Import Task").append(EOL);
-		expectedOut.append("Importing projects from ").append(project.getAbsolutePath()).append(EOL);
-		expectedOut.append(project.toPath().getFileName().toString()).append(EOL);
-		expectedOut.append("Already up to date.");
+		expectedOut.append("Already up to date.").append(EOL).append(EOL);
+		assertOutputMessageEnd(expectedOut.toString());
 	}
 
 	/**
@@ -329,48 +212,18 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testSetupFile_complexPath() throws Exception {
-
-		Path existinProjectPath = getRepositoryPath().resolve("MER003");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.notation") //
-				.create(existinProjectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
-
-		Path folderWithComplexePath = getRepositoryPath().resolve("Folder with space & special char");
-		folderWithComplexePath.toFile().mkdirs();
-
-		// Creates Oomph model
-		File userSetupFile = createPapyrusUserOomphModel(folderWithComplexePath
-				.resolve("Setup file with spaces.setup"), project);
-
+	public void testMER003_SetupFile_complexPath() throws Exception {
 		// Mocks that the commands is launched from the git repository folder.
 		setCmdLocation(getRepositoryPath().toString());
 
-		// Sets args
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), userSetupFile.getAbsolutePath(),
-				branchA);
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER003_SetupFile_complexPath();
 
-		// Runs command
-		Object result = getApp().start(getContext());
+		runMerge(Returns.COMPLETE, getShortId("branch_a"));
 
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
-
-		assertEquals(Returns.COMPLETE.code(), result);
 		StringBuilder expectedOut = new StringBuilder();
-		expectedOut.append("Performing setup task Projects Import Task").append(EOL);
-		expectedOut.append("Importing projects from ").append(project.getAbsolutePath()).append(EOL);
-		expectedOut.append(project.toPath().getFileName().toString()).append(EOL);
-		expectedOut.append("Already up to date.");
+		expectedOut.append("Already up to date.").append(EOL).append(EOL);
+		assertOutputMessageEnd(expectedOut.toString());
 
 	}
 
@@ -380,26 +233,12 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testRelativePaths() throws Exception {
-
-		Path existinProjectPath = getRepositoryPath().resolve("MER003");
-		File project = new ProjectBuilder(this) //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.di")//
-				.addContentToCopy("data/automerging/MER003/branch_a/model.uml") //
-				.addContentToCopy("data/automerging/MER003/branch_a/model.notation") //
-				.create(existinProjectPath);
-		String branchA = "branch_a";
-		addAllAndCommit("Initial commit [PapyrusProject3]");
-		createBranch(branchA, "master");
-
-		Path folder = getRepositoryPath().resolve("a" + SEP + "b" + SEP + "c");
-		folder.toFile().mkdirs();
-
-		// Creates Oomph model
-		createPapyrusUserOomphModel(folder.resolve("setup.setup"), project);
-
+	public void testMER003_RelativePaths() throws Exception {
 		// Mocks that the commands is launched from the git repository folder.
 		setCmdLocation(getRepositoryPath().toString());
+
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupMER003_RelativePaths();
 
 		// Args : relative paths
 		String repoPathLastSegment = getRepositoryPath().toString().substring(
@@ -408,24 +247,13 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 		String setupRelativePath = CURRENT + SEP + "a" + SEP + "b" + SEP + "c" + SEP + "setup.setup";
 
 		// Sets args
-		getContext().addArg(gitRelativePath, setupRelativePath, branchA);
+		getContext().addArg(gitRelativePath, setupRelativePath, getShortId("branch_a"));
 
-		// Runs command
-		Object result = getApp().start(getContext());
+		runCommand(Returns.COMPLETE);
 
-		// Uncomments to displays output
-		printOut();
-		printErr();
-
-		IProject[] projectInWorkspace = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		assertEquals(1, projectInWorkspace.length);
-
-		assertEquals(Returns.COMPLETE.code(), result);
 		StringBuilder expectedOut = new StringBuilder();
-		expectedOut.append("Performing setup task Projects Import Task").append(EOL);
-		expectedOut.append("Importing projects from ").append(project.getAbsolutePath()).append(EOL);
-		expectedOut.append(project.toPath().getFileName().toString()).append(EOL);
-		expectedOut.append("Already up to date.");
+		expectedOut.append("Already up to date.").append(EOL).append(EOL);
+		assertOutputMessageEnd(expectedOut.toString());
 
 	}
 
@@ -625,7 +453,7 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#buildApp()
+	 * @see org.eclipse.emf.compare.git.pgm.internal.app.AbstractApplicationTest#buildApp()
 	 */
 	@Override
 	protected IApplication buildApp() {
@@ -633,75 +461,13 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	}
 
 	/**
-	 * Create a Oomph setup file being able to handle the merge of a Papyrus model.
-	 * 
-	 * @param project
-	 * @return
-	 * @throws IOException
-	 */
-	private File createPapyrusUserOomphModel(File... project) throws IOException {
-		return createPapyrusUserOomphModel(getTestTmpFolder().resolve("setup.setup"), project);
-	}
-
-	private File createPapyrusUserOomphModel(Path setupFilePath, File... project) throws IOException {
-		OomphUserModelBuilder userModelBuilder = new OomphUserModelBuilder();
-		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
-		File userSetupFile = userModelBuilder.setInstallationLocation(oomphFolderPath.toString()) //
-				.setWorkspaceLocation(getWorkspaceLocation().getAbsolutePath()) //
-				.setProjectPaths(Arrays.stream(project).map(p -> p.getAbsolutePath()).toArray(String[]::new)) //
-				.setRepositories("http://download.eclipse.org/releases/luna/201409261001",
-						"http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest/",
-						"http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/luna") //
-				.setRequirements("org.eclipse.uml2.feature.group",
-						"org.eclipse.papyrus.sdk.feature.feature.group",
-						"org.eclipse.emf.compare.rcp.ui.feature.group",
-						"org.eclipse.emf.compare.uml2.feature.group",
-						"org.eclipse.emf.compare.diagram.gmf.feature.group",
-						"org.eclipse.emf.compare.diagram.papyrus.feature.group") //
-				.saveTo(setupFilePath.toString());
-		return userSetupFile;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#getApp()
+	 * @see org.eclipse.emf.compare.git.pgm.internal.app.AbstractApplicationTest#getApp()
 	 */
 	@Override
 	protected MergeApplication getApp() {
 		return (MergeApplication)super.getApp();
-	}
-
-	/**
-	 * Assert that there is no conflict marker in the file (( <<<<<<<<<< or ========= or >>>>>>>>>>>). In fact
-	 * this test try to load the resource.
-	 * 
-	 * @param paths
-	 * @throws IOException
-	 * @throws AssertionError
-	 */
-	private void assertNoConflitMarker(Path... paths) throws AssertionError, IOException {
-		ResourceSet resourceSet = new ResourceSetImpl();
-		for (Path p : paths) {
-			try {
-				Resource resource = resourceSet.getResource(URI.createFileURI(p.toString()), true);
-				assertNotNull(resource);
-			} catch (Exception e) {
-				throw new AssertionError("Error wile parsing resource " + p.toString() + EOL
-						+ getConfigurationMessage(), e);
-			}
-		}
-	}
-
-	private void assertExistInResource(Path resourcePath, String... fragments) throws IOException {
-		ResourceSet resourceSet = new ResourceSetImpl();
-		Resource resource = resourceSet.getResource(URI.createFileURI(resourcePath.toString()), true);
-		assertNotNull(resource);
-		for (String fragment : fragments) {
-			EObject eObject = resource.getEObject(fragment);
-			assertNotNull("Element with framgment " + fragment + " does not exist" + EOL
-					+ getConfigurationMessage(), eObject);
-		}
 	}
 
 	private void runCommand(Returns expectedReturnCode) throws Exception {

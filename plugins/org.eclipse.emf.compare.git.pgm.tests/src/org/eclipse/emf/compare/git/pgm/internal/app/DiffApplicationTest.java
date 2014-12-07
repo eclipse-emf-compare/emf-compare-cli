@@ -12,14 +12,9 @@ package org.eclipse.emf.compare.git.pgm.internal.app;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.nio.file.Path;
-
-import org.eclipse.emf.compare.git.pgm.AbstractApplicationTest;
 import org.eclipse.emf.compare.git.pgm.Returns;
+import org.eclipse.emf.compare.git.pgm.internal.app.data.ContextSetup;
 import org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil;
-import org.eclipse.emf.compare.git.pgm.util.OomphUserModelBuilder;
-import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
 import org.eclipse.equinox.app.IApplication;
 import org.junit.Test;
 
@@ -28,17 +23,10 @@ import org.junit.Test;
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
+@SuppressWarnings("nls")
 public class DiffApplicationTest extends AbstractApplicationTest {
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#buildApp()
-	 */
-	@Override
-	protected IApplication buildApp() {
-		return new DiffApplication();
-	}
+	private ContextSetup contextSetup;
 
 	/**
 	 * Test if there is no difference to display then the software display the "No differende to display"
@@ -50,25 +38,34 @@ public class DiffApplicationTest extends AbstractApplicationTest {
 	public void nothingToDo() throws Exception {
 		setCmdLocation(getRepositoryPath().toString());
 
-		Path oomphFolderPath = getTestTmpFolder().resolve("oomphFolder");
-		File newSetupFile = new OomphUserModelBuilder() //
-				.setInstallationLocation(getTestTmpFolder().resolve("oomphFolder").toString()) //
-				.setWorkspaceLocation(oomphFolderPath.resolve("ws").toString()) //
-				.saveTo(getTestTmpFolder().resolve("setup.setup").toString());
-
-		// Creates some content for the first commit.
-		new ProjectBuilder(this) //
-				.create(getRepositoryPath().resolve("EmptyProject"));
-
-		addAllAndCommit("First commit");
-
+		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
+		contextSetup.setupDIFnothingToDo();
 		// No reference
-		getContext().addArg(getRepositoryPath().resolve(".git").toString(), newSetupFile.getAbsolutePath(),
-				"master", "master");
+		getContext().addArg(getRepositoryPath().resolve(".git").toString(),
+				contextSetup.getUserSetupFile().getAbsolutePath(), "master", "master");
 		Object result = getApp().start(getContext());
 		assertOutputMessageEnd("No difference to display." + EMFCompareGitPGMUtil.EOL);
 		assertEmptyErrorMessage();
 		assertEquals(Returns.COMPLETE.code(), result);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.eclipse.emf.compare.git.pgm.internal.app.AbstractApplicationTest#buildApp()
+	 */
+	@Override
+	protected IApplication buildApp() {
+		return new DiffApplication();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see org.eclipse.emf.compare.git.pgm.internal.app.AbstractApplicationTest#getApp()
+	 */
+	@Override
+	protected DiffApplication getApp() {
+		return (DiffApplication)super.getApp();
+	}
 }

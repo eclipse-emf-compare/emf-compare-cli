@@ -11,6 +11,7 @@
 package org.eclipse.emf.compare.git.pgm.internal.app.data;
 
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
+import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.SEP;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -455,6 +456,17 @@ public class ContextSetup {
 		userSetupFile = createPapyrusUserOomphModel(project);
 	}
 
+	public void setupDIFnothingToDo() throws Exception {
+		projectPath = getRepositoryPath().resolve("EmptyProject");
+		project = new ProjectBuilder(this) //
+				.create(projectPath);
+
+		addAllAndCommit("First commit");
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
 	/**
 	 * <h3>History:</h3>
 	 * 
@@ -590,6 +602,148 @@ public class ContextSetup {
 
 		// Creates Oomph model
 		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
+	/**
+	 * Setup for testMER003_alreadyUpToDate0.
+	 * 
+	 * @throws Exception
+	 */
+	public void setupMER003_alreadyUpToDate0() throws Exception {
+		projectPath = getRepositoryPath().resolve("MER003");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("automerging/MER003/branch_a/model.di")//
+				.addContentToCopy("automerging/MER003/branch_a/model.uml") //
+				.addContentToCopy("automerging/MER003/branch_a/model.notation") //
+				.create(projectPath);
+		addAllAndCommit("Initial commit [PapyrusProject3]");
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
+	/**
+	 * Setup for testMER003_alreadyUpToDate0.
+	 * 
+	 * @throws Exception
+	 */
+	public void setupMER003_alreadyUpToDate1() throws Exception {
+		projectPath = getRepositoryPath().resolve("PapyrusModel");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("automerging/MER003/branch_a/model.di")//
+				.addContentToCopy("automerging/MER003/branch_a/model.uml") //
+				.addContentToCopy("automerging/MER003/branch_a/model.notation") //
+				.create(projectPath);
+		String branchA = "branch_a";
+		addAllAndCommit("Initial commit [PapyrusProject3]");
+		createBranch(branchA, "master");
+
+		// Creates branch b
+		String branchB = "branch_b";
+		createBranchAndCheckout(branchB, branchA);
+
+		project = new ProjectBuilder(this) //
+				.clean(true) //
+				.addContentToCopy("automerging/MER003/branch_b/model.di")//
+				.addContentToCopy("automerging/MER003/branch_b/model.uml") //
+				.addContentToCopy("automerging/MER003/branch_b/model.notation") //
+				.create(projectPath);
+
+		addAllAndCommit("Adds class 1");
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
+	/**
+	 * Setup for testMER003_IncorrectProjectToImport_NotExistingProject.
+	 * 
+	 * @throws Exception
+	 */
+	public void setupMER003_IncorrectProjectToImport_NotExistingProject() throws Exception {
+		projectPath = getRepositoryPath().resolve("MER003");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("automerging/MER003/branch_a/model.di")//
+				.addContentToCopy("automerging/MER003/branch_a/model.uml") //
+				.addContentToCopy("automerging/MER003/branch_a/model.notation") //
+				.create(projectPath);
+		String branchA = "branch_a";
+		addAllAndCommit("Initial commit [PapyrusProject3]");
+		createBranch(branchA, "master");
+
+		File notExistingProject = getRepositoryPath().resolve("GhostProject").toFile();
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project, notExistingProject);
+	}
+
+	/**
+	 * Setup for testMER003_ProjectToImport_complexPath.
+	 * 
+	 * @throws Exception
+	 */
+	public void setupMER003_ProjectToImport_complexPath() throws Exception {
+		Path folderWithComplexePath = getRepositoryPath().resolve("Folder with space & special char");
+		folderWithComplexePath.toFile().mkdirs();
+		projectPath = folderWithComplexePath.resolve("Project with path and spécial character");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("automerging/MER003/branch_a/model.di")//
+				.addContentToCopy("automerging/MER003/branch_a/model.uml") //
+				.addContentToCopy("automerging/MER003/branch_a/model.notation") //
+				.create(projectPath);
+		String branchA = "branch_a";
+		addAllAndCommit("Initial commit [PapyrusProject3]");
+		createBranch(branchA, "master");
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(project);
+	}
+
+	/**
+	 * Setup for testMER003_SetupFile_complexPath.
+	 * 
+	 * @throws Exception
+	 */
+	public void setupMER003_SetupFile_complexPath() throws Exception {
+		projectPath = getRepositoryPath().resolve("MER003");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("automerging/MER003/branch_a/model.di")//
+				.addContentToCopy("automerging/MER003/branch_a/model.uml") //
+				.addContentToCopy("automerging/MER003/branch_a/model.notation") //
+				.create(projectPath);
+		String branchA = "branch_a";
+		addAllAndCommit("Initial commit [PapyrusProject3]");
+		createBranch(branchA, "master");
+
+		Path folderWithComplexePath = getRepositoryPath().resolve("Folder with space & special char");
+		folderWithComplexePath.toFile().mkdirs();
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(folderWithComplexePath
+				.resolve("Setup file with spaces.setup"), project);
+	}
+
+	/**
+	 * Setup for testMER003_RelativePaths.
+	 * 
+	 * @throws Exception
+	 */
+	public void setupMER003_RelativePaths() throws Exception {
+		projectPath = getRepositoryPath().resolve("MER003");
+		project = new ProjectBuilder(this) //
+				.addContentToCopy("automerging/MER003/branch_a/model.di")//
+				.addContentToCopy("automerging/MER003/branch_a/model.uml") //
+				.addContentToCopy("automerging/MER003/branch_a/model.notation") //
+				.create(projectPath);
+		String branchA = "branch_a";
+		addAllAndCommit("Initial commit [PapyrusProject3]");
+		createBranch(branchA, "master");
+
+		Path folder = getRepositoryPath().resolve("a" + SEP + "b" + SEP + "c");
+		folder.toFile().mkdirs();
+
+		// Creates Oomph model
+		userSetupFile = createPapyrusUserOomphModel(folder.resolve("setup.setup"), project);
 	}
 
 	/**

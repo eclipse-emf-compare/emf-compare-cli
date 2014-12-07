@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.eclipse.emf.compare.git.pgm.AbstractLogicalAppTest;
+import org.eclipse.emf.compare.git.pgm.AbstractIntegrationTest;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.util.OomphUserModelBuilder;
 import org.eclipse.emf.compare.git.pgm.util.ProjectBuilder;
@@ -31,7 +31,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public abstract class AbstractLogicalCommandTest extends AbstractLogicalAppTest {
+public abstract class AbstractCommandTest extends AbstractIntegrationTest {
 
 	/**
 	 * @return the name of the command under test.

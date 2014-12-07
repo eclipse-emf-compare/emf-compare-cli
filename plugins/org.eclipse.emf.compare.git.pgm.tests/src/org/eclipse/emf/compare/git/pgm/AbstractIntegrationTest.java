@@ -10,18 +10,19 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.git.pgm;
 
+import org.eclipse.emf.compare.git.pgm.LogicalApp;
 import org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommand;
 import org.eclipse.equinox.app.IApplication;
 
 /**
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
-public abstract class AbstractLogicalAppTest extends AbstractApplicationTest {
+public abstract class AbstractIntegrationTest extends AbstractTest {
 
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#buildApp()
+	 * @see org.eclipse.emf.compare.git.pgm.internal.app.AbstractApplicationTest#buildApp()
 	 */
 	@Override
 	protected IApplication buildApp() {
@@ -31,7 +32,7 @@ public abstract class AbstractLogicalAppTest extends AbstractApplicationTest {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.AbstractApplicationTest#getApp()
+	 * @see org.eclipse.emf.compare.git.pgm.internal.app.AbstractApplicationTest#getApp()
 	 */
 	@Override
 	protected LogicalApp getApp() {

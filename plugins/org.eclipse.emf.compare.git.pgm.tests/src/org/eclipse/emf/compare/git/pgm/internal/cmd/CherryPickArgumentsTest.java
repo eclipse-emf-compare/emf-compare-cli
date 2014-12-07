@@ -35,7 +35,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class CherryPickArgumentsTest extends AbstractLogicalCommandTest {
+public class CherryPickArgumentsTest extends AbstractCommandTest {
 
 	@Override
 	protected String getCommandName() {

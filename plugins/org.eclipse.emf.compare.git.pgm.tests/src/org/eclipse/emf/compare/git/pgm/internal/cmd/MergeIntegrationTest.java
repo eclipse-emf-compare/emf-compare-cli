@@ -20,7 +20,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.compare.git.pgm.AbstractLogicalAppTest;
+import org.eclipse.emf.compare.git.pgm.AbstractIntegrationTest;
 import org.eclipse.emf.compare.git.pgm.LogicalApp;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.Options;
@@ -42,7 +42,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class MergeIntegrationTest extends AbstractLogicalAppTest {
+public class MergeIntegrationTest extends AbstractIntegrationTest {
 
 	@Override
 	protected IApplication buildApp() {

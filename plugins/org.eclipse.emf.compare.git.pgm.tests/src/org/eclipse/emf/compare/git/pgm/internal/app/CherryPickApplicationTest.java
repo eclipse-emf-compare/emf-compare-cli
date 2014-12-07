@@ -37,7 +37,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class CherryPickApplicationTest extends AbstractLogicalCommandApplicationTest {
+public class CherryPickApplicationTest extends AbstractApplicationTest {
 
 	private ContextSetup contextSetup;
 

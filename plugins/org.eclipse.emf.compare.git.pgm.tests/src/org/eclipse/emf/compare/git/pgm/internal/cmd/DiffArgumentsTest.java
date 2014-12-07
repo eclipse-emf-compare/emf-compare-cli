@@ -29,12 +29,12 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class DiffArgumentsTest extends AbstractLogicalCommandTest {
+public class DiffArgumentsTest extends AbstractCommandTest {
 
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommandTest#getCommandName()
+	 * @see org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractCommandTest#getCommandName()
 	 */
 	@Override
 	protected String getCommandName() {
@@ -44,7 +44,7 @@ public class DiffArgumentsTest extends AbstractLogicalCommandTest {
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractLogicalCommandTest#getExpectedUsage()
+	 * @see org.eclipse.emf.compare.git.pgm.internal.cmd.AbstractCommandTest#getExpectedUsage()
 	 */
 	@Override
 	protected String getExpectedUsage() {

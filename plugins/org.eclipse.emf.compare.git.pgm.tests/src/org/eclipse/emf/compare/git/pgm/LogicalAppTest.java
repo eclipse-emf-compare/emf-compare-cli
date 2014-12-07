@@ -21,7 +21,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class LogicalAppTest extends AbstractLogicalAppTest {
+public class LogicalAppTest extends AbstractIntegrationTest {
 
 	private String getExpectedAvailableCommandUsage() {
 		//@formatter:off

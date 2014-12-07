@@ -17,7 +17,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.compare.git.pgm.AbstractLogicalAppTest;
+import org.eclipse.emf.compare.git.pgm.AbstractIntegrationTest;
 import org.eclipse.emf.compare.git.pgm.LogicalApp;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.suite.AllIntegrationTests;
@@ -37,7 +37,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class DiffIntegrationTest extends AbstractLogicalAppTest {
+public class DiffIntegrationTest extends AbstractIntegrationTest {
 
 	@Override
 	protected IApplication buildApp() {

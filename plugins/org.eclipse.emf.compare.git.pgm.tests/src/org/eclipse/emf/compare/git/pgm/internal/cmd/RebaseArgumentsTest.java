@@ -36,7 +36,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class RebaseArgumentsTest extends AbstractLogicalCommandTest {
+public class RebaseArgumentsTest extends AbstractCommandTest {
 
 	@Override
 	protected String getCommandName() {

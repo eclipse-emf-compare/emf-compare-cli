@@ -21,14 +21,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IWorkspace;
@@ -40,11 +36,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.api.errors.RefNotFoundException;
-import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -62,10 +55,10 @@ import org.junit.Before;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public abstract class AbstractApplicationTest {
+public abstract class AbstractTest {
 	private static final String TMP_DIRECTORY_PREFIX = "emfcompare-git-pgm"; //$NON-NLS-1$
 
-	private static final String REPO_PREFIX = "Repo_"; //$NON-NLS-1$
+	protected static final String REPO_PREFIX = "Repo_"; //$NON-NLS-1$
 
 	private Path testTmpFolder;
 
@@ -177,6 +170,26 @@ public abstract class AbstractApplicationTest {
 		return root.getLocation().toFile();
 	}
 
+	protected Path getTestTmpFolder() {
+		return testTmpFolder;
+	}
+
+	protected IApplication getApp() {
+		return app;
+	}
+
+	protected Git getGit() {
+		return git;
+	}
+
+	protected void printOut() {
+		sysout.println(outputStream.toString());
+	}
+
+	protected void printErr() {
+		syserr.println(errStream.toString());
+	}
+
 	protected void setCmdLocation(String path) {
 		System.setProperty("user.dir", path); //$NON-NLS-1$
 	}
@@ -239,26 +252,13 @@ public abstract class AbstractApplicationTest {
 		System.setOut(new PrintStream(outputStream));
 	}
 
-	protected Path getTestTmpFolder() {
-		return testTmpFolder;
-	}
-
-	protected IApplication getApp() {
-		return app;
-	}
-
 	protected RevCommit addAllAndCommit(String commitMessage) throws Exception {
-		DirCache dirChache = git.add().addFilepattern(".").call(); //$NON-NLS-1$
+		DirCache dirChache = getGit().add().addFilepattern(".").call(); //$NON-NLS-1$
 		// Assert there is something to commit
 		assertTrue(dirChache.getEntriesWithin("").length > 0);
-		RevCommit revCommit = git.commit().setAuthor("Logical test author", "logicaltest@obeo.fr")
+		RevCommit revCommit = getGit().commit().setAuthor("Logical test author", "logicaltest@obeo.fr")
 				.setCommitter("Logical test author", "logicaltest@obeo.fr").setMessage(commitMessage).call();
 		return revCommit;
-	}
-
-	protected Ref createBranch(String branchName, String startingPoint) throws RefAlreadyExistsException,
-			RefNotFoundException, InvalidRefNameException, GitAPIException {
-		return getGit().branchCreate().setName(branchName).setStartPoint(startingPoint).call();
 	}
 
 	protected Ref createBranchAndCheckout(String ref, String startingPoint) throws RefAlreadyExistsException,
@@ -276,107 +276,13 @@ public abstract class AbstractApplicationTest {
 		return resolved.abbreviate(7).name();
 	}
 
-	protected Git getGit() {
-		return git;
+	protected String getLongId(String ref) throws RevisionSyntaxException, AmbiguousObjectException,
+			IncorrectObjectTypeException, IOException {
+		ObjectId resolved = getGit().getRepository().resolve(ref);
+		return getLongId(resolved);
 	}
 
-	protected void printOut() {
-		sysout.println(outputStream.toString());
-	}
-
-	protected void printErr() {
-		syserr.println(errStream.toString());
-	}
-
-	protected Git createClone(Git gitToClone) throws InvalidRemoteException, TransportException,
-			GitAPIException, IOException {
-		Path newRepoFile = Files.createTempDirectory(testTmpFolder, REPO_PREFIX, new FileAttribute<?>[] {});
-		return Git.cloneRepository().setDirectory(newRepoFile.toFile()) //
-				.setURI(gitToClone.getRepository().getDirectory().getAbsolutePath()) //
-				.setBare(false) //
-				.setCloneAllBranches(true) //
-				.call();
-	}
-
-	protected Git createClone(Git gitToClone, Collection<String> branchesToClone)
-			throws InvalidRemoteException, TransportException, GitAPIException, IOException {
-		Path newRepoFile = Files.createTempDirectory(testTmpFolder, REPO_PREFIX, new FileAttribute<?>[] {});
-		return Git.cloneRepository().setDirectory(newRepoFile.toFile()) //
-				.setURI(gitToClone.getRepository().getDirectory().getAbsolutePath()) //
-				.setBare(false) //
-				.setBranchesToClone(branchesToClone) //
-				.call();
-	}
-
-	protected String getConfigurationMessage() throws IOException {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("Configuration:").append(EOL);
-		builder.append("\t").append("Tmp folder: ").append(testTmpFolder.toString()).append(EOL);
-		builder.append("\t").append("Git folder: ").append(getGitFolderPath().getAbsolutePath()).append(EOL);
-		builder.append("\t").append("Git content:").append(EOL);
-		Files.walkFileTree(getRepositoryPath(), new FileVisitor<Path>() {
-
-			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-				if (dir.endsWith(".git")) {
-					return FileVisitResult.SKIP_SUBTREE;
-				} else {
-					builder.append("\t\t").append(dir.toString()).append(EOL);
-					return FileVisitResult.CONTINUE;
-				}
-			}
-
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				return FileVisitResult.CONTINUE;
-			}
-
-			public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-				return FileVisitResult.CONTINUE;
-			}
-
-			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-				return FileVisitResult.CONTINUE;
-			}
-		});
-
-		return builder.toString();
-	}
-
-	protected void assertLog(String... messages) throws NoHeadException, MissingObjectException,
-			IncorrectObjectTypeException, GitAPIException, IOException {
-		List<RevCommit> revCommits = Lists.newArrayList(getGit().log().setMaxCount(messages.length).add(
-				getHeadCommit()).call());
-		assertEquals(messages.length, revCommits.size());
-		for (int i = 0; i < messages.length; i++) {
-			assertEquals(messages[i], revCommits.get(i).getShortMessage());
-		}
-	}
-
-	protected void assertFileContent(Path pathfile, String expected) throws IOException {
-		assertEquals(expected, new String(Files.readAllBytes(pathfile)));
-	}
-
-	/**
-	 * Internal data structure.
-	 * 
-	 * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
-	 */
-	protected static class CommittedFile {
-		private final File file;
-
-		private final RevCommit rev;
-
-		public CommittedFile(File file, RevCommit rev) {
-			super();
-			this.file = file;
-			this.rev = rev;
-		}
-
-		public File getFile() {
-			return file;
-		}
-
-		public RevCommit getRev() {
-			return rev;
-		}
+	protected String getLongId(ObjectId resolved) {
+		return resolved.name();
 	}
 }

@@ -28,7 +28,7 @@ import org.junit.Test;
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
  */
 @SuppressWarnings("nls")
-public class MergeToolArgumentsTest extends AbstractLogicalCommandTest {
+public class MergeToolArgumentsTest extends AbstractCommandTest {
 
 	@Override
 	protected String getCommandName() {

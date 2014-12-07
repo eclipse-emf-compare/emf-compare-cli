@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author <a href="mailto:axel.richard@obeo.fr">Axel Richardy</a>
  */
 @SuppressWarnings("nls")
-public class PullArgumentsTest extends AbstractLogicalCommandTest {
+public class PullArgumentsTest extends AbstractCommandTest {
 
 	@Override
 	protected String getCommandName() {

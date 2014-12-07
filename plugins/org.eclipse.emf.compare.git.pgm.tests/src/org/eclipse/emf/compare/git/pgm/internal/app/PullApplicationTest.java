@@ -34,7 +34,7 @@ import org.junit.Test;
  * @author <a href="mailto:axel.richard@obeo.fr">Axel Richard</a>
  */
 @SuppressWarnings("nls")
-public class PullApplicationTest extends AbstractLogicalCommandApplicationTest {
+public class PullApplicationTest extends AbstractApplicationTest {
 
 	private ContextSetup contextSetup;
 
