@@ -34,7 +34,7 @@
       <unit id="org.eclipse.oomph.setup.projects.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.oomph.setup.projectset.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.oomph.setup.workingsets.feature.group" version="0.0.0"/>
-      <repository location="http://download.eclipse.org/oomph/updates"/>
+      <repository location="http://download.eclipse.org/oomph/updates/latest"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.egit.source.feature.group" version="0.0.0"/>
