@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,26 +18,24 @@ import static org.eclipse.emf.compare.git.pgm.internal.util.GitUtils.getCommitsB
 import static org.eclipse.emf.compare.git.pgm.internal.util.GitUtils.getOneLineCommitMsg;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.egit.core.op.CherryPickOperation;
-import org.eclipse.egit.core.op.RebaseOperation;
 import org.eclipse.emf.compare.git.pgm.Returns;
 import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitHandler;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DeathType;
 import org.eclipse.emf.compare.git.pgm.internal.exception.Die.DiesOn;
-import org.eclipse.jgit.api.RebaseCommand.Operation;
-import org.eclipse.jgit.api.RebaseResult;
+import org.eclipse.jgit.api.CherryPickResult;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.merge.ResolveMerger.MergeFailureReason;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.Option;
 
 /**
  * Logical cherry-pick command. <h3>Name</h3>
@@ -46,12 +44,11 @@ import org.kohsuke.args4j.Option;
  * </p>
  * <h4>Synopsis</h4>
  * <p>
- * logicalcherry-pick &lt;setup&gt; &lt;commit...&gt; [--abort] [--continue] [--quit] [--show-stack-trace]
- * [--git-dir &lt;gitDirectory&gt;]
+ * logicalcherry-pick &lt;setup&gt; &lt;commit&gt; [--show-stack-trace] [--git-dir &lt;gitDirectory&gt;]
  * </p>
  * <h4>Description</h4>
  * <p>
- * The logical cherry-pick is used to cherry-pick one or more revision using logical model.
+ * The logical cherry-pick is used to cherry-pick one revision using logical model.
  * </p>
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
@@ -59,31 +56,10 @@ import org.kohsuke.args4j.Option;
 @SuppressWarnings({"restriction", "nls" })
 public class CherryPickApplication extends AbstractLogicalApplication {
 	/**
-	 * Message to display when there is nothing to commit.
+	 * Holds {@link RevCommit} that needs to be merged.
 	 */
-	private static final String NOTING_TO_COMMIT_MESSAGE = "No changes detected" + EOL //
-			+ EOL //
-			+ "If there is nothing left to stage, chances are that something" + EOL//
-			+ "else already introduced the same changes; you might want to skip" + EOL//
-			+ "this patch using git logicalcherry-pick --quit" + EOL;
-
-	/**
-	 * Holds {@link RevCommit}s that need to be merged.
-	 */
-	@Argument(index = 2, required = false, multiValued = true, metaVar = "<commit>", usage = "Commit IDs to cherry pick.", handler = RevCommitHandler.class)
-	private List<RevCommit> commits;
-
-	/** Continue option. */
-	@Option(required = false, name = "--continue", usage = "Use this option to continue a in going cherry-pick")
-	private boolean continueOpt;
-
-	/** Abort option. */
-	@Option(required = false, name = "--abort", usage = "Use this option to abort a in going cherry-pick")
-	private boolean abortOpt;
-
-	/** Quit option. */
-	@Option(required = false, name = "--quit", usage = "Use this option to qui a in going cherry-pick")
-	private boolean quitOpt;
+	@Argument(index = 2, required = true, metaVar = "<commit>", usage = "Commit ID to cherry pick.", handler = RevCommitHandler.class)
+	private RevCommit commit;
 
 	/** Holds a reference to the HEAD before any operation. */
 	private ObjectId oldHead;
@@ -95,75 +71,38 @@ public class CherryPickApplication extends AbstractLogicalApplication {
 		} catch (RevisionSyntaxException | IOException e) {
 			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying(e.getMessage()).ready();
 		}
-		final RebaseResult result;
+		final CherryPickResult result;
 		try {
-			if (!continueOpt && !abortOpt && !quitOpt) {
-				result = startCherryPick();
-			} else {
-				result = processRebaseStep();
-			}
+			result = startCherryPick();
 			waitEgitJobs();
-			return handleRebaseResult(result);
+			return handleCherryPickResult(result);
 		} catch (CoreException | IOException e) {
 			throw new DiesOn(DeathType.ERROR).duedTo(e).displaying(e.getMessage()).ready();
 		}
 	}
 
 	/**
-	 * Processes a rebase step. This method handles one of the following option:
-	 * <ul>
-	 * <li>--continue</li>
-	 * <li>--abort</li>
-	 * <li>--quit</li>
-	 * </ul>
+	 * Starts to cherry pick commit.
 	 * 
-	 * @return {@link RebaseResult}.
-	 * @throws CoreException
-	 *             from {@link RebaseOperation#execute(org.eclipse.core.runtime.IProgressMonitor)}
-	 */
-	private RebaseResult processRebaseStep() throws CoreException {
-		final RebaseResult result;
-		// If one of the option is used then launch a rebase operation
-		final Operation op;
-		if (abortOpt) {
-			op = Operation.ABORT;
-		} else if (quitOpt) {
-			op = Operation.SKIP;
-		} else {
-			op = Operation.CONTINUE;
-		}
-		RebaseOperation rebaseOperation = new RebaseOperation(repo, op);
-		rebaseOperation.execute(new NullProgressMonitor());
-		result = rebaseOperation.getResult();
-		return result;
-	}
-
-	/**
-	 * Starts to cherry pick commits.
-	 * 
-	 * @return {@link RebaseResult}.
+	 * @return {@link CherryPickResult}.
 	 * @throws CoreException
 	 *             from {@link CherryPickOperation#execute(org.eclipse.core.runtime.IProgressMonitor)}
 	 */
-	private RebaseResult startCherryPick() throws CoreException {
-		final RebaseResult result;
-		// Cherrypick operation expects commits in reverse order. See thee
-		// org.eclipse.jgit.api.RebaseCommand.InteractiveHandler CherrypickOPeration
-		Collections.reverse(commits);
-
-		CherryPickOperation cherryPickOperation = new CherryPickOperation(repo, commits);
+	private CherryPickResult startCherryPick() throws CoreException {
+		final CherryPickResult result;
+		CherryPickOperation cherryPickOperation = new CherryPickOperation(repo, commit);
 		cherryPickOperation.execute(new NullProgressMonitor());
 		result = cherryPickOperation.getResult();
 		return result;
 	}
 
 	/**
-	 * Handles the rebase result.
+	 * Handles the cherry pick result.
 	 * <p>
 	 * It also prints a message to the user.
 	 * </p>
 	 * 
-	 * @param rebaseResult
+	 * @param cherryPickResult
 	 *            result to handle.
 	 * @return the return code of this operation.
 	 * @throws Die
@@ -171,53 +110,28 @@ public class CherryPickApplication extends AbstractLogicalApplication {
 	 * @throws IOException
 	 *             propagates JGit {@link IOException}.
 	 */
-	private Integer handleRebaseResult(RebaseResult rebaseResult) throws Die, IOException {
+	private Integer handleCherryPickResult(CherryPickResult cherryPickResult) throws Die, IOException {
 		final Integer result;
 		final String message;
 
-		switch (rebaseResult.getStatus()) {
+		switch (cherryPickResult.getStatus()) {
 			case OK:
 				result = Returns.COMPLETE.code();
 				message = getSuccessfullCherryPickMessage() + "Complete.";
 				break;
-			case FAST_FORWARD:
-				// FIXME: Test this use case again after correction of
-				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=451159
-				result = Returns.COMPLETE.code();
-				message = "Fast forward." + EOL //
-						+ getSuccessfullCherryPickMessage();
-				break;
-			case UP_TO_DATE:
-				result = Returns.COMPLETE.code();
-				message = "Up to date.";
-				break;
-			case ABORTED:
-				result = Returns.ABORTED.code();
-				message = "Aborted.";
-				break;
-			case NOTHING_TO_COMMIT:
-				result = Returns.ABORTED.code();
-				message = NOTING_TO_COMMIT_MESSAGE;
-				break;
-			case STOPPED:
-			case CONFLICTS:
+			case CONFLICTING:
 				// FIXME write the conflict commit message is .git/COMMIT_MSG and propose to the user to
 				// modify it
 				result = Returns.ABORTED.code();
-				message = getConflictMessage(rebaseResult.getConflicts(), rebaseResult.getCurrentCommit());
+				message = getConflictMessage(cherryPickResult.getFailingPaths());
 				break;
 			case FAILED:
 				result = Returns.ERROR.code();
 				message = "failed";
 				break;
-			case UNCOMMITTED_CHANGES:// Should never happen since a validation is done before
-				// Should never ever happen during cherry pick
-			case INTERACTIVE_PREPARED:
-			case STASH_APPLY_CONFLICTS:
-			case EDIT:
 			default:
 				throw new DiesOn(DeathType.ERROR).displaying(
-						"Invalid rebase result:" + rebaseResult.getStatus()).ready();
+						"Invalid rebase result:" + cherryPickResult.getStatus()).ready();
 		}
 		System.out.println(message);
 		return result;
@@ -227,40 +141,33 @@ public class CherryPickApplication extends AbstractLogicalApplication {
 	 * Gets the message to display in case the rebase result is a
 	 * {@link org.eclipse.jgit.api.RebaseResult.Status#CONFLICTS}.
 	 * 
-	 * @param conflictingFiles
-	 *            List of conflicting files.
-	 * @param currentCommit
-	 *            {@link RevCommit} where the rebase has stopped.
+	 * @param failingPaths
+	 *            List of failing paths
 	 * @return the message to display.
 	 * @throws IOException
 	 *             propagates JGIt exception.
 	 */
-	private String getConflictMessage(List<String> conflictingFiles, RevCommit currentCommit)
-			throws IOException {
+	private String getConflictMessage(Map<String, MergeFailureReason> failingPaths) throws IOException {
 		StringBuilder messageBuilder = new StringBuilder();
-		messageBuilder.append(getSuccessfullCherryPickMessage());
 
-		// Displays the list on conflicting files
-		if (conflictingFiles != null && !conflictingFiles.isEmpty()) {
+		// Displays the conflicting files
+		if (failingPaths != null && !failingPaths.isEmpty()) {
 			messageBuilder.append("error: There is some conflicts on the following files:").append(EOL);
-			for (String conflictingFile : conflictingFiles) {
+			for (String conflictingFile : failingPaths.keySet()) {
 				messageBuilder.append(conflictingFile);
 			}
 		}
 
 		// Prints the hint message to the user
-		if (currentCommit != null) {
-			String id = currentCommit.abbreviate(SHORT_REV_COMMIT_ID_LENGTH).name();
-			String cmMsg = currentCommit.getShortMessage();
+		if (commit != null) {
+			String id = commit.abbreviate(SHORT_REV_COMMIT_ID_LENGTH).name();
+			String cmMsg = commit.getShortMessage();
 			String msg = "error: Could not apply [" + id + "]... " + cmMsg + EOL;
 			msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
 			msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
 			msg += "hint: by adding them to the index (Team > Add to index) or" + EOL;
 			msg += "hint: by removing them from the index (Team > Remove from index)." + EOL;
-			msg += "hint: Do NOT commit, use one of the following commands instead" + EOL;
-			msg += "hint:  git logicalcherry-pick --continue : to continue the cherry pick" + EOL;
-			msg += "hint:  git logicalcherry-pick --abort : to abort the cherry pick" + EOL;
-			msg += "hint:  git logicalcherry-pick --quit : to skip this commit" + EOL;
+			msg += "hint: Then DO commit." + EOL;
 
 			messageBuilder.append(msg);
 		}
@@ -269,9 +176,9 @@ public class CherryPickApplication extends AbstractLogicalApplication {
 	}
 
 	/**
-	 * Gets the message that notifies the user of new successfully cherry-picked commits.
+	 * Gets the message that notifies the user of new successfully cherry-picked commit.
 	 * 
-	 * @return the message that notifies the user of new successfully cherry-picked commits.
+	 * @return the message that notifies the user of new successfully cherry-picked commit.
 	 * @throws IOException
 	 *             propagates JGit exception.
 	 */
@@ -281,9 +188,9 @@ public class CherryPickApplication extends AbstractLogicalApplication {
 		if (successfullCommits != null && !successfullCommits.isEmpty()) {
 			final String message;
 			StringBuilder messageBuilder = new StringBuilder();
-			messageBuilder.append("The following revisions were successfully cherry-picked:").append(EOL);
-			for (RevCommit commit : successfullCommits) {
-				messageBuilder.append(TAB).append(getOneLineCommitMsg(commit)).append(EOL);
+			messageBuilder.append("The following revision was successfully cherry-picked:").append(EOL);
+			for (RevCommit successfullCommit : successfullCommits) {
+				messageBuilder.append(TAB).append(getOneLineCommitMsg(successfullCommit)).append(EOL);
 			}
 			message = messageBuilder.toString();
 			return message;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import static org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus.cre
 import static org.eclipse.emf.compare.git.pgm.internal.util.EMFCompareGitPGMUtil.EOL;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.eclipse.emf.compare.git.pgm.internal.args.RevCommitHandler;
 import org.eclipse.emf.compare.git.pgm.internal.args.ValidationStatus;
@@ -38,12 +37,11 @@ import org.kohsuke.args4j.Option;
  * </p>
  * <h4>Synopsis</h4>
  * <p>
- * logicalcherry-pick &lt;setup&gt; &lt;commit...&gt; [--abort] [--continue] [--quit] [--show-stack-trace]
- * [--git-dir &lt;gitDirectory&gt;]
+ * logicalcherry-pick &lt;setup&gt; &lt;commit&gt; [--show-stack-trace] [--git-dir &lt;gitDirectory&gt;]
  * </p>
  * <h4>Description</h4>
  * <p>
- * The logical cherry-pick is used to cherry-pick one or more revision using logical model.
+ * The logical cherry-pick is used to cherry-pick one revision using logical model.
  * </p>
  * 
  * @author <a href="mailto:arthur.daussy@obeo.fr">Arthur Daussy</a>
@@ -68,21 +66,9 @@ public class CherryPickCommand extends AbstractLogicalCommand {
 	/** Tab character. */
 	private static final String TAB = "\t"; //$NON-NLS-1$
 
-	/** Holds the {@link RevCommit}s that need to be merged. */
-	@Argument(index = 1, required = false, multiValued = true, metaVar = "<commit>", usage = "Commit IDs to cherry pick.", handler = RevCommitHandler.class)
-	private List<RevCommit> commits;
-
-	/** Continue options. */
-	@Option(required = false, name = CONTINUE_OPT, usage = "Use this option to continue a in going cherry-pick")
-	private boolean continueOpt;
-
-	/** Abort option. */
-	@Option(required = false, name = ABORT_OPT, usage = "Use this option to abort a in going cherry-pick")
-	private boolean abortOpt;
-
-	/** Quit option. */
-	@Option(required = false, name = QUIT_OPT, usage = "Use this option to quit a in going cherry-pick")
-	private boolean quitOpt;
+	/** Holds the {@link RevCommit} that needs to be merged. */
+	@Argument(index = 1, required = true, metaVar = "<commit>", usage = "Commit ID to cherry pick.", handler = RevCommitHandler.class)
+	private RevCommit commit;
 
 	/** Option debug. */
 	@Option(name = "--debug", usage = "Launches the provisionned eclipse in debug mode.", aliases = {"-d" })
@@ -110,17 +96,7 @@ public class CherryPickCommand extends AbstractLogicalCommand {
 				.setRepositoryPath(getRepository().getDirectory().getAbsolutePath())
 				.showStackTrace(isShowStackTrace());
 		//@formatter:on
-		if (continueOpt) {
-			launcher.addAttribute(CONTINUE_OPT);
-		} else if (abortOpt) {
-			launcher.addAttribute(ABORT_OPT);
-		} else if (quitOpt) {
-			launcher.addAttribute(QUIT_OPT);
-		} else {
-			for (RevCommit revCommit : commits) {
-				launcher.addAttribute(revCommit.getName());
-			}
-		}
+		launcher.addAttribute(commit.getName());
 
 		return launcher.launch();
 
@@ -144,11 +120,8 @@ public class CherryPickCommand extends AbstractLogicalCommand {
 	 */
 	private ValidationStatus checkStartingCherryPickArguments() {
 		final ValidationStatus result;
-		boolean oneOptionSet = abortOpt || quitOpt || continueOpt;
-		boolean commitsProvided = commits != null && !commits.isEmpty();
-		if (oneOptionSet) {
-			result = createErrorStatus("No current cherry-picking.");
-		} else if (!commitsProvided) {
+		boolean commitsProvided = commit != null;
+		if (!commitsProvided) {
 			result = createErrorStatusWithUsage("Argument \"<commit>\" is required");
 		} else {
 			try {
@@ -185,24 +158,17 @@ public class CherryPickCommand extends AbstractLogicalCommand {
 	 */
 	private ValidationStatus checkRebasingCherryPickArgs() {
 		final ValidationStatus result;
-		boolean oneOptionSet = abortOpt || quitOpt || continueOpt;
-		boolean commitsProvided = commits != null && !commits.isEmpty();
-		if (!oneOptionSet || commitsProvided) {
-			String msg = "We are currently cherry-picking commits. Please use one of the following options:"
+		boolean commitsProvided = commit != null;
+		if (commitsProvided) {
+			String msg = "We are currently cherry-picking commit. Please use one of the following options:"
 					+ EOL;
 			msg += TAB + CONTINUE_OPT + EOL;
 			msg += TAB + ABORT_OPT + EOL;
 			msg += TAB + QUIT_OPT + EOL;
 			result = createErrorStatus(msg);
-		} else if (abortOpt && continueOpt) {
-			result = createErrorStatus("logical cherry-pick: --continue cannot be used with --abort");
-		} else if (quitOpt && continueOpt) {
-			result = createErrorStatus("logical cherry-pick: --quit cannot be used with --continue");
-		} else if (quitOpt && abortOpt) {
-			result = createErrorStatus("logical cherry-pick: --quit cannot be used with --abort");
 		} else {
 			RepositoryState state = getRepository().getRepositoryState();
-			if (continueOpt && state == RepositoryState.REBASING_MERGE) {
+			if (state == RepositoryState.REBASING_MERGE) {
 				StringBuilder msgBuilder = new StringBuilder();
 				Status status;
 				try {
