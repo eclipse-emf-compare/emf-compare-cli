@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,7 +80,7 @@ import org.eclipse.oomph.setup.Trigger;
 import org.eclipse.oomph.setup.internal.core.SetupContext;
 import org.eclipse.oomph.setup.internal.core.SetupTaskPerformer;
 import org.eclipse.oomph.setup.internal.core.util.ECFURIHandlerImpl;
-import org.eclipse.oomph.setup.internal.core.util.SetupUtil;
+import org.eclipse.oomph.setup.internal.core.util.SetupCoreUtil;
 import org.eclipse.oomph.setup.projects.ProjectsFactory;
 import org.eclipse.oomph.setup.projects.ProjectsImportTask;
 import org.eclipse.oomph.util.Confirmer;
@@ -205,7 +205,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		ComposedAdapterFactory adapterFactory = new ComposedAdapterFactory(BaseEditUtil
 				.createAdapterFactory());
 
-		ResourceSet rs = SetupUtil.createResourceSet();
+		ResourceSet rs = SetupCoreUtil.createResourceSet();
 		rs.eAdapters().add(
 				new AdapterFactoryEditingDomain.EditingDomainProvider(new AdapterFactoryEditingDomain(
 						adapterFactory, null, rs)));
@@ -218,7 +218,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 		Project startupSetupProject = (Project)EcoreUtil.getObjectByType(startupSetupResource.getContents(),
 				SetupPackage.Literals.PROJECT);
 
-		SetupContext setupContext = SetupContext.createInstallationAndUser(rs);
+		SetupContext setupContext = SetupContext.create(rs);
 		// CHECKSTYLE.OFF: IllegalCatch - No choice since Oomph launch such an exception. We want to handle
 		// exception ourself
 		try {
@@ -237,7 +237,7 @@ public abstract class AbstractLogicalApplication implements IApplication {
 
 			handleImportProjects(startupSetupProject, performerStartup);
 
-			performerStartup.perform();
+			performerStartup.perform(new NullProgressMonitor());
 
 			validatePerform(performerStartup);
 

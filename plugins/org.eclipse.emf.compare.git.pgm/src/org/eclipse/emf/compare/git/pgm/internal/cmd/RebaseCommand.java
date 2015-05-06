@@ -34,7 +34,7 @@ import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryState;
-import org.eclipse.oomph.setup.util.OS;
+import org.eclipse.oomph.util.OS;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 

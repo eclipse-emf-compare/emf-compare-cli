@@ -47,7 +47,7 @@ public class MergeIntegrationTest extends AbstractIntegrationTest {
 	@Override
 	protected IApplication buildApp() {
 		return new LogicalApp(URI.createURI(
-				"platform:/fragment/org.eclipse.emf.compare.git.pgm.tests/model/lunaIntegrationTest.setup",
+				"platform:/fragment/org.eclipse.emf.compare.git.pgm.tests/model/marsIntegrationTest.setup",
 				false));
 	}
 

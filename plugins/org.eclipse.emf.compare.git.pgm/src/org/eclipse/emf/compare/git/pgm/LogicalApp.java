@@ -88,7 +88,7 @@ public class LogicalApp implements IApplication {
 	 * Default constructor.
 	 */
 	public LogicalApp() {
-		this(URI.createPlatformPluginURI("/org.eclipse.emf.compare.git.pgm/model/luna.setup", true)); //$NON-NLS-1$
+		this(URI.createPlatformPluginURI("/org.eclipse.emf.compare.git.pgm/model/mars.setup", true)); //$NON-NLS-1$
 	}
 
 	/**

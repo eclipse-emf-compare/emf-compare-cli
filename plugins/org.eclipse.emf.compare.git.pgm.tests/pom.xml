@@ -137,7 +137,7 @@
 					</includes>
 					<systemProperties>
 						<!-- Point to the location to the newly created update. This property 
-							is need for the model/lunaIntegrationTest.setup -->
+							is need for the model/marsIntegrationTest.setup -->
 						<emfcompare-git-pgm--updatesite>${project.baseUri}../../packaging/org.eclipse.emf.compare.git.pgm.update/target/repository/</emfcompare-git-pgm--updatesite>
 					</systemProperties>
 

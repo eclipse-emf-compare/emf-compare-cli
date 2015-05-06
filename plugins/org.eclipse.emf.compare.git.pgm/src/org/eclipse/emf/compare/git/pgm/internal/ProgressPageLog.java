@@ -96,4 +96,14 @@ public class ProgressPageLog implements ProgressLog {
 
 	}
 
+	public void log(String line, Severity severity) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void log(String line, boolean filter, Severity severity) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

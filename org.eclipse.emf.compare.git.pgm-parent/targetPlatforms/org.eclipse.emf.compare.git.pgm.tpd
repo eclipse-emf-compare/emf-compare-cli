@@ -2,27 +2,21 @@ target "EMF Compare Git PGM target platform"
 
 with source requirements
 
-location "http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest/" {
+location "http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/" {
+	org.eclipse.egit.feature.group lazy
+}
+
+location "http://download.eclipse.org/modeling/emf/compare/updates/logical/emf.compare/nightly/latest/" {
 	org.eclipse.emf.compare.rcp.ui.feature.group lazy
 	org.eclipse.emf.compare.ide.ui.feature.group lazy
 	org.eclipse.emf.compare.uml2.feature.group lazy
 	org.eclipse.emf.compare.diagram.gmf.feature.group lazy
 	org.eclipse.emf.compare.diagram.papyrus.feature.group lazy
+	org.eclipse.emf.compare.egit.feature.group lazy
 }
 
-location "http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/luna" {
-	org.eclipse.papyrus.sdk.feature.feature.group lazy
-}
-
-location "http://download.eclipse.org/releases/luna" {
-	org.eclipse.platform.sdk lazy
-	org.eclipse.emf.sdk.feature.group lazy
-	org.eclipse.emf.transaction.sdk.feature.group lazy
-	org.eclipse.uml2.feature.group lazy
-	org.eclipse.gmf.runtime.notation.sdk.feature.group lazy	
-}
-
-location "http://download.eclipse.org/oomph/updates/release" {
+location "http://download.eclipse.org/oomph/updates" { //nightly
+//location "http://download.eclipse.org/oomph/updates/release" { 1.0.0 release
 	org.eclipse.oomph.util lazy
 	org.eclipse.oomph.p2.feature.group lazy
 	org.eclipse.oomph.preferences.feature.group lazy
@@ -33,11 +27,6 @@ location "http://download.eclipse.org/oomph/updates/release" {
 	org.eclipse.oomph.setup.projects.feature.group lazy
 	org.eclipse.oomph.setup.projectset.feature.group lazy
 	org.eclipse.oomph.setup.workingsets.feature.group lazy
-}
-
-location "http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/" {
-	org.eclipse.egit.source.feature.group lazy
-	org.eclipse.egit.feature.group lazy
 }
 
 location "http://download.eclipse.org/cbi/updates/license" {
@@ -53,4 +42,12 @@ location "http://download.eclipse.org/tools/orbit/downloads/drops/R2014052502125
 	org.apache.commons.compress
 	org.kohsuke.args4j
 	/* Egit/Jgit */
+}
+
+location "http://download.eclipse.org/releases/mars/201505081000" {
+	org.eclipse.platform.sdk lazy
+	org.eclipse.emf.sdk.feature.group lazy
+	org.eclipse.emf.transaction.sdk.feature.group lazy
+	org.eclipse.uml2.feature.group lazy
+	org.eclipse.gmf.runtime.notation.sdk.feature.group lazy	
 }

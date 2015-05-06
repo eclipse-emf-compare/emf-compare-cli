@@ -42,7 +42,7 @@ public class DiffIntegrationTest extends AbstractIntegrationTest {
 	@Override
 	protected IApplication buildApp() {
 		return new LogicalApp(URI.createURI(
-				"platform:/fragment/org.eclipse.emf.compare.git.pgm.tests/model/lunaIntegrationTest.setup",
+				"platform:/fragment/org.eclipse.emf.compare.git.pgm.tests/model/marsIntegrationTest.setup",
 				false));
 	}
 
@@ -63,8 +63,8 @@ public class DiffIntegrationTest extends AbstractIntegrationTest {
 		addAllAndCommit("First commit");
 
 		// No reference
-		getContext().addArg(DiffCommand.LOGICAL_DIFF_CMD_NAME, newSetupFile.getAbsolutePath(),
-				"master", "master");
+		getContext().addArg(DiffCommand.LOGICAL_DIFF_CMD_NAME, newSetupFile.getAbsolutePath(), "master",
+				"master");
 		Object result = getApp().start(getContext());
 
 		printOut();

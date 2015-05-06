@@ -35,6 +35,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.compare.git.pgm.Returns;
@@ -77,11 +78,11 @@ import org.eclipse.oomph.setup.WorkspaceTask;
 import org.eclipse.oomph.setup.internal.core.SetupContext;
 import org.eclipse.oomph.setup.internal.core.SetupTaskPerformer;
 import org.eclipse.oomph.setup.internal.core.util.ECFURIHandlerImpl;
-import org.eclipse.oomph.setup.internal.core.util.SetupUtil;
+import org.eclipse.oomph.setup.internal.core.util.SetupCoreUtil;
 import org.eclipse.oomph.setup.log.ProgressLog;
 import org.eclipse.oomph.setup.p2.P2Task;
-import org.eclipse.oomph.setup.util.OS;
 import org.eclipse.oomph.util.Confirmer;
+import org.eclipse.oomph.util.OS;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
@@ -248,7 +249,7 @@ public abstract class AbstractLogicalCommand {
 			try {
 				// Loads eclipse environment setup model.
 				performer = createSetupTaskPerformer(setupFile.getAbsolutePath(), environmentSetupURI);
-				performer.perform();
+				performer.perform(new NullProgressMonitor());
 
 				if (!performer.hasSuccessfullyPerformed()) {
 					throw new DiesOn(DeathType.FATAL).displaying("Error during Oomph operation").ready();
@@ -448,7 +449,7 @@ public abstract class AbstractLogicalCommand {
 		ComposedAdapterFactory adapterFactory = new ComposedAdapterFactory(BaseEditUtil
 				.createAdapterFactory());
 
-		ResourceSet rs = SetupUtil.createResourceSet();
+		ResourceSet rs = SetupCoreUtil.createResourceSet();
 		rs.eAdapters().add(
 				new AdapterFactoryEditingDomain.EditingDomainProvider(new AdapterFactoryEditingDomain(
 						adapterFactory, null, rs)));

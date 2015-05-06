@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -112,9 +112,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 		runRebase(Returns.COMPLETE, "branch_b", "branch_d");
 
 		//@formatter:off
-		String expected = "Switched to branch 'refs/heads/branch_d'" + EOL;
-		expected += EOL;
-		expected +="Has rewinded head to replay your work on top of.." + EOL;
+		String expected ="Has rewinded head to replay your work on top of.." + EOL;
 		expected += "Applied ["+getShortId("HEAD")+"] Creates P1. Moves C1 and Int1 to P1.+ Modifies in.txt & out.txt" + EOL;
 		expected += "Applied ["+getShortId("HEAD~1")+"] Creates Int1 + Modifies in.txt & out.txt" + EOL +EOL;
 		//@formatter:on
@@ -167,9 +165,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 		runRebase(Returns.COMPLETE, "branch_b", "branch_d");
 
 		//@formatter:off
-		String expected = "Switched to branch 'refs/heads/branch_d'" + EOL;
-		expected += EOL;
-		expected +="Has rewinded head to replay your work on top of.." + EOL;
+		String expected ="Has rewinded head to replay your work on top of.." + EOL;
 		expected += "Applied ["+getShortId("HEAD")+"] Creates P1. Moves C1 and Int1 to P1.+ Modifies in.txt & out.txt" + EOL;
 		expected += "Applied ["+getShortId("HEAD~1")+"] Creates Int1 + Modifies in.txt & out.txt" + EOL +EOL;
 		//@formatter:on
@@ -375,8 +371,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 
 		runContinue(Returns.COMPLETE);
 
-		msg = "Importing project REB001" + EOL;
-		msg += "Applied [" + getShortId("HEAD") + "] Deletes C1 + Modifies in.txt & out.txt" + EOL + EOL;
+		msg = "Applied [" + getShortId("HEAD") + "] Deletes C1 + Modifies in.txt & out.txt" + EOL + EOL;
 
 		assertOutputMessageEnd(msg);
 
@@ -424,8 +419,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 
 		runAbort(Returns.COMPLETE);
 
-		msg = "Importing project REB001" + EOL;
-		msg += "Aborted." + EOL + EOL;
+		msg = "Aborted." + EOL + EOL;
 
 		assertOutputMessageEnd(msg);
 
@@ -471,10 +465,6 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 				projectPath.resolve("model.notation"));
 
 		runSkip(Returns.COMPLETE);
-
-		msg = "Importing project REB001" + EOL + EOL;
-
-		assertOutputMessageEnd(msg);
 
 		assertLog("Creates ATTR1 in C1 + Modifies in.txt & out.txt",//
 				"Creates C1 + Creates in.txt & out.txt");
@@ -533,8 +523,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 		runContinue(Returns.ABORTED);
 
 		//@formatter:off
-		msg = "Importing project REB002" + EOL;
-		msg += "Applied [" + getShortId("HEAD") + "] Deletes C1 + Modifies in.txt & out.txt" + EOL;
+		msg = "Applied [" + getShortId("HEAD") + "] Deletes C1 + Modifies in.txt & out.txt" + EOL;
 		msg += "error: Could not apply [" + getShortId("branch_d")+ "] Deletes C2 + Modifies in.txt & out.txt" + EOL;
 		msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
 		msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
@@ -616,8 +605,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 
 		runAbort(Returns.COMPLETE);
 
-		msg = "Importing project REB002" + EOL;
-		msg += "Aborted." + EOL + EOL;
+		msg = "Aborted." + EOL + EOL;
 
 		assertOutputMessageEnd(msg);
 
@@ -666,8 +654,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 		runSkip(Returns.ABORTED);
 
 		//@formatter:off
-		msg = "Importing project REB002" + EOL;
-		msg += "error: Could not apply [" + getShortId("branch_d")+ "] Deletes C2 + Modifies in.txt & out.txt" + EOL;
+		msg = "error: Could not apply [" + getShortId("branch_d")+ "] Deletes C2 + Modifies in.txt & out.txt" + EOL;
 		msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
 		msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
 		msg += "hint: by adding them to the index (Team > Add to index) or" + EOL;
@@ -868,8 +855,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 
 		runContinue(Returns.ABORTED);
 
-		msg = "Importing project REB009" + EOL;
-		msg += "Applied [" + getShortId("HEAD") + "] Deletes C1 (Deletes Class1.uml)" + EOL;
+		msg = "Applied [" + getShortId("HEAD") + "] Deletes C1 (Deletes Class1.uml)" + EOL;
 		msg += "error: Could not apply [" + getShortId("branch_d") + "] Deletes C2" + EOL;
 		msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
 		msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
@@ -899,8 +885,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 
 		runContinue(Returns.COMPLETE);
 
-		msg = "Importing project REB009" + EOL;
-		msg += "Applied [" + getShortId("HEAD") + "] Deletes C2" + EOL + EOL;
+		msg = "Applied [" + getShortId("HEAD") + "] Deletes C2" + EOL + EOL;
 
 		assertOutputMessageEnd(msg);
 
@@ -978,8 +963,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 
 		runSkip(Returns.ABORTED);
 
-		msg = "Importing project REB009" + EOL;
-		msg += "error: Could not apply [" + getShortId("branch_d") + "] Deletes C2" + EOL;
+		msg = "error: Could not apply [" + getShortId("branch_d") + "] Deletes C2" + EOL;
 		msg += "hint: to resolve the conflict use git logicalmergetool command." + EOL;
 		msg += "hint: After resolving the conflicts, mark the corrected paths" + EOL;
 		msg += "hint: by adding them to the index (Team > Add to index) or" + EOL;
@@ -991,8 +975,8 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 		assertOutputMessageEnd(msg);
 
 		// Checks that the expected file are marked as conflicting
-		assertEquals(Sets.newHashSet("REB009/model.uml", "REB009/model.notation", "REB009/Class1.uml"),
-				getGit().status().call().getConflicting());
+		assertEquals(Sets.newHashSet("REB009/model.uml", "REB009/model.notation", "REB009/Class1.notation",
+				"REB009/Class1.di", "REB009/Class1.uml"), getGit().status().call().getConflicting());
 		// Checks that the model files were not corrupted by <<< and >>> markers.
 		assertNoConflitMarker(projectPath.resolve("model.uml"), //
 				projectPath.resolve("model.notation"),//
@@ -1012,8 +996,7 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 
 		runContinue(Returns.COMPLETE);
 
-		msg = "Importing project REB009" + EOL + EOL;
-		msg += "Applied [" + getShortId("HEAD") + "] Deletes C2" + EOL + EOL;
+		msg = "Applied [" + getShortId("HEAD") + "] Deletes C2" + EOL + EOL;
 
 		assertLog("Deletes C2",//
 				"Creates Attr1 in C1 (Class1.uml) + Creates Attr2 in C2 (model.uml)",//

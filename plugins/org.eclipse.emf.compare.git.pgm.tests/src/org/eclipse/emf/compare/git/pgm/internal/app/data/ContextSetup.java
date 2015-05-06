@@ -115,15 +115,17 @@ public class ContextSetup {
 				.setInstallationLocation(oomphFolderPath.toString())
 				.setWorkspaceLocation(getWorkspaceLocation().getAbsolutePath())
 				.setProjectPaths(Arrays.stream(projects).map(p -> p.getAbsolutePath()).toArray(String[]::new))
-				.setRepositories("http://download.eclipse.org/releases/luna/201409261001",
-						"http://download.eclipse.org/modeling/emf/compare/updates/nightly/latest/",
-						"http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/luna")
+				.setRepositories("http://download.eclipse.org/releases/mars/201505081000",
+						"http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/",
+						"http://download.eclipse.org/modeling/emf/compare/updates/logical/emf.compare/nightly/latest/",
+						"http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/mars")
 				.setRequirements("org.eclipse.uml2.feature.group",
 						"org.eclipse.papyrus.sdk.feature.feature.group",
 						"org.eclipse.emf.compare.rcp.ui.feature.group",
 						"org.eclipse.emf.compare.uml2.feature.group",
 						"org.eclipse.emf.compare.diagram.gmf.feature.group",
-						"org.eclipse.emf.compare.diagram.papyrus.feature.group")
+						"org.eclipse.emf.compare.diagram.papyrus.feature.group",
+						"org.eclipse.emf.compare.egit.feature.group")
 				.saveTo(setupFilePath.toString());
 		//@formatter:on
 		return model;
