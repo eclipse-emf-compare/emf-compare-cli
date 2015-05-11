@@ -116,7 +116,6 @@ public class ContextSetup {
 				.setWorkspaceLocation(getWorkspaceLocation().getAbsolutePath())
 				.setProjectPaths(Arrays.stream(projects).map(p -> p.getAbsolutePath()).toArray(String[]::new))
 				.setRepositories("http://download.eclipse.org/releases/mars/201505081000",
-						"http://download.eclipse.org/modeling/emf/compare/updates/egit-logical/nightly/",
 						"http://download.eclipse.org/modeling/emf/compare/updates/logical/emf.compare/nightly/latest/",
 						"http://download.eclipse.org/modeling/mdt/papyrus/updates/nightly/mars")
 				.setRequirements("org.eclipse.uml2.feature.group",
@@ -124,8 +123,7 @@ public class ContextSetup {
 						"org.eclipse.emf.compare.rcp.ui.feature.group",
 						"org.eclipse.emf.compare.uml2.feature.group",
 						"org.eclipse.emf.compare.diagram.gmf.feature.group",
-						"org.eclipse.emf.compare.diagram.papyrus.feature.group",
-						"org.eclipse.emf.compare.egit.feature.group")
+						"org.eclipse.emf.compare.diagram.papyrus.feature.group")
 				.saveTo(setupFilePath.toString());
 		//@formatter:on
 		return model;

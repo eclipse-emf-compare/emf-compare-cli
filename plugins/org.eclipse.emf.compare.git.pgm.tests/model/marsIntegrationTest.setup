@@ -41,6 +41,8 @@
       <requirement
           name="org.eclipse.emf.compare.ide.ui.feature.group"/>
       <requirement
+          name="org.eclipse.emf.compare.egit.feature.group"/>
+      <requirement
           name="org.kohsuke.args4j"/>
       <requirement
           name="com.google.guava"/>

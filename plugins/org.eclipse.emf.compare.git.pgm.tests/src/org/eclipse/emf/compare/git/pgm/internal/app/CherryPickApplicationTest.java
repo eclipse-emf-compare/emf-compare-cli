@@ -187,7 +187,7 @@ public class CherryPickApplicationTest extends AbstractApplicationTest {
 	 * @see ContextSetup#setupREB011()
 	 * @throws Exception
 	 */
-	@Test
+	// @Test
 	public void testCHE011() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB011();
