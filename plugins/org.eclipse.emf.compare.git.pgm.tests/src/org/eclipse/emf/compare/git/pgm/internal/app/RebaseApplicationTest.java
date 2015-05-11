@@ -991,6 +991,8 @@ public class RebaseApplicationTest extends AbstractApplicationTest {
 				.create(projectPath);
 
 		getGit().rm().addFilepattern("REB009/Class1.uml").call();
+		getGit().rm().addFilepattern("REB009/Class1.notation").call();
+		getGit().rm().addFilepattern("REB009/Class1.di").call();
 
 		getGit().add().addFilepattern(".").call();
 
