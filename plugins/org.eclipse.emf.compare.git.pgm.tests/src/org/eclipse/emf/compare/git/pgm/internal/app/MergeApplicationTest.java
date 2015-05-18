@@ -423,7 +423,7 @@ public class MergeApplicationTest extends AbstractApplicationTest {
 	 * @see ContextSetup#setupREB011()
 	 * @throws Exception
 	 */
-	// @Test
+	@Test
 	public void testMER011() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB011();

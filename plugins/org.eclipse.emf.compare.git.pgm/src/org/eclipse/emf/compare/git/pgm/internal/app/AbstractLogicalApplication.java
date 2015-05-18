@@ -318,12 +318,9 @@ public abstract class AbstractLogicalApplication implements IApplication {
 	 */
 	protected AbstractTreeIterator getTreeIterator(Repository repository, ObjectId id) throws IOException {
 		final CanonicalTreeParser p = new CanonicalTreeParser();
-		final ObjectReader or = repository.newObjectReader();
-		try {
+		try (ObjectReader or = repository.newObjectReader()) {
 			p.reset(or, new RevWalk(repository).parseTree(id));
 			return p;
-		} finally {
-			or.release();
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,8 +45,7 @@ public class RevCommitHandler extends OptionHandler<RevCommit> {
 	 * @param setter
 	 *            {@link OptionHandler#setter}
 	 */
-	public RevCommitHandler(CmdLineParser parser, OptionDef option,
-			Setter<? super ObjectId> setter) {
+	public RevCommitHandler(CmdLineParser parser, OptionDef option, Setter<? super ObjectId> setter) {
 		super(parser, option, setter);
 		Preconditions.checkArgument(parser instanceof CmdLineParserRepositoryBuilder);
 	}
@@ -68,14 +67,12 @@ public class RevCommitHandler extends OptionHandler<RevCommit> {
 			if (objectID == null) {
 				throw new ArgumentValidationError(owner, "bad revision '" + ref + "'.");
 			}
-			RevWalk revWalk = new RevWalk(repo);
-			try {
+
+			try (RevWalk revWalk = new RevWalk(repo)) {
 				RevCommit commitId = revWalk.parseCommit(objectID);
 				setter.addValue(commitId);
 			} catch (IOException e) {
 				throw new ArgumentValidationError(owner, "bad revision '" + ref + "'.");
-			} finally {
-				revWalk.release();
 			}
 
 		} catch (Die e) {

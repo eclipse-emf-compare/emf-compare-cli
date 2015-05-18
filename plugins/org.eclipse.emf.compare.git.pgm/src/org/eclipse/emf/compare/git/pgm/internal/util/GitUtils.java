@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,11 +53,9 @@ public final class GitUtils {
 	 */
 	public static List<RevCommit> getCommitsBetween(Repository repo, ObjectId from, ObjectId to)
 			throws IOException {
-		RevWalk revWak = new RevWalk(repo);
-		try {
+
+		try (RevWalk revWak = new RevWalk(repo)) {
 			return RevWalkUtils.find(revWak, revWak.parseCommit(from), revWak.parseCommit(to));
-		} finally {
-			revWak.release();
 		}
 	}
 

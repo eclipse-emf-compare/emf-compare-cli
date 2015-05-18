@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -185,14 +185,11 @@ public class RebaseApplication extends AbstractLogicalApplication {
 		if (objectId instanceof RevCommit) {
 			return (RevCommit)objectId;
 		} else {
-			RevWalk revWalk = new RevWalk(repo);
-			try {
+			try (RevWalk revWalk = new RevWalk(repo)) {
 				return revWalk.parseCommit(objectId);
 			} catch (IOException e) {
 				throw new DiesOn(DeathType.FATAL).displaying("Invalid ref " + ref.getName()).duedTo(e)
 						.ready();
-			} finally {
-				revWalk.release();
 			}
 		}
 	}

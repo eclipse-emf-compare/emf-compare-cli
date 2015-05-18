@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2015 Obeo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,14 +87,11 @@ public class RefHandler extends OptionHandler<Ref> {
 					throw new ArgumentValidationError(owner, "bad revision '" + refName + "'.");
 				}
 				// Checks that the resolved object is a RevCommit
-				RevWalk revWalk = new RevWalk(repo);
-				try {
+				try (RevWalk revWalk = new RevWalk(repo)) {
 					RevCommit commitId = revWalk.parseCommit(objectID);
 					ref = new ObjectIdRef.Unpeeled(Storage.LOOSE, commitId.getName(), commitId);
 				} catch (IOException e) {
 					throw new ArgumentValidationError(owner, "bad revision '" + refName + "'.");
-				} finally {
-					revWalk.release();
 				}
 			}
 

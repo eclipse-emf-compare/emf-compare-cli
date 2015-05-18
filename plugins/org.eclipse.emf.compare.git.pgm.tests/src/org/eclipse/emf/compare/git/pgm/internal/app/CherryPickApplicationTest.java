@@ -55,7 +55,7 @@ public class CherryPickApplicationTest extends AbstractApplicationTest {
 		contextSetup.setupCHE003();
 		runCherryPick(Returns.COMPLETE, "branch_b");
 
-		assertOutputMessageEnd(getCompleteMessage("[" + getShortId("HEAD") + "] Adds class 1"));
+		assertOutputMessageEnd("Complete." + EOL);
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class CherryPickApplicationTest extends AbstractApplicationTest {
 	 * @see ContextSetup#setupREB011()
 	 * @throws Exception
 	 */
-	// @Test
+	@Test
 	public void testCHE011() throws Exception {
 		contextSetup = new ContextSetup(getGit(), getTestTmpFolder());
 		contextSetup.setupREB011();
